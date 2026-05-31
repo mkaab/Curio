@@ -1,9 +1,11 @@
 import * as React from "react";
 import Image from "next/image";
-import { Card, CardContent } from "./Card";
+import Link from "next/link";
+import { Card, CardContent } from "@heroui/react";
 import { cn } from "../lib/utils";
 
 export interface ProductCardProps {
+  id: string;
   title: string;
   price: number;
   image: string;
@@ -11,10 +13,13 @@ export interface ProductCardProps {
   brand?: string;
   sellerName?: string;
   sellerAvatar?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: (e: React.MouseEvent) => void;
   className?: string;
 }
 
 export function ProductCard({
+  id,
   title,
   price,
   image,
@@ -22,35 +27,83 @@ export function ProductCard({
   brand,
   sellerName,
   sellerAvatar,
+  isFavorite,
+  onToggleFavorite,
   className,
 }: ProductCardProps) {
   return (
-    <div className={cn("group cursor-pointer flex flex-col space-y-2", className)}>
-      <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-neutral-warm">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:brightness-95"
-        />
-        {size && (
-          <div className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-white/95 rounded-sm text-[10px] font-bold text-text-black shadow-sm">
-            {size}
-          </div>
+    <Link href={`/item/${id}`} className="group block cursor-pointer">
+      <Card 
+        className={cn(
+          "bg-white border border-ceramic rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 shadow-sm", 
+          className
         )}
-      </div>
-      <div className="flex flex-col">
-        <span className="text-base font-bold text-text-black leading-tight">₨ {price.toLocaleString()}</span>
-        {brand && <span className="text-[11px] font-semibold text-text-black-soft uppercase tracking-wide leading-tight">{brand}</span>}
-        <h3 className="text-[13px] text-text-black-soft line-clamp-1 mt-0.5 leading-tight">{title}</h3>
-        
-        <div className="mt-2 flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className="h-4 w-4 rounded-full bg-brand-green/10 flex items-center justify-center text-[8px] font-bold text-brand-green">
-            {sellerName ? sellerName[0] : 'C'}
-          </div>
-          <span className="text-[10px] text-text-black-soft/60">{sellerName || 'Anonymous'}</span>
+      >
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-warm">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          
+          {/* Favorite Button */}
+          {onToggleFavorite && (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.preventDefault(); // prevent link navigation
+                e.stopPropagation(); // prevent card click
+                onToggleFavorite(e);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onToggleFavorite(e as any);
+                }
+              }}
+              className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-white/70 backdrop-blur-md hover:bg-white transition-all shadow-sm z-10 scale-95 group-hover:scale-100 cursor-pointer"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill={isFavorite ? "#006241" : "none"} 
+                stroke={isFavorite ? "#006241" : "currentColor"} 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={isFavorite ? "text-brand-green" : "text-text-black"}
+              >
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              </svg>
+            </div>
+          )}
+
+          {size && (
+            <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-brand-green text-white rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">
+              {size}
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+        <CardContent className="p-3 flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col">
+              <span className="text-sm font-extrabold text-text-black leading-none">₨ {price.toLocaleString()}</span>
+              <div className="text-[10px] font-semibold text-brand-green mt-1 flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>₨ {(price + 150 + Math.round(price * 0.05)).toLocaleString()} insured</span>
+              </div>
+            </div>
+            {brand && <p className="text-[10px] font-bold text-brand-green uppercase tracking-wider leading-none mt-2">{brand}</p>}
+            <h3 className="text-xs text-text-black-soft line-clamp-1 mt-1 leading-tight font-medium">{title}</h3>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

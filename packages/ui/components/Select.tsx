@@ -13,6 +13,11 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(!!props.value || !!props.defaultValue);
 
+    // Synchronize hasValue state when the select values change dynamically
+    React.useEffect(() => {
+      setHasValue(!!props.value || !!props.defaultValue);
+    }, [props.value, props.defaultValue]);
+
     const handleFocus = (e: React.FocusEvent<HTMLSelectElement>) => {
       setIsFocused(true);
       props.onFocus?.(e);

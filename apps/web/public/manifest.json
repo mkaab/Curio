@@ -1,0 +1,23 @@
+{
+  "name": "Curio Preloved Marketplace",
+  "short_name": "Curio",
+  "description": "Pakistan's premium curated preloved fashion marketplace.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f0eb",
+  "theme_color": "#006241",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

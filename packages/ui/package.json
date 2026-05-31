@@ -11,6 +11,7 @@
   "dependencies": {
     "lucide-react": "latest",
     "clsx": "latest",
-    "tailwind-merge": "latest"
+    "tailwind-merge": "latest",
+    "@heroui/react": "^3.1.0"
   }
 }

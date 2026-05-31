@@ -1,33 +1,21 @@
-import { User } from './user';
-
 export interface Listing {
-  id: string;
+  id: number;
   sellerId: string;
   title: string;
-  description?: string;
-  categoryId: number;
-  brandId: number;
+  description: string;
+  price: number;
   condition: 'new_with_tags' | 'like_new' | 'good' | 'fair';
-  size: string;
-  fabric?: string;
-  color: string[];
-  pricePkr: number;
-  originalPricePkr?: number;
-  photos: ListingPhoto[];
-  status: 'draft' | 'active' | 'sold' | 'archived';
-  views: number;
-  likes: number;
-  isBoosted: boolean;
-  boostExpiresAt?: Date;
-  city: string;
-  allowOffers: boolean;
+  category: string;
+  size?: string;
+  brand?: string;
+  images: string[];
+  status: string;
+  moderationStatus: string;
+  shareSlug?: string;
+  viewCount: number;
   createdAt: Date;
-  soldAt?: Date;
+  updatedAt: Date;
+  department: string;
+  subcategory?: string;
 }
 
-export interface ListingPhoto {
-  url: string;
-  order: number;
-  width: number;
-  height: number;
-}

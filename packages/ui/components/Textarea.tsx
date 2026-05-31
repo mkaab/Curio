@@ -13,6 +13,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(!!props.value || !!props.defaultValue);
 
+    // Synchronize hasValue state when the textarea values change dynamically
+    React.useEffect(() => {
+      setHasValue(!!props.value || !!props.defaultValue);
+    }, [props.value, props.defaultValue]);
+
     const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
       setIsFocused(true);
       props.onFocus?.(e);
@@ -28,7 +33,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       props.onChange?.(e);
     };
 
-    const isActive = isFocused || hasValue;
+    const isActive = isFocused || hasValue || !!props.placeholder;
 
     return (
       <div className="group relative w-full">

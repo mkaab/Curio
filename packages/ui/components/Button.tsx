@@ -9,7 +9,8 @@ export interface ButtonProps
     | "black"
     | "dark-outline"
     | "inverted"
-    | "outline-dark";
+    | "outline-dark"
+    | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
 }
 
@@ -22,6 +23,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       "dark-outline": "bg-transparent text-text-black border border-text-black",
       inverted: "bg-white text-accent-green border border-white",
       "outline-dark": "bg-transparent text-white border border-white",
+      ghost: "bg-transparent text-text-black border-none hover:bg-ceramic/50",
     };
 
     const sizes = {

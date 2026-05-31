@@ -13,6 +13,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [isFocused, setIsFocused] = React.useState(false);
     const [hasValue, setHasValue] = React.useState(!!props.value || !!props.defaultValue);
 
+    // Synchronize hasValue state when the parent prop values change dynamically (controlled inputs / autofill)
+    React.useEffect(() => {
+      setHasValue(!!props.value || !!props.defaultValue);
+    }, [props.value, props.defaultValue]);
+
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(true);
       props.onFocus?.(e);
@@ -28,16 +33,23 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       props.onChange?.(e);
     };
 
-    const isActive = isFocused || hasValue;
+    // Float the label if focused, has value, or has a placeholder text to prevent overlap collisions
+    const isActive = isFocused || hasValue || !!props.placeholder;
 
     return (
-      <div className="group relative w-full">
+      <div
+        className={cn(
+          "group relative w-full rounded-xl transition-colors duration-200",
+          "bg-ceramic/30 hover:bg-ceramic/50",
+          isFocused && "bg-ceramic/10 ring-2 ring-brand-green ring-offset-1"
+        )}
+      >
         <label
           className={cn(
-            "absolute left-3 transition-all duration-300 pointer-events-none select-none",
+            "absolute left-4 transition-all duration-200 pointer-events-none select-none origin-top-left",
             isActive
-              ? "top-2 text-xs font-bold text-text-black uppercase tracking-wider"
-              : "top-1/2 -translate-y-1/2 text-base text-text-black-soft"
+              ? "translate-y-2 scale-75 text-text-black font-semibold"
+              : "top-1/2 -translate-y-1/2 text-text-black-soft"
           )}
         >
           {label}
@@ -45,7 +57,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            "w-full rounded-lg border border-ceramic bg-white px-3 pb-2 pt-6 text-base text-text-black transition-all focus:border-accent-green focus:outline-none focus:ring-0 group-hover:border-accent-green/50",
+            "w-full bg-transparent px-4 pb-2 pt-6 text-base text-text-black transition-all focus:outline-none",
             className
           )}
           ref={ref}

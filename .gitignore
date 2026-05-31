@@ -1,37 +1,9 @@
-# dependencies
 node_modules
-.pnpm-store
-
-# next.js
-.next/
-out/
-
-# turbo
 .turbo
-
-# build outputs
-dist/
-build/
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
+.next
+dist
+build
+.env.local
 .env
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# logs
-logs
-*.log
+.env.*
+curio.db
