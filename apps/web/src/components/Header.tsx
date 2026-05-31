@@ -80,33 +80,6 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
   return (
     <nav className="sticky top-0 z-50 flex h-[72px] items-center justify-between bg-white px-6 md:px-10 border-b border-ceramic shadow-sm">
       <div className="flex items-center flex-1 mr-4 md:mr-8">
-        {/* Mobile Hamburger */}
-        <div className="block sm:hidden mr-3">
-          <Dropdown>
-            <DropdownTrigger>
-              <button className="p-1.5 text-text-black hover:bg-ceramic rounded-full transition-colors focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
-              </button>
-            </DropdownTrigger>
-            <DropdownPopover placement="bottom start" className="w-56 bg-white rounded-2xl shadow-2xl border border-ceramic p-2 overflow-hidden z-[100]">
-              <DropdownMenu aria-label="Mobile Navigation" className="outline-none">
-                <DropdownItem key="sell" className="font-extrabold text-brand-green mb-2 py-2" onAction={() => router.push(sellPath)}>
-                  Sell now
-                </DropdownItem>
-                {user ? (
-                   <DropdownItem key="profile" onAction={() => router.push("/profile")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">My Profile</DropdownItem>
-                ) : (
-                   <DropdownItem key="login" onAction={() => router.push("/login")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">Sign up | Log in</DropdownItem>
-                )}
-                <DropdownItem key="women" className="font-semibold py-1.5" onAction={() => router.push("/")}>Women</DropdownItem>
-                <DropdownItem key="men" className="font-semibold py-1.5" onAction={() => router.push("/")}>Men</DropdownItem>
-                <DropdownItem key="kids" className="font-semibold py-1.5" onAction={() => router.push("/")}>Kids</DropdownItem>
-                <DropdownItem key="home" className="font-semibold py-1.5" onAction={() => router.push("/")}>Home</DropdownItem>
-              </DropdownMenu>
-            </DropdownPopover>
-          </Dropdown>
-        </div>
-
         <Link href="/" className="flex items-center space-x-2 mr-4 md:mr-10 cursor-pointer">
           <div className="h-8 w-8 shrink-0 rounded-full bg-brand-green flex items-center justify-center text-white font-bold">C</div>
           <span className="text-xl font-bold text-brand-green uppercase tracking-wider hidden sm:block">Curio</span>
@@ -129,6 +102,33 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
       </div>
 
       <div className="flex items-center space-x-4">
+        {/* Mobile Hamburger */}
+        <div className="block sm:hidden">
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="p-1.5 text-text-black hover:bg-ceramic rounded-full transition-colors focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+              </button>
+            </DropdownTrigger>
+            <DropdownPopover placement="bottom end" className="w-56 bg-white rounded-2xl shadow-2xl border border-ceramic p-2 overflow-hidden z-[100]">
+              <DropdownMenu aria-label="Mobile Navigation" className="outline-none">
+                <DropdownItem key="sell" className="font-extrabold text-brand-green mb-2 py-2" onAction={() => router.push(sellPath)}>
+                  Sell now
+                </DropdownItem>
+                {user ? (
+                   <DropdownItem key="profile" onAction={() => router.push("/profile")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">My Profile</DropdownItem>
+                ) : (
+                   <DropdownItem key="login" onAction={() => router.push("/login")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">Sign up | Log in</DropdownItem>
+                )}
+                <DropdownItem key="women" className="font-semibold py-1.5" onAction={() => router.push("/")}>Women</DropdownItem>
+                <DropdownItem key="men" className="font-semibold py-1.5" onAction={() => router.push("/")}>Men</DropdownItem>
+                <DropdownItem key="kids" className="font-semibold py-1.5" onAction={() => router.push("/")}>Kids</DropdownItem>
+                <DropdownItem key="home" className="font-semibold py-1.5" onAction={() => router.push("/")}>Home</DropdownItem>
+              </DropdownMenu>
+            </DropdownPopover>
+          </Dropdown>
+        </div>
+
         {user ? (
           <div className="hidden sm:block">
             <Dropdown>
@@ -159,25 +159,16 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
           </Dropdown>
           </div>
           ) : (
-            <>
-              <div className="hidden sm:block">
-                <Link href="/login">
-                  <Button 
-                    variant="outline" 
-                    className="border-2 border-ceramic hover:border-brand-green/30 bg-white hover:bg-neutral-warm/20 text-text-black font-extrabold rounded-full px-5 h-[38px] text-xs shadow-sm hover:shadow transition-all duration-300 cursor-pointer"
-                  >
-                    Sign up | Log in
-                  </Button>
-                </Link>
-              </div>
-              <div className="block sm:hidden">
-                <Link href="/login">
-                  <div className="h-9 w-9 rounded-full border-2 border-ceramic flex items-center justify-center text-text-black-soft bg-white hover:bg-neutral-warm/20 active:scale-95 transition-all cursor-pointer shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  </div>
-                </Link>
-              </div>
-            </>
+            <div className="hidden sm:block">
+              <Link href="/login">
+                <Button 
+                  variant="outline" 
+                  className="border-2 border-ceramic hover:border-brand-green/30 bg-white hover:bg-neutral-warm/20 text-text-black font-extrabold rounded-full px-5 h-[38px] text-xs shadow-sm hover:shadow transition-all duration-300 cursor-pointer"
+                >
+                  Sign up | Log in
+                </Button>
+              </Link>
+            </div>
           )}
 
           <div className="hidden sm:block">

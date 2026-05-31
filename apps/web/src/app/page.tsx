@@ -329,16 +329,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Sell CTA (Fixed for mobile) */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <Link href={sellPath}>
-          <Button 
-            className="bg-brand-green text-white font-bold rounded-full shadow-2xl h-14 px-10 text-lg flex items-center space-x-2 border-none"
-          >
-            <span>Sell now</span>
-          </Button>
-        </Link>
-      </div>
     </main>
   );
 }
