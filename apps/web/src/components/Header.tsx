@@ -79,8 +79,35 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
 
   return (
     <nav className="sticky top-0 z-50 flex h-[72px] items-center justify-between bg-white px-6 md:px-10 border-b border-ceramic shadow-sm">
-      <div className="flex items-center flex-1 mr-8">
-        <Link href="/" className="flex items-center space-x-2 mr-10 cursor-pointer">
+      <div className="flex items-center flex-1 mr-4 md:mr-8">
+        {/* Mobile Hamburger */}
+        <div className="block sm:hidden mr-3">
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="p-1.5 text-text-black hover:bg-ceramic rounded-full transition-colors focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+              </button>
+            </DropdownTrigger>
+            <DropdownPopover placement="bottom start" className="w-56 bg-white rounded-2xl shadow-2xl border border-ceramic p-2 overflow-hidden z-[100]">
+              <DropdownMenu aria-label="Mobile Navigation" className="outline-none">
+                <DropdownItem key="sell" className="font-extrabold text-brand-green mb-2 py-2" onAction={() => router.push(sellPath)}>
+                  Sell now
+                </DropdownItem>
+                {user ? (
+                   <DropdownItem key="profile" onAction={() => router.push("/profile")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">My Profile</DropdownItem>
+                ) : (
+                   <DropdownItem key="login" onAction={() => router.push("/login")} className="font-bold border-b border-ceramic/40 pb-3 mb-2">Sign up | Log in</DropdownItem>
+                )}
+                <DropdownItem key="women" className="font-semibold py-1.5" onAction={() => router.push("/")}>Women</DropdownItem>
+                <DropdownItem key="men" className="font-semibold py-1.5" onAction={() => router.push("/")}>Men</DropdownItem>
+                <DropdownItem key="kids" className="font-semibold py-1.5" onAction={() => router.push("/")}>Kids</DropdownItem>
+                <DropdownItem key="home" className="font-semibold py-1.5" onAction={() => router.push("/")}>Home</DropdownItem>
+              </DropdownMenu>
+            </DropdownPopover>
+          </Dropdown>
+        </div>
+
+        <Link href="/" className="flex items-center space-x-2 mr-4 md:mr-10 cursor-pointer">
           <div className="h-8 w-8 shrink-0 rounded-full bg-brand-green flex items-center justify-center text-white font-bold">C</div>
           <span className="text-xl font-bold text-brand-green uppercase tracking-wider hidden sm:block">Curio</span>
         </Link>
@@ -103,9 +130,10 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
 
       <div className="flex items-center space-x-4">
         {user ? (
-          <Dropdown>
-            <DropdownTrigger>
-              <div className="h-9 w-9 rounded-full bg-brand-green/10 flex items-center justify-center text-xs font-bold text-brand-green border border-brand-green/20 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+          <div className="hidden sm:block">
+            <Dropdown>
+              <DropdownTrigger>
+                <div className="h-9 w-9 rounded-full bg-brand-green/10 flex items-center justify-center text-xs font-bold text-brand-green border border-brand-green/20 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
                 {profile?.name ? profile.name[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : 'U')}
               </div>
             </DropdownTrigger>
@@ -129,6 +157,7 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
               </DropdownMenu>
             </DropdownPopover>
           </Dropdown>
+          </div>
           ) : (
             <>
               <div className="hidden sm:block">

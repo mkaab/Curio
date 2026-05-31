@@ -200,48 +200,96 @@ export default function Home() {
 
       {/* Seller Onboarding Banner */}
       {!user && (
-        <div className="px-6 md:px-10 py-4 animate-slide-in">
-          <section className="relative w-full h-[320px] sm:h-[280px] rounded-[24px] overflow-hidden shadow-sm group">
-            <Image
-              src="/assets/hero.png"
-              alt="Sell on Curio"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-[center_35%] transition-transform duration-1000 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
-
-            <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12">
-              <div className="max-w-md backdrop-blur-md bg-black/35 p-6 rounded-2xl border border-white/10 shadow-xl animate-slide-in">
-                <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-white uppercase bg-accent-green rounded-full shadow-md">
+        <>
+          {/* Mobile Vinted-Style Hero */}
+          <div className="block md:hidden w-full relative bg-white pb-6 animate-slide-in">
+            <div className="relative w-full h-[320px]">
+              <Image
+                src="/assets/wardrobe_hero.png"
+                alt="Sell on Curio"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-[center_35%]"
+              />
+            </div>
+            
+            <div className="px-4 -mt-16 relative z-10">
+              <div className="max-w-xl mx-auto backdrop-blur-xl bg-white/70 p-6 rounded-3xl border border-white/60 shadow-2xl animate-slide-in flex flex-col items-center text-center">
+                <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-brand-green uppercase bg-white rounded-full shadow-sm border border-brand-green/20">
                   Zero Selling Fees
                 </div>
-                <h2 className="text-2xl md:text-3xl font-extrabold mb-2 tracking-tight !text-white drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]">
-                  Turn your closet into cash.
+                <h2 className="text-2xl font-extrabold mb-3 tracking-tight text-text-black">
+                  Ready to declutter your wardrobe?
                 </h2>
-                <p className="text-xs md:text-sm mb-4 font-medium text-white/90 drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.6)] max-w-sm leading-relaxed">
+                <p className="text-xs mb-6 font-medium text-text-black-soft max-w-sm leading-relaxed">
                   Join thousands of others selling pre-loved fashion. List an item in 60 seconds and keep 100% of your profits.
                 </p>
-                <div className="flex flex-row gap-3">
-                  <Link href={sellPath}>
+                <div className="flex flex-col items-center gap-3 w-full">
+                  <Link href={sellPath} className="w-full">
                     <Button 
-                      className="bg-brand-green text-white font-bold h-11 px-6 text-sm shadow-lg shadow-brand-green/20 hover:bg-accent-green hover:shadow-xl transition-all border-none cursor-pointer"
+                      className="bg-brand-green text-white font-bold h-12 px-10 text-base shadow-lg shadow-brand-green/20 hover:bg-accent-green hover:shadow-xl transition-all border-none cursor-pointer w-full rounded-xl"
                     >
-                      Start Selling
+                      Sell now
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    className="h-11 px-6 text-sm text-white border-white hover:bg-white hover:text-text-black transition-all cursor-pointer"
-                  >
-                    How it works
-                  </Button>
+                  <Link href="/how-it-works" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="h-12 px-10 text-base font-bold text-brand-green border-2 border-brand-green hover:bg-brand-green/5 transition-all cursor-pointer w-full rounded-xl"
+                    >
+                      How it works
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+
+          {/* Desktop Original Hero */}
+          <div className="hidden md:block px-6 md:px-10 py-4 animate-slide-in">
+            <section className="relative w-full h-[320px] sm:h-[280px] rounded-[24px] overflow-hidden shadow-sm group">
+              <Image
+                src="/assets/hero.png"
+                alt="Sell on Curio"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-[center_35%] transition-transform duration-1000 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
+
+              <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12">
+                <div className="max-w-md backdrop-blur-md bg-black/35 p-6 rounded-2xl border border-white/10 shadow-xl animate-slide-in">
+                  <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-white uppercase bg-accent-green rounded-full shadow-md">
+                    Zero Selling Fees
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-extrabold mb-2 tracking-tight !text-white drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]">
+                    Turn your closet into cash.
+                  </h2>
+                  <p className="text-xs md:text-sm mb-4 font-medium text-white/90 drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.6)] max-w-sm leading-relaxed">
+                    Join thousands of others selling pre-loved fashion. List an item in 60 seconds and keep 100% of your profits.
+                  </p>
+                  <div className="flex flex-row gap-3">
+                    <Link href={sellPath}>
+                      <Button 
+                        className="bg-brand-green text-white font-bold h-11 px-6 text-sm shadow-lg shadow-brand-green/20 hover:bg-accent-green hover:shadow-xl transition-all border-none cursor-pointer"
+                      >
+                        Start Selling
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="h-11 px-6 text-sm text-white border-white hover:bg-white hover:text-text-black transition-all cursor-pointer"
+                    >
+                      How it works
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </>
       )}
 
       {/* Marketplace Grid */}
