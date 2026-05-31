@@ -181,7 +181,7 @@ export default function SellPage() {
         size: size ? size.trim() : "",
         price: parseFloat(price),
         images: photos,
-        status: "pending",
+        status: "draft",
         moderation_status: "pending",
       });
 
