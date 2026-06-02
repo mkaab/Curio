@@ -89,7 +89,7 @@ export default function Home() {
       try {
         let { data, error } = await supabase
           .from("listing")
-          .select("*, seller:user_profile!listing_seller_id_fkey(name)")
+          .select("*, seller:public_user_profiles(name)")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 

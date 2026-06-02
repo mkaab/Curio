@@ -74,7 +74,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
       try {
         let { data, error } = await supabase
           .from("listing")
-          .select("*, seller:user(name)")
+          .select("*, seller:public_user_profiles(name)")
           .eq("id", id)
           .single();
 

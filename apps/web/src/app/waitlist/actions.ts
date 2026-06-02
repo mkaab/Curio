@@ -29,13 +29,12 @@ export async function joinWaitlist(formData: FormData) {
 
 export async function getWaitlistCount() {
   const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("waitlist")
-    .select('*', { count: 'exact', head: true });
+  const { data, error } = await supabase.rpc('get_waitlist_count');
     
   if (error) {
+    console.error("Waitlist count error:", error);
     return 0;
   }
   
-  return count || 0;
+  return data || 0;
 }

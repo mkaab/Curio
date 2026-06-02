@@ -87,7 +87,7 @@ export default function ProfilePage() {
       // Fetch Favorites
       const { data: favData } = await supabase
         .from("favorite")
-        .select("listing(*, seller:user(name))")
+        .select("listing(*, seller:public_user_profiles(name))")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -119,7 +119,7 @@ export default function ProfilePage() {
       // Fetch Conversations
       const { data: convData } = await supabase
         .from("conversation")
-        .select("*, listing(title, images), buyer:user!buyer_id(name), seller:user!seller_id(name)")
+        .select("*, listing(title, images), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
         .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
         .order("last_message_at", { ascending: false });
 
@@ -130,7 +130,7 @@ export default function ProfilePage() {
       // Fetch Orders (Transactions)
       const { data: txData } = await supabase
         .from("transaction")
-        .select("*, listing(title, images, price), buyer:user!buyer_id(name), seller:user!seller_id(name)")
+        .select("*, listing(title, images, price), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
         .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
         .order("created_at", { ascending: false });
 
