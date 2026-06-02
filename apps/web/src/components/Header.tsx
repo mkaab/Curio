@@ -106,9 +106,9 @@ export function Header({ searchQuery = "", setSearchQuery, showSearch = true }: 
         <div className="block sm:hidden">
           <Dropdown>
             <DropdownTrigger>
-              <button className="p-1.5 text-text-black hover:bg-ceramic rounded-full transition-colors focus:outline-none">
+              <div role="button" tabIndex={0} className="p-1.5 text-text-black hover:bg-ceramic rounded-full transition-colors focus:outline-none cursor-pointer flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
-              </button>
+              </div>
             </DropdownTrigger>
             <DropdownPopover placement="bottom end" className="w-56 bg-white rounded-2xl shadow-2xl border border-ceramic p-2 overflow-hidden z-[100]">
               <DropdownMenu aria-label="Mobile Navigation" className="outline-none">
