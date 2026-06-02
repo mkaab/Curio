@@ -149,7 +149,7 @@ export default function WaitlistPage() {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[10%] left-[8%] md:left-[12%] w-32 h-32 md:w-56 md:h-56 opacity-80"
         >
-          <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill className="object-contain drop-shadow-2xl mix-blend-multiply" />
+          <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill quality={100} className="object-contain drop-shadow-2xl mix-blend-multiply" />
         </motion.div>
 
         {/* Sunglasses - Top Right */}
@@ -158,7 +158,7 @@ export default function WaitlistPage() {
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           className="absolute top-[25%] right-[8%] md:right-[15%] w-24 h-24 md:w-40 md:h-40 opacity-70"
         >
-          <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill className="object-contain drop-shadow-xl mix-blend-multiply" />
+          <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill quality={100} className="object-contain drop-shadow-xl mix-blend-multiply" />
         </motion.div>
 
         {/* Denim Jacket - Middle Left */}
@@ -167,7 +167,7 @@ export default function WaitlistPage() {
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           className="absolute top-[50%] left-[5%] md:left-[10%] w-32 h-32 md:w-48 md:h-48 opacity-50"
         >
-          <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill className="object-contain drop-shadow-xl mix-blend-multiply" />
+          <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill quality={100} className="object-contain drop-shadow-xl mix-blend-multiply" />
         </motion.div>
 
         {/* Handbag - Bottom Right */}
@@ -176,7 +176,7 @@ export default function WaitlistPage() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           className="absolute bottom-[10%] right-[5%] md:right-[12%] w-32 h-32 md:w-64 md:h-64 opacity-70"
         >
-          <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill className="object-contain drop-shadow-2xl mix-blend-multiply" />
+          <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill quality={100} className="object-contain drop-shadow-2xl mix-blend-multiply" />
         </motion.div>
       </div>
 

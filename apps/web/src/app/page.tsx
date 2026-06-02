@@ -209,6 +209,7 @@ export default function Home() {
                 alt="Sell on Curio"
                 fill
                 priority
+                quality={100}
                 sizes="100vw"
                 className="object-cover object-[center_35%]"
               />
@@ -254,6 +255,7 @@ export default function Home() {
                 alt="Sell on Curio"
                 fill
                 priority
+                quality={100}
                 sizes="100vw"
                 className="object-cover object-[center_35%] transition-transform duration-1000 group-hover:scale-105"
               />
