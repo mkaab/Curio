@@ -280,12 +280,14 @@ export default function Home() {
                         Start Selling
                       </Button>
                     </Link>
-                    <Button 
-                      variant="outline" 
-                      className="h-11 px-6 text-sm text-white border-white hover:bg-white hover:text-text-black transition-all cursor-pointer"
-                    >
-                      How it works
-                    </Button>
+                    <Link href="/how-it-works">
+                      <Button 
+                        variant="outline" 
+                        className="h-11 px-6 text-sm text-white border-white hover:bg-white hover:text-text-black transition-all cursor-pointer"
+                      >
+                        How it works
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>

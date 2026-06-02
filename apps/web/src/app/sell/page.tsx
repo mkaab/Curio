@@ -78,6 +78,9 @@ export default function SellPage() {
   // Form State
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [hasAcceptedGuidelines, setHasAcceptedGuidelines] = useState(false);
+  const [guidelinesCheckbox, setGuidelinesCheckbox] = useState(false);
   
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -106,7 +109,19 @@ export default function SellPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePhotoUpload = () => {
+    if (!hasAcceptedGuidelines) {
+      setShowGuidelines(true);
+      return;
+    }
     fileInputRef.current?.click();
+  };
+
+  const handleAcceptGuidelines = () => {
+    if (guidelinesCheckbox) {
+      setHasAcceptedGuidelines(true);
+      setShowGuidelines(false);
+      setTimeout(() => fileInputRef.current?.click(), 100);
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -487,6 +502,51 @@ export default function SellPage() {
           )}
         </div>
       </div>
+      
+      {/* Guidelines Modal */}
+      {showGuidelines && (
+        <div className="fixed inset-0 z-[100] bg-[#1E3932]/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl relative animate-slide-in">
+            <button onClick={() => setShowGuidelines(false)} className="absolute top-6 right-6 text-[#1E3932]/50 hover:text-[#1E3932] font-bold text-xl leading-none">✕</button>
+            <h3 className="text-2xl font-black text-[#1E3932] mb-2">Before you upload</h3>
+            <p className="text-[#1E3932]/70 text-sm mb-6 font-medium">Great photos sell 3x faster. Follow these rules.</p>
+            
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start">
+                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">1</div>
+                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Bright, natural lighting.</strong> No dark rooms or harsh flash.</p>
+              </div>
+              <div className="flex items-start">
+                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">2</div>
+                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Show all angles.</strong> Include tags, soles, and any flaws.</p>
+              </div>
+              <div className="flex items-start">
+                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">3</div>
+                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Clean background.</strong> Avoid messy beds or cluttered floors.</p>
+              </div>
+            </div>
+
+            <label className="flex items-start space-x-3 mb-8 cursor-pointer bg-[#f2f0eb] p-4 rounded-xl border border-ceramic hover:border-[#00754A]/30 transition-colors">
+              <input 
+                type="checkbox" 
+                checked={guidelinesCheckbox} 
+                onChange={(e) => setGuidelinesCheckbox(e.target.checked)} 
+                className="mt-0.5 w-5 h-5 rounded border-ceramic text-[#00754A] focus:ring-[#00754A]" 
+              />
+              <span className="text-sm font-bold text-[#1E3932] leading-tight">I promise to upload high-quality, honest photos.</span>
+            </label>
+
+            <Button 
+              variant="primary" 
+              onClick={handleAcceptGuidelines} 
+              disabled={!guidelinesCheckbox} 
+              className="w-full h-12 text-base rounded-xl font-bold"
+            >
+              Continue to Upload
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
