@@ -17,13 +17,13 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "default", ...props }, ref) => {
     const variants = {
-      primary: "bg-accent-green text-white border border-accent-green",
-      outline: "bg-transparent text-accent-green border border-accent-green",
+      primary: "bg-primary text-on-primary border border-primary",
+      outline: "bg-transparent text-primary border border-primary",
       black: "bg-black text-white border border-black",
-      "dark-outline": "bg-transparent text-text-black border border-text-black",
-      inverted: "bg-white text-accent-green border border-white",
+      "dark-outline": "bg-transparent text-on-surface border border-on-surface",
+      inverted: "bg-white text-primary border border-white",
       "outline-dark": "bg-transparent text-white border border-white",
-      ghost: "bg-transparent text-text-black border-none hover:bg-ceramic/50",
+      ghost: "bg-transparent text-on-surface border-none hover:bg-surface-container/50",
     };
 
     const sizes = {
@@ -36,7 +36,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          "inline-flex items-center justify-center rounded-pill font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-green disabled:pointer-events-none disabled:opacity-50 btn-active-scale",
+          "inline-flex items-center justify-center rounded-pill font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 btn-active-scale",
           variants[variant],
           sizes[size],
           className

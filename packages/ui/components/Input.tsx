@@ -40,16 +40,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div
         className={cn(
           "group relative w-full rounded-xl transition-colors duration-200",
-          "bg-ceramic/30 hover:bg-ceramic/50",
-          isFocused && "bg-ceramic/10 ring-2 ring-brand-green ring-offset-1"
+          "bg-surface-container/30 hover:bg-surface-container/50",
+          isFocused && "bg-surface-container/10 ring-2 ring-primary ring-offset-1"
         )}
       >
         <label
           className={cn(
             "absolute left-4 transition-all duration-200 pointer-events-none select-none origin-top-left",
             isActive
-              ? "translate-y-2 scale-75 text-text-black font-semibold"
-              : "top-1/2 -translate-y-1/2 text-text-black-soft"
+              ? "translate-y-2 scale-75 text-on-surface font-semibold"
+              : "top-1/2 -translate-y-1/2 text-surface-tint"
           )}
         >
           {label}
@@ -57,7 +57,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            "w-full bg-transparent px-4 pb-2 pt-6 text-base text-text-black transition-all focus:outline-none",
+            "w-full bg-transparent px-4 pb-2 pt-6 text-base text-on-surface transition-all focus:outline-none",
             className
           )}
           ref={ref}

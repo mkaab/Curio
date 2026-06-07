@@ -205,7 +205,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   if (!item) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white space-y-4">
-        <p className="text-lg font-bold text-text-black">Item not found.</p>
+        <p className="text-lg font-bold text-on-surface">Item not found.</p>
         <Button onClick={() => router.push("/")} variant="outline">Go Back</Button>
       </div>
     );
@@ -308,7 +308,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               </button>
             </div>
 
-            <div className="h-px bg-ceramic/60" />
+            <div className="h-px bg-surface-container/60" />
 
             {/* Vinted Properties Grid Table */}
             <div className="space-y-3">
@@ -320,33 +320,33 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 <span className="text-on-surface-variant font-semibold">Brand</span>
                 <span className="font-bold text-surface-tint hover:underline cursor-pointer">{item.brand || 'Unbranded'}</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-ceramic/40">
-                <span className="text-text-black-soft/75 font-semibold">Size</span>
-                <span className="font-extrabold text-text-black">{item.size || 'OS'}</span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-surface-container/40">
+                <span className="text-surface-tint font-semibold">Size</span>
+                <span className="font-extrabold text-on-surface">{item.size || 'OS'}</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-ceramic/40">
-                <span className="text-text-black-soft/75 font-semibold">Condition</span>
-                <span className="font-extrabold text-text-black capitalize">{item.condition?.replace(/_/g, ' ') || 'New'}</span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-surface-container/40">
+                <span className="text-surface-tint font-semibold">Condition</span>
+                <span className="font-extrabold text-on-surface capitalize">{item.condition?.replace(/_/g, ' ') || 'New'}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-text-black-soft/75 font-semibold">Location</span>
-                <span className="font-extrabold text-text-black">Pakistan</span>
+                <span className="text-surface-tint font-semibold">Location</span>
+                <span className="font-extrabold text-on-surface">Pakistan</span>
               </div>
             </div>
 
-            <div className="h-px bg-ceramic/60" />
+            <div className="h-px bg-surface-container/60" />
 
             {/* Description block */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-text-black uppercase tracking-wider">Description</h3>
-              <p className="text-xs text-text-black-soft/95 leading-relaxed whitespace-pre-wrap font-medium">{item.description}</p>
+              <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider">Description</h3>
+              <p className="text-xs text-surface-tint/95 leading-relaxed whitespace-pre-wrap font-medium">{item.description}</p>
             </div>
 
-            <div className="h-px bg-ceramic/60" />
+            <div className="h-px bg-surface-container/60" />
 
             {/* Compact Buyer Protection Info panel */}
-            <div className="bg-brand-green/[0.02] border border-brand-green/10 rounded-xl p-4 text-[10px] text-text-black-soft/80 leading-relaxed">
-              <span className="font-bold text-brand-green block mb-1">Our Buyer Protection Plan</span>
+            <div className="bg-primary/[0.02] border border-primary/10 rounded-xl p-4 text-[10px] text-surface-tint/80 leading-relaxed">
+              <span className="font-bold text-primary block mb-1">Our Buyer Protection Plan</span>
               Provides safety against fraud, ensuring full refunds if items are damaged, incorrect, or lost in transit.
             </div>
 
@@ -415,20 +415,20 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Mobile Sticky Bottom Action Bar (Only shows on mobile viewports) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-ceramic p-4 flex items-center space-x-3 z-50 md:hidden shadow-lg animate-slide-in">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-xl border-t border-surface-container p-4 flex items-center space-x-3 z-50 md:hidden shadow-lg animate-slide-in">
         {showOfferInput ? (
-          <div className="flex flex-1 items-center space-x-2 bg-white border-2 border-brand-green rounded-xl pl-4 pr-1 h-12 overflow-hidden w-full">
-            <span className="font-bold text-text-black text-sm">₨</span>
+          <div className="flex flex-1 items-center space-x-2 bg-surface border-2 border-primary rounded-xl pl-4 pr-1 h-12 overflow-hidden w-full">
+            <span className="font-bold text-on-surface text-sm">₨</span>
             <input 
               type="number" 
               value={offerAmount}
               onChange={(e) => setOfferAmount(e.target.value)}
               placeholder="0"
-              className="flex-1 w-full outline-none font-bold text-base text-text-black"
+              className="flex-1 w-full outline-none font-bold text-base text-on-surface"
               autoFocus
             />
-            <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-text-black-soft hover:bg-ceramic rounded-full">✕</Button>
-            <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-brand-green hover:bg-accent-green text-white font-extrabold h-9 rounded-lg px-4 text-xs whitespace-nowrap border-none cursor-pointer">
+            <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-surface-tint hover:bg-surface-container rounded-full">✕</Button>
+            <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-extrabold h-9 rounded-lg px-4 text-xs whitespace-nowrap border-none cursor-pointer">
               Offer
             </Button>
           </div>
@@ -437,7 +437,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <Button 
               onClick={() => handleInitiateChat('buy')} 
               isDisabled={isProcessing} 
-              className="bg-brand-green hover:bg-accent-green text-white font-extrabold h-12 flex-1 rounded-xl text-sm shadow-sm transition-all border-none cursor-pointer"
+              className="bg-primary hover:bg-primary-container text-on-primary font-extrabold h-12 flex-1 rounded-xl text-sm shadow-sm transition-all border-none cursor-pointer"
             >
               {isProcessing ? "Loading..." : "Buy Now"}
             </Button>
@@ -445,7 +445,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               onClick={() => setShowOfferInput(true)} 
               isDisabled={isProcessing} 
               variant="outline" 
-              className="border-2 border-ceramic hover:border-brand-green/30 bg-white hover:bg-neutral-warm/20 text-text-black font-extrabold h-12 flex-1 rounded-xl text-sm transition-all cursor-pointer"
+              className="border-2 border-surface-container hover:border-primary/30 bg-surface hover:bg-surface-container/20 text-on-surface font-extrabold h-12 flex-1 rounded-xl text-sm transition-all cursor-pointer"
             >
               Offer
             </Button>

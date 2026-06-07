@@ -184,8 +184,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-warm">
-        <div className="h-10 w-10 border-4 border-brand-green/20 border-t-brand-green rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-surface-dim">
+        <div className="h-10 w-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -298,8 +298,8 @@ export default function ProfilePage() {
                   const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
                     pending: { label: "Awaiting Shipment", color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
                     shipped: { label: "Shipped", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-                    delivered: { label: "Delivered", color: "text-brand-green", bg: "bg-brand-green/5 border-brand-green/20" },
-                    completed: { label: "Completed", color: "text-brand-green", bg: "bg-brand-green/10 border-brand-green/20" },
+                    delivered: { label: "Delivered", color: "text-primary", bg: "bg-primary/5 border-primary/20" },
+                    completed: { label: "Completed", color: "text-primary", bg: "bg-primary/10 border-primary/20" },
                   };
                   const sc = statusConfig[order.status] || statusConfig.pending;
 
@@ -312,31 +312,31 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-bold text-text-black truncate text-sm">{order.listing?.title}</h3>
+                            <h3 className="font-bold text-on-surface truncate text-sm">{order.listing?.title}</h3>
                             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${sc.bg} ${sc.color}`}>
                               {sc.label}
                             </span>
                           </div>
-                          <p className="text-lg font-extrabold text-brand-green">Rs {order.agreed_amount?.toLocaleString()}</p>
+                          <p className="text-lg font-extrabold text-primary">Rs {order.agreed_amount?.toLocaleString()}</p>
                           <div className="flex items-center space-x-2 mt-1">
-                            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSeller ? 'bg-orange-100 text-orange-700' : 'bg-brand-green/10 text-brand-green'}`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSeller ? 'bg-orange-100 text-orange-700' : 'bg-primary/10 text-primary'}`}>
                               {isSeller ? "Selling" : "Buying"}
                             </span>
-                            <span className="text-xs text-text-black-soft">{isSeller ? "to" : "from"} <strong>{otherName || "Curio Member"}</strong></span>
+                            <span className="text-xs text-surface-tint">{isSeller ? "to" : "from"} <strong>{otherName || "Curio Member"}</strong></span>
                           </div>
                         </div>
                       </div>
 
                       {/* Action Area */}
                       {order.status === 'pending' && isSeller && (
-                        <div className="border-t border-ceramic p-4 bg-amber-50/50">
+                        <div className="border-t border-surface-container p-4 bg-amber-50/50">
                           <div className="flex items-center gap-3 mb-3">
                             <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-700"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-text-black">Get ready to ship!</p>
-                              <p className="text-xs text-text-black-soft">Package and ship within 2 business days</p>
+                              <p className="text-sm font-bold text-on-surface">Get ready to ship!</p>
+                              <p className="text-xs text-surface-tint">Package and ship within 2 business days</p>
                             </div>
                           </div>
                           <Button
@@ -358,29 +358,29 @@ export default function ProfilePage() {
                       )}
 
                       {order.status === 'pending' && !isSeller && (
-                        <div className="border-t border-ceramic p-4 bg-amber-50/50">
+                        <div className="border-t border-surface-container p-4 bg-amber-50/50">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-700"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-text-black">Waiting for seller to ship</p>
-                              <p className="text-xs text-text-black-soft">Seller will ship within 2 business days</p>
+                              <p className="text-sm font-bold text-on-surface">Waiting for seller to ship</p>
+                              <p className="text-xs text-surface-tint">Seller will ship within 2 business days</p>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {order.status === 'shipped' && !isSeller && (
-                        <div className="border-t border-ceramic p-4 bg-blue-50/50">
+                        <div className="border-t border-surface-container p-4 bg-blue-50/50">
                           <div className="flex items-center gap-3 mb-3">
                             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700"><rect width="16" height="13" x="6" y="4" rx="2"/><path d="m22 7-7.1 3.78"/><path d="M2 8v11a2 2 0 0 0 2 2h14"/></svg>
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-text-black">Your item is on the way!</p>
+                              <p className="text-sm font-bold text-on-surface">Your item is on the way!</p>
                               {order.shipping_tracking_id && (
-                                <p className="text-xs text-text-black-soft">Tracking: <strong className="text-text-black">{order.shipping_tracking_id}</strong></p>
+                                <p className="text-xs text-surface-tint">Tracking: <strong className="text-on-surface">{order.shipping_tracking_id}</strong></p>
                               )}
                             </div>
                           </div>
@@ -399,15 +399,15 @@ export default function ProfilePage() {
                       )}
 
                       {order.status === 'shipped' && isSeller && (
-                        <div className="border-t border-ceramic p-4 bg-blue-50/50">
+                        <div className="border-t border-surface-container p-4 bg-blue-50/50">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700"><rect width="16" height="13" x="6" y="4" rx="2"/><path d="m22 7-7.1 3.78"/><path d="M2 8v11a2 2 0 0 0 2 2h14"/></svg>
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-text-black">Item shipped — waiting for delivery confirmation</p>
+                              <p className="text-sm font-bold text-on-surface">Item shipped — waiting for delivery confirmation</p>
                               {order.shipping_tracking_id && (
-                                <p className="text-xs text-text-black-soft">Tracking: <strong className="text-text-black">{order.shipping_tracking_id}</strong></p>
+                                <p className="text-xs text-surface-tint">Tracking: <strong className="text-on-surface">{order.shipping_tracking_id}</strong></p>
                               )}
                             </div>
                           </div>
@@ -415,12 +415,12 @@ export default function ProfilePage() {
                       )}
 
                       {(order.status === 'delivered' || order.status === 'completed') && (
-                        <div className="border-t border-ceramic p-4 bg-brand-green/5">
+                        <div className="border-t border-surface-container p-4 bg-primary/5">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-brand-green/10 flex items-center justify-center shrink-0">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                             </div>
-                            <p className="text-sm font-bold text-brand-green">Order complete — item delivered!</p>
+                            <p className="text-sm font-bold text-primary">Order complete — item delivered!</p>
                           </div>
                         </div>
                       )}
@@ -496,24 +496,24 @@ export default function ProfilePage() {
                        </div>
                        
                        <div className="flex-1 min-w-0">
-                         <div className="flex items-center justify-between mb-1">
-                           <h3 className="font-bold text-text-black truncate text-sm">{conv.listing?.title}</h3>
-                           <span className="text-[10px] font-bold text-text-black-soft ml-2 shrink-0">
-                             {conv.last_message_at ? new Date(conv.last_message_at).toLocaleDateString() : ''}
-                           </span>
-                         </div>
-                         <div className="flex items-center space-x-2">
-                           <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isBuyer ? 'bg-brand-green/10 text-brand-green' : 'bg-orange-100 text-orange-700'}`}>
-                             {roleTag}
-                           </span>
-                           <span className="text-xs font-bold text-text-black-soft truncate">
-                             {otherName || "Curio Member"}
-                           </span>
-                         </div>
-                         <p className="text-sm text-text-black-soft truncate mt-1.5 font-medium group-hover:text-text-black transition-colors">
-                           {conv.last_message || "No messages yet"}
-                         </p>
-                       </div>
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-bold text-on-surface truncate text-sm">{conv.listing?.title}</h3>
+                            <span className="text-[10px] font-bold text-surface-tint ml-2 shrink-0">
+                              {conv.last_message_at ? new Date(conv.last_message_at).toLocaleDateString() : ''}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isBuyer ? 'bg-primary/10 text-primary' : 'bg-orange-100 text-orange-700'}`}>
+                              {roleTag}
+                            </span>
+                            <span className="text-xs font-bold text-surface-tint truncate">
+                              {otherName || "Curio Member"}
+                            </span>
+                          </div>
+                          <p className="text-sm text-surface-tint truncate mt-1.5 font-medium group-hover:text-on-surface transition-colors">
+                            {conv.last_message || "No messages yet"}
+                          </p>
+                        </div>
                      </Link>
                    );
                  })}
@@ -533,20 +533,20 @@ export default function ProfilePage() {
             <div className="bg-surface-bright rounded-lg border border-surface-container p-6 space-y-6">
               {/* Avatar Upload */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="relative h-20 w-20 rounded-full bg-ceramic/50 border border-ceramic flex items-center justify-center overflow-hidden">
+                <div className="relative h-20 w-20 rounded-full bg-surface-container/50 border border-surface-container flex items-center justify-center overflow-hidden">
                   {editAvatar ? (
                     <Image src={editAvatar} alt="Profile" fill className="object-cover" />
                   ) : (
-                    <span className="text-2xl text-text-black-soft font-bold">{editName?.[0]?.toUpperCase() || "U"}</span>
+                    <span className="text-2xl text-surface-tint font-bold">{editName?.[0]?.toUpperCase() || "U"}</span>
                   )}
                 </div>
                 <div className="flex flex-col items-start">
                   <Button variant="outline" size="sm" onClick={handleSimulateAvatarUpload} className="mb-2 font-bold text-sm border-2">Change Picture</Button>
-                  <p className="text-xs text-text-black-soft">JPG, GIF or PNG. Max size of 800K</p>
+                  <p className="text-xs text-surface-tint">JPG, GIF or PNG. Max size of 800K</p>
                 </div>
               </div>
 
-              <div className="h-px w-full bg-ceramic/50" />
+              <div className="h-px w-full bg-surface-container/50" />
 
               <div>
                 <label className="block text-sm font-bold text-primary mb-2">Full Name</label>
@@ -594,16 +594,16 @@ export default function ProfilePage() {
       </div>
 
       {/* Bottom Nav padding for mobile */}
-      <div className="fixed bottom-0 w-full h-16 bg-white border-t border-ceramic flex items-center justify-around md:hidden z-40 pb-safe">
-        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-text-black-soft hover:text-brand-green">
+      <div className="fixed bottom-0 w-full h-16 bg-surface border-t border-surface-container flex items-center justify-around md:hidden z-40 pb-safe">
+        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-surface-tint hover:text-primary">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </Link>
-        <Link href="/sell" className="flex flex-col items-center justify-center w-full h-full text-text-black-soft hover:text-brand-green">
-          <div className="bg-brand-green text-white rounded-full p-2 shadow-lg -mt-4 border-4 border-white">
+        <Link href="/sell" className="flex flex-col items-center justify-center w-full h-full text-surface-tint hover:text-primary">
+          <div className="bg-primary text-on-primary rounded-full p-2 shadow-lg -mt-4 border-4 border-surface">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
           </div>
         </Link>
-        <div className="flex flex-col items-center justify-center w-full h-full text-brand-green">
+        <div className="flex flex-col items-center justify-center w-full h-full text-primary">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
       </div>

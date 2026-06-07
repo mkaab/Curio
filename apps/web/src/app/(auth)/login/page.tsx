@@ -73,26 +73,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white md:bg-neutral-warm px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-surface md:bg-surface-dim px-6 py-12">
       <div className="w-full max-w-[420px] animate-fade-in">
         <div className="text-center mb-10">
            <Link href="/" className="inline-flex items-center space-x-2 group cursor-pointer">
-              <div className="h-10 w-10 shrink-0 rounded-full bg-brand-green flex items-center justify-center text-white font-bold transition-transform group-hover:rotate-12 shadow-sm">C</div>
-              <span className="text-2xl font-bold text-brand-green uppercase tracking-[0.2em]">Curio</span>
+              <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold transition-transform group-hover:rotate-12 shadow-sm">C</div>
+              <span className="text-2xl font-serif font-bold text-primary uppercase tracking-[0.2em]">Curio</span>
            </Link>
         </div>
 
-        <Card className="border-none shadow-none md:shadow-2xl md:border md:border-ceramic/50 rounded-[24px]">
+        <Card className="border-none shadow-none md:shadow-2xl md:border md:border-surface-container/50 rounded-[24px]">
           <CardContent className="p-0 md:p-10">
-            <h1 className="text-2xl font-bold text-text-black text-center mb-2 tracking-tight">Log in to your account</h1>
-            <p className="text-sm text-text-black-soft text-center mb-8">Welcome back! Please enter your details.</p>
+            <h1 className="text-2xl font-serif font-bold text-on-surface text-center mb-2 tracking-tight">Log in to your account</h1>
+            <p className="text-sm text-surface-tint text-center mb-8">Welcome back! Please enter your details.</p>
 
             <Button
               type="button"
               onClick={handleGoogleLogin}
               isDisabled={loading}
               variant="outline"
-              className="w-full h-14 text-base font-semibold border-ceramic text-text-black hover:bg-neutral-warm/50 flex items-center justify-center gap-3 mb-6"
+              className="w-full h-14 text-base font-semibold border-surface-container text-on-surface hover:bg-surface-dim/50 flex items-center justify-center gap-3 mb-6"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -105,30 +105,30 @@ export default function LoginPage() {
             </Button>
 
             <div className="relative flex items-center py-5">
-              <div className="flex-grow border-t border-ceramic"></div>
-              <span className="flex-shrink-0 mx-4 text-text-black-soft text-sm">or log in with email</span>
-              <div className="flex-grow border-t border-ceramic"></div>
+              <div className="flex-grow border-t border-surface-container"></div>
+              <span className="flex-shrink-0 mx-4 text-surface-tint text-sm">or log in with email</span>
+              <div className="flex-grow border-t border-surface-container"></div>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-text-black">Email Address</label>
+                <label className="block text-sm font-bold text-on-surface">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-ceramic rounded-xl focus:ring-1 focus:ring-brand-green focus:border-brand-green outline-none text-text-black text-sm transition-all"
+                  className="w-full px-4 py-3 bg-surface border border-surface-container rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none text-on-surface text-sm transition-all"
                   required
                 />
               </div>
               
               <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-text-black">Password</label>
+                <label className="block text-sm font-bold text-on-surface">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-ceramic rounded-xl focus:ring-1 focus:ring-brand-green focus:border-brand-green outline-none text-text-black text-sm transition-all"
+                  className="w-full px-4 py-3 bg-surface border border-surface-container rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none text-on-surface text-sm transition-all"
                   required
                 />
               </div>
@@ -136,7 +136,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full h-14 text-base font-bold shadow-lg shadow-brand-green/20"
+                className="w-full h-14 text-base font-bold shadow-lg shadow-primary/20"
                 isDisabled={loading}
               >
                 {loading ? "Signing in..." : "Log In"}
@@ -146,23 +146,23 @@ export default function LoginPage() {
             {message && (
               <div className={cn(
                 "p-4 mt-6 rounded-xl text-sm font-medium text-center animate-spring",
-                message.startsWith("Error") ? "bg-red-50 text-red-600 border border-red-100" : "bg-brand-green/10 text-brand-green border border-brand-green/20"
+                message.startsWith("Error") ? "bg-red-50 text-red-600 border border-red-100" : "bg-primary/10 text-primary border border-primary/20"
               )}>
                 {message}
               </div>
             )}
 
             <div className="mt-8 text-center">
-               <p className="text-sm text-text-black-soft">
+               <p className="text-sm text-surface-tint">
                  Don&apos;t have an account?{' '}
-                 <Link href="/signup" className="text-brand-green font-bold hover:underline">
+                 <Link href="/signup" className="text-primary font-bold hover:underline">
                    Sign up
                  </Link>
                </p>
             </div>
             
-            <p className="mt-8 text-center text-xs text-text-black-soft/60 px-6 leading-relaxed">
-              By continuing, you agree to Curio&apos;s <a href="#" className="underline hover:text-brand-green">Terms of Service</a> and <a href="#" className="underline hover:text-brand-green">Privacy Policy</a>.
+            <p className="mt-8 text-center text-xs text-surface-tint/60 px-6 leading-relaxed">
+              By continuing, you agree to Curio&apos;s <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
             </p>
           </CardContent>
         </Card>

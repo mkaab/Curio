@@ -17,7 +17,7 @@ const FrapButton = React.forwardRef<HTMLButtonElement, FrapButtonProps>(
     return (
       <button
         className={cn(
-          "fixed bottom-8 right-8 z-50 flex items-center justify-center rounded-full bg-accent-green text-white shadow-frap transition-all duration-200 btn-active-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-green",
+          "fixed bottom-8 right-8 z-50 flex items-center justify-center rounded-full bg-primary text-on-primary shadow-frap transition-all duration-200 btn-active-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
           sizes[size],
           className
         )}
