@@ -186,6 +186,9 @@ export default function WaitlistPage() {
           <div className="h-10 w-10 shrink-0 rounded-full bg-[#006241] flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
           <span className="text-2xl font-bold text-[#006241] uppercase tracking-wider hidden sm:block">Curio</span>
         </Link>
+        <Link href="/how-it-works" className="text-[#006241] font-bold text-sm md:text-base hover:underline underline-offset-4 mr-4">
+          How it works
+        </Link>
       </nav>
 
       {/* Hero Section */}

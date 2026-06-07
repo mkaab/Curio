@@ -32,10 +32,10 @@ export function ProductCard({
   className,
 }: ProductCardProps) {
   return (
-    <Link href={`/item/${id}`} className="group block cursor-pointer">
+    <Link href={`/item/${id}`} className="group block cursor-pointer h-full">
       <Card 
         className={cn(
-          "bg-white border border-ceramic rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 shadow-sm", 
+          "h-full flex flex-col bg-white border border-ceramic rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 shadow-sm", 
           className
         )}
       >
@@ -90,7 +90,7 @@ export function ProductCard({
             </div>
           )}
         </div>
-        <CardContent className="p-3 flex flex-col justify-between">
+        <CardContent className="p-3 flex flex-col flex-grow justify-between">
           <div>
             <div className="flex flex-col">
               <span className="text-sm font-extrabold text-text-black leading-none">₨ {price.toLocaleString()}</span>
