@@ -198,13 +198,13 @@ export default function ProfilePage() {
     { id: "settings", label: "Settings" },
   ];
   return (
-    <main className="min-h-screen bg-neutral-warm font-sans pb-24 md:pb-12">
+    <main className="min-h-screen bg-surface font-sans pb-24 md:pb-12">
       <Header showSearch={false} />
       {/* Top Header */}
-      <div className="bg-white border-b border-ceramic">
+      <div className="bg-surface-bright border-b border-surface-container">
         <div className="max-w-6xl mx-auto px-4 md:px-10 py-6 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center space-x-4">
-            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full bg-brand-green text-white flex items-center justify-center text-2xl font-bold shadow-inner overflow-hidden">
+            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary text-on-primary flex items-center justify-center text-2xl font-bold shadow-inner overflow-hidden">
               {profile?.avatar_url || profile?.avatarUrl ? (
                 <Image src={profile.avatar_url || profile.avatarUrl} alt="Avatar" fill className="object-cover" />
               ) : (
@@ -212,8 +212,8 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-text-black tracking-tight">{profile?.name || "Curio User"}</h1>
-              <p className="text-text-black-soft text-sm mt-1">{profile?.email}</p>
+              <h1 className="text-2xl md:text-3xl font-serif font-bold text-primary tracking-tight">{profile?.name || "Curio User"}</h1>
+              <p className="text-on-surface-variant text-sm mt-1">{profile?.email}</p>
             </div>
           </div>
           
@@ -224,8 +224,8 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`whitespace-nowrap px-4 py-2 rounded-full font-bold transition-all text-sm ${
                   activeTab === tab.id
-                    ? "bg-brand-green text-white shadow-md"
-                    : "bg-ceramic/50 text-text-black-soft hover:bg-ceramic hover:text-text-black"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "bg-surface-dim text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
                 }`}
               >
                 {tab.label}
@@ -241,21 +241,21 @@ export default function ProfilePage() {
         {activeTab === "listings" && (
           <div className="animate-slide-in">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-text-black">My Listings</h2>
+              <h2 className="text-2xl font-serif font-bold text-primary">My Listings</h2>
               <Link href="/sell">
-                <Button variant="outline" size="sm" className="border-2 font-bold">Add New</Button>
+                <Button variant="outline" size="sm" className="border border-surface-container font-bold rounded">Add New</Button>
               </Link>
             </div>
             
             {listings.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-ceramic p-12 flex flex-col items-center justify-center text-center">
-                <div className="h-16 w-16 bg-ceramic/50 rounded-full flex items-center justify-center mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-black-soft"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+                <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
                 </div>
-                <h3 className="text-xl font-bold text-text-black mb-2">No listings yet</h3>
-                <p className="text-text-black-soft mb-6 max-w-sm">Start selling your preloved items to clear out your closet and earn money.</p>
+                <h3 className="text-xl font-serif font-bold text-primary mb-2">No listings yet</h3>
+                <p className="text-on-surface-variant mb-6 max-w-sm">Start selling your preloved items to clear out your closet and earn money.</p>
                 <Link href="/sell">
-                  <Button variant="primary" className="font-bold shadow-lg shadow-brand-green/20">Sell an Item</Button>
+                  <Button className="font-bold bg-primary hover:bg-primary-container text-on-primary rounded">Sell an Item</Button>
                 </Link>
               </div>
             ) : (
@@ -278,14 +278,14 @@ export default function ProfilePage() {
         {/* ORDERS TAB */}
         {activeTab === "orders" && (
           <div className="animate-slide-in">
-            <h2 className="text-2xl font-bold text-text-black mb-6">My Orders</h2>
+            <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Orders</h2>
             {ordersList.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-ceramic p-12 flex flex-col items-center justify-center text-center">
-                <div className="h-16 w-16 bg-ceramic/50 rounded-full flex items-center justify-center mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-black-soft"><path d="M21 10.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8.5"/><path d="M21 5.5v5l-9 4-9-4v-5"/><path d="m3 5.5 9-4 9 4"/></svg>
+              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+                <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M21 10.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8.5"/><path d="M21 5.5v5l-9 4-9-4v-5"/><path d="m3 5.5 9-4 9 4"/></svg>
                 </div>
-                <h3 className="text-xl font-bold text-text-black mb-2">No orders yet</h3>
-                <p className="text-text-black-soft max-w-sm">When you buy or sell items, your orders will appear here.</p>
+                <h3 className="text-xl font-serif font-bold text-primary mb-2">No orders yet</h3>
+                <p className="text-on-surface-variant max-w-sm">When you buy or sell items, your orders will appear here.</p>
               </div>
             ) : (
               <div className="flex flex-col space-y-4">
@@ -304,10 +304,10 @@ export default function ProfilePage() {
                   const sc = statusConfig[order.status] || statusConfig.pending;
 
                   return (
-                    <div key={order.id} className="bg-white border border-ceramic rounded-2xl overflow-hidden">
+                    <div key={order.id} className="bg-surface-bright border border-surface-container rounded-lg overflow-hidden">
                       {/* Order Header */}
                       <div className="flex items-center p-4 gap-4">
-                        <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-ceramic bg-ceramic/50">
+                        <div className="relative h-16 w-16 rounded overflow-hidden shrink-0 border border-surface-container bg-surface-dim">
                           <Image src={parsedImage || "/assets/hero.png"} alt="Item" fill className="object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -435,16 +435,16 @@ export default function ProfilePage() {
         {/* FAVORITES TAB */}
         {activeTab === "favorites" && (
           <div className="animate-slide-in">
-            <h2 className="text-2xl font-bold text-text-black mb-6">My Favorites</h2>
+            <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Favorites</h2>
             {favoritesList.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-ceramic p-12 flex flex-col items-center justify-center text-center">
-                 <div className="h-16 w-16 bg-ceramic/50 rounded-full flex items-center justify-center mb-4">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-black-soft"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+                 <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                  </div>
-                 <h3 className="text-xl font-bold text-text-black mb-2">Your favorites list is empty</h3>
-                 <p className="text-text-black-soft mb-6 max-w-sm">Heart items you like while browsing to save them here for later.</p>
+                 <h3 className="text-xl font-serif font-bold text-primary mb-2">Your favorites list is empty</h3>
+                 <p className="text-on-surface-variant mb-6 max-w-sm">Heart items you like while browsing to save them here for later.</p>
                  <Link href="/">
-                   <Button variant="primary" className="font-bold shadow-lg shadow-brand-green/20">Explore Items</Button>
+                   <Button className="font-bold bg-primary hover:bg-primary-container text-on-primary rounded">Explore Items</Button>
                  </Link>
               </div>
             ) : (
@@ -471,14 +471,14 @@ export default function ProfilePage() {
         {/* CHATS TAB */}
         {activeTab === "chats" && (
           <div className="animate-slide-in">
-             <h2 className="text-2xl font-bold text-text-black mb-6">My Chats</h2>
+             <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Chats</h2>
              {conversationsList.length === 0 ? (
-               <div className="bg-white rounded-3xl border border-ceramic p-12 flex flex-col items-center justify-center text-center">
-                 <div className="h-16 w-16 bg-ceramic/50 rounded-full flex items-center justify-center mb-4">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-black-soft"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+               <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+                 <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
                  </div>
-                 <h3 className="text-xl font-bold text-text-black mb-2">No messages yet</h3>
-                 <p className="text-text-black-soft max-w-sm">Conversations with buyers and sellers will appear here.</p>
+                 <h3 className="text-xl font-serif font-bold text-primary mb-2">No messages yet</h3>
+                 <p className="text-on-surface-variant max-w-sm">Conversations with buyers and sellers will appear here.</p>
                </div>
              ) : (
                <div className="flex flex-col space-y-3">
@@ -490,8 +490,8 @@ export default function ProfilePage() {
                    const parsedImage = images ? (typeof images === 'string' ? JSON.parse(images)[0] : images[0]) : "/assets/hero.png";
                    
                    return (
-                     <Link key={conv.id} href={`/chat/${conv.id}`} className="bg-white border border-ceramic rounded-2xl p-4 flex items-center hover:shadow-md transition-shadow group cursor-pointer">
-                       <div className="relative h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-ceramic bg-ceramic/50 mr-4">
+                     <Link key={conv.id} href={`/chat/${conv.id}`} className="bg-surface-bright border border-surface-container rounded-lg p-4 flex items-center hover:shadow-md transition-shadow group cursor-pointer">
+                       <div className="relative h-14 w-14 rounded overflow-hidden shrink-0 border border-surface-container bg-surface-dim mr-4">
                          <Image src={parsedImage || "/assets/hero.png"} alt="Listing" fill className="object-cover" />
                        </div>
                        
@@ -526,11 +526,11 @@ export default function ProfilePage() {
         {activeTab === "settings" && (
           <div className="max-w-2xl animate-slide-in">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-text-black">Account Settings</h2>
-              {saveMessage && <span className="text-brand-green font-bold text-sm bg-brand-green/10 px-3 py-1 rounded-full">{saveMessage}</span>}
+              <h2 className="text-2xl font-serif font-bold text-primary">Account Settings</h2>
+              {saveMessage && <span className="text-primary font-bold text-sm bg-secondary-fixed px-3 py-1 rounded-full">{saveMessage}</span>}
             </div>
             
-            <div className="bg-white rounded-3xl border border-ceramic p-6 space-y-6">
+            <div className="bg-surface-bright rounded-lg border border-surface-container p-6 space-y-6">
               {/* Avatar Upload */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="relative h-20 w-20 rounded-full bg-ceramic/50 border border-ceramic flex items-center justify-center overflow-hidden">
@@ -549,42 +549,42 @@ export default function ProfilePage() {
               <div className="h-px w-full bg-ceramic/50" />
 
               <div>
-                <label className="block text-sm font-bold text-text-black mb-2">Full Name</label>
+                <label className="block text-sm font-bold text-primary mb-2">Full Name</label>
                 <input 
                   type="text" 
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Your display name"
-                  className="w-full px-4 py-3 bg-white border-2 border-ceramic rounded-xl focus:outline-none focus:border-brand-green transition-colors"
+                  className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-black mb-2">Bio</label>
+                <label className="block text-sm font-bold text-primary mb-2">Bio</label>
                 <textarea 
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
                   placeholder="Tell buyers a little about your style..."
-                  className="w-full px-4 py-3 bg-white border-2 border-ceramic rounded-xl focus:outline-none focus:border-brand-green transition-colors min-h-[100px] resize-y"
+                  className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors min-h-[100px] resize-y"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-bold text-text-black mb-2">Email Address</label>
+                <label className="block text-sm font-bold text-primary mb-2">Email Address</label>
                 <input 
                   type="email" 
                   defaultValue={profile?.email || ""}
-                  className="w-full px-4 py-3 bg-neutral-warm border border-ceramic rounded-xl focus:outline-none focus:border-brand-green text-text-black-soft"
+                  className="w-full px-4 py-3 bg-surface-dim border border-surface-container rounded focus:outline-none text-on-surface-variant"
                   disabled
                 />
-                <p className="text-xs text-text-black-soft mt-2">Email changes currently require support assistance.</p>
+                <p className="text-xs text-on-surface-variant mt-2">Email changes currently require support assistance.</p>
               </div>
 
-              <div className="pt-6 border-t border-ceramic flex items-center justify-between">
-                <Button onClick={handleSignOut} variant="outline" className="h-12 font-bold text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300">
+              <div className="pt-6 border-t border-surface-container flex items-center justify-between">
+                <Button onClick={handleSignOut} variant="outline" className="h-12 font-bold text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 rounded">
                   Sign Out
                 </Button>
-                <Button onClick={handleSaveProfile} variant="primary" isDisabled={isSaving} className="h-12 font-bold shadow-lg shadow-brand-green/20 px-8">
+                <Button onClick={handleSaveProfile} className="h-12 font-bold bg-primary hover:bg-primary-container text-on-primary px-8 rounded">
                   {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>

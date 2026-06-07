@@ -212,7 +212,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f7f5] pb-24 md:pb-12 font-sans flex flex-col selection:bg-brand-green selection:text-white">
+    <main className="min-h-screen bg-surface pb-24 md:pb-12 font-sans flex flex-col selection:bg-primary selection:text-white">
       <div className="hidden md:block">
         <Header />
       </div>
@@ -242,11 +242,11 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
         </button>
       </div>
 
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-6 md:py-10 w-full flex-1">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 md:py-20 w-full flex-1">
 
         {/* Left Side: Image Panel with Thumbnails Selection */}
-        <div className="w-full md:w-3/5 bg-white border border-ceramic p-4 rounded-lg shadow-sm flex flex-col items-center animate-slide-in h-fit">
-          <div className="relative w-full aspect-[3/4] md:h-[500px] rounded-sm overflow-hidden bg-neutral-warm">
+        <div className="w-full md:w-3/5 bg-surface border border-surface-container p-4 rounded-lg shadow-sm flex flex-col items-center animate-slide-in h-fit">
+          <div className="relative w-full aspect-[3/4] md:h-[600px] rounded-lg overflow-hidden bg-surface-dim">
             <Image 
               src={item.parsedImages[currentImageIdx]} 
               alt={item.title} 
@@ -263,7 +263,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 <button
                   key={idx}
                   onClick={() => setCurrentImageIdx(idx)}
-                  className={`relative h-14 w-11 shrink-0 rounded-sm overflow-hidden border-2 transition-all cursor-pointer ${idx === currentImageIdx ? 'border-brand-green scale-105 shadow-sm' : 'border-ceramic hover:border-text-black-soft/50'}`}
+                  className={`relative h-14 w-11 shrink-0 rounded overflow-hidden border-2 transition-all cursor-pointer ${idx === currentImageIdx ? 'border-primary scale-105 shadow-sm' : 'border-surface-container hover:border-on-surface-variant'}`}
                 >
                   <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
                 </button>
@@ -275,14 +275,14 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
         {/* Right Side: The Unified Vinted Details Pane Card */}
         <div className="w-full md:w-2/5 flex flex-col space-y-4">
           
-          <div className="bg-white border border-ceramic p-6 rounded-lg shadow-sm space-y-5 animate-slide-in">
+          <div className="bg-surface-bright border border-surface-container p-8 rounded-lg shadow-sm space-y-6 animate-slide-in">
             
             {/* Pricing Section */}
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
-                <span className="text-3xl font-black text-text-black tracking-tight">₨ {item.price.toLocaleString()}</span>
-                <div className="text-xs font-semibold text-brand-green mt-1.5 flex items-center space-x-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span className="text-4xl font-serif font-black text-primary tracking-tight">₨ {item.price.toLocaleString()}</span>
+                <div className="text-xs font-semibold text-surface-tint mt-1.5 flex items-center space-x-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                   <span>₨ {(item.price + 150 + Math.round(item.price * 0.05)).toLocaleString()} includes Buyer Protection</span>
                 </div>
               </div>
@@ -290,15 +290,15 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               {/* Favorites heart button */}
               <button 
                 onClick={handleToggleFavorite}
-                className="h-10 w-10 flex items-center justify-center rounded-full border border-ceramic text-text-black-soft hover:text-brand-green active:scale-95 transition-all bg-white cursor-pointer shadow-sm"
+                className="h-10 w-10 flex items-center justify-center rounded border border-surface-container text-on-surface-variant hover:text-primary active:scale-95 transition-all bg-surface-bright cursor-pointer shadow-sm"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   width="18" 
                   height="18" 
                   viewBox="0 0 24 24" 
-                  fill={isFavorite ? "#006241" : "none"} 
-                  stroke={isFavorite ? "#006241" : "currentColor"} 
+                  fill={isFavorite ? "var(--color-primary)" : "none"} 
+                  stroke={isFavorite ? "var(--color-primary)" : "currentColor"} 
                   strokeWidth="2.5" 
                   strokeLinecap="round" 
                   strokeLinejoin="round"
@@ -311,14 +311,14 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <div className="h-px bg-ceramic/60" />
 
             {/* Vinted Properties Grid Table */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-ceramic/40">
-                <span className="text-text-black-soft/75 font-semibold">Title</span>
-                <span className="font-extrabold text-text-black truncate max-w-[200px]">{item.title}</span>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm pb-3 border-b border-surface-container/40">
+                <span className="text-on-surface-variant font-semibold">Title</span>
+                <span className="font-serif font-bold text-primary truncate max-w-[200px]">{item.title}</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-ceramic/40">
-                <span className="text-text-black-soft/75 font-semibold">Brand</span>
-                <span className="font-extrabold text-brand-green hover:underline cursor-pointer">{item.brand || 'Unbranded'}</span>
+              <div className="flex justify-between items-center text-sm pb-3 border-b border-surface-container/40">
+                <span className="text-on-surface-variant font-semibold">Brand</span>
+                <span className="font-bold text-surface-tint hover:underline cursor-pointer">{item.brand || 'Unbranded'}</span>
               </div>
               <div className="flex justify-between items-center text-xs pb-2 border-b border-ceramic/40">
                 <span className="text-text-black-soft/75 font-semibold">Size</span>
@@ -351,20 +351,20 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* Integrated Action Buttons */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-4">
               {showOfferInput ? (
-                <div className="flex items-center space-x-2 bg-white border-2 border-brand-green rounded-xl pl-4 pr-1 h-12 overflow-hidden w-full animate-slide-in">
-                  <span className="font-bold text-text-black text-sm">₨</span>
+                <div className="flex items-center space-x-2 bg-surface-bright border border-surface-container rounded pl-4 pr-1 h-12 overflow-hidden w-full animate-slide-in">
+                  <span className="font-bold text-on-surface text-sm">₨</span>
                   <input 
                     type="number" 
                     value={offerAmount}
                     onChange={(e) => setOfferAmount(e.target.value)}
                     placeholder="0"
-                    className="flex-1 w-full outline-none font-bold text-base text-text-black"
+                    className="flex-1 w-full outline-none font-bold text-base text-on-surface bg-transparent"
                     autoFocus
                   />
-                  <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-text-black-soft hover:bg-ceramic rounded-full">✕</Button>
-                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-brand-green hover:bg-accent-green text-white font-extrabold h-9 rounded-lg px-4 text-xs whitespace-nowrap border-none cursor-pointer">
+                  <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-on-surface-variant hover:bg-surface-container rounded-full">✕</Button>
+                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-bold h-9 rounded px-4 text-xs whitespace-nowrap border-none cursor-pointer">
                     Send Offer
                   </Button>
                 </div>
@@ -373,7 +373,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                   <Button 
                     onClick={() => handleInitiateChat('buy')} 
                     isDisabled={isProcessing} 
-                    className="bg-brand-green hover:bg-accent-green text-white font-extrabold h-12 w-full rounded-xl text-sm shadow-sm transition-all border-none cursor-pointer"
+                    className="bg-primary hover:bg-primary-container text-on-primary font-bold h-12 w-full rounded text-sm shadow-sm transition-all border-none cursor-pointer"
                   >
                     {isProcessing ? "Loading..." : "Buy Now"}
                   </Button>
@@ -381,7 +381,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     onClick={() => setShowOfferInput(true)} 
                     isDisabled={isProcessing} 
                     variant="outline" 
-                    className="border-2 border-ceramic hover:border-brand-green/30 bg-white hover:bg-neutral-warm/20 text-text-black font-extrabold h-12 w-full rounded-xl text-sm transition-all cursor-pointer"
+                    className="border border-surface-container hover:border-surface-tint bg-surface-bright hover:bg-surface text-on-surface font-bold h-12 w-full rounded text-sm transition-all cursor-pointer"
                   >
                     Make an Offer
                   </Button>
@@ -392,20 +392,20 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
           </div>
 
           {/* Dynamic Seller Profile Panel */}
-          <div className="bg-white border border-ceramic p-4 rounded-lg shadow-sm flex items-center justify-between animate-slide-in">
-            <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 rounded-full bg-brand-green/10 border border-brand-green/20 flex items-center justify-center text-brand-green font-extrabold text-sm shrink-0">
+          <div className="bg-surface-bright border border-surface-container p-6 rounded-lg shadow-sm flex items-center justify-between animate-slide-in mt-4">
+            <div className="flex items-center space-x-4">
+              <div className="h-12 w-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-lg shrink-0">
                 {item.sellerName[0].toUpperCase()}
               </div>
               <div>
-                <p className="font-extrabold text-text-black text-sm leading-tight hover:underline cursor-pointer">{item.sellerName}</p>
-                <div className="flex items-center text-[10px] text-gold font-bold mt-1 space-x-1">
+                <p className="font-serif font-bold text-primary text-base leading-tight hover:underline cursor-pointer">{item.sellerName}</p>
+                <div className="flex items-center text-[10px] text-tertiary-fixed-dim font-bold mt-1 space-x-1">
                   <span>★★★★★</span>
-                  <span className="text-text-black-soft/80 font-semibold ml-1">(141 reviews)</span>
+                  <span className="text-on-surface-variant font-semibold ml-1">(141 reviews)</span>
                 </div>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="border-2 border-ceramic hover:border-text-black text-text-black font-bold h-9 px-4 rounded-xl cursor-pointer bg-white text-xs">
+            <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-9 px-4 rounded cursor-pointer bg-surface-bright text-xs">
               Ask Seller
             </Button>
           </div>

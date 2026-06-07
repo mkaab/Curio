@@ -35,11 +35,11 @@ export function ProductCard({
     <Link href={`/item/${id}`} className="group block cursor-pointer h-full">
       <Card 
         className={cn(
-          "h-full flex flex-col bg-white border border-ceramic rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 shadow-sm", 
+          "h-full flex flex-col bg-white border border-surface-container rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 shadow-sm", 
           className
         )}
       >
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-warm">
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-surface-dim">
           <Image
             src={image}
             alt={title}
@@ -77,7 +77,7 @@ export function ProductCard({
                 strokeWidth="2.5" 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 
-                className={isFavorite ? "text-brand-green" : "text-text-black"}
+                className={isFavorite ? "text-primary" : "text-on-surface"}
               >
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
               </svg>
@@ -85,7 +85,7 @@ export function ProductCard({
           )}
 
           {size && (
-            <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-brand-green text-white rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">
+            <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-primary text-white rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">
               {size}
             </div>
           )}
@@ -93,14 +93,18 @@ export function ProductCard({
         <CardContent className="p-3 flex flex-col flex-grow justify-between">
           <div>
             <div className="flex flex-col">
-              <span className="text-sm font-extrabold text-text-black leading-none">₨ {price.toLocaleString()}</span>
-              <div className="text-[10px] font-semibold text-brand-green mt-1 flex items-center space-x-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span className="text-base font-serif font-bold text-primary leading-none">₨ {price.toLocaleString()}</span>
+              <div className="text-[10px] font-semibold text-surface-tint mt-1 flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <span>₨ {(price + 150 + Math.round(price * 0.05)).toLocaleString()} insured</span>
               </div>
             </div>
-            {brand && <p className="text-[10px] font-bold text-brand-green uppercase tracking-wider leading-none mt-2">{brand}</p>}
-            <h3 className="text-xs text-text-black-soft line-clamp-1 mt-1 leading-tight font-medium">{title}</h3>
+            {brand ? (
+              <p className="text-[10px] font-bold text-surface-tint uppercase tracking-wider leading-none mt-2">{brand}</p>
+            ) : (
+              <p className="text-[10px] leading-none mt-2 select-none" aria-hidden="true">&nbsp;</p>
+            )}
+            <h3 className="text-sm font-serif text-on-surface truncate mt-1 leading-tight font-medium" title={title}>{title}</h3>
           </div>
         </CardContent>
       </Card>

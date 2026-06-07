@@ -29,7 +29,7 @@ function TextReveal({ text, className }: { text: string; className?: string }) {
           <motion.span
             className={cn(
               "inline-block", 
-              word.toLowerCase().includes("pre-loved") && "italic bg-[#00754A] text-white px-4 py-0.5 rounded-xl shadow-lg"
+              word.toLowerCase().includes("pre-loved") && "italic bg-primary text-on-primary px-4 py-0.5 rounded-lg shadow-lg"
             )}
             variants={{
               hidden: { y: "100%", opacity: 0, rotate: 10 },
@@ -51,7 +51,7 @@ function ShinyInput({ label, name, type, placeholder, disabled }: { label: strin
       <label className="text-[13px] font-bold text-black/60 mb-1.5 ml-1">{label}</label>
       <div className="relative rounded-2xl overflow-hidden p-[2px] transition-all duration-300">
         {/* Animated glowing border effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00754A]/30 to-transparent opacity-0 group-focus-within:opacity-100 group-hover:opacity-50 blur-sm transition-opacity duration-500 animate-[spin_4s_linear_infinite]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-focus-within:opacity-100 group-hover:opacity-50 blur-sm transition-opacity duration-500 animate-[spin_4s_linear_infinite]" />
 
         <input
           type={type}
@@ -59,7 +59,7 @@ function ShinyInput({ label, name, type, placeholder, disabled }: { label: strin
           required
           disabled={disabled}
           placeholder={placeholder}
-          className="relative w-full h-14 bg-white/70 backdrop-blur-md px-5 rounded-2xl text-[16px] text-black placeholder:text-black/30 outline-none border border-white/50 focus:bg-white focus:shadow-[0_0_20px_rgba(0,117,74,0.1)] transition-all z-10"
+          className="relative w-full h-14 bg-white/70 backdrop-blur-md px-5 rounded-2xl text-[16px] text-primary placeholder:text-primary/30 outline-none border border-white/50 focus:bg-white focus:shadow-[0_0_20px_var(--color-primary)] transition-all z-10"
         />
       </div>
     </div>
@@ -72,11 +72,11 @@ function SweepButton({ children, disabled, loading }: { children: ReactNode, dis
     <button
       type="submit"
       disabled={disabled}
-      className="relative w-full h-[56px] mt-4 rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(0,117,74,0.2)] hover:shadow-[0_0_30px_rgba(0,117,74,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+      className="relative w-full h-[56px] mt-4 rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
     >
-      <div className="absolute inset-0 bg-[#00754A] transition-colors z-0" />
+      <div className="absolute inset-0 bg-primary transition-colors z-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
-      <div className="relative z-10 flex items-center justify-center w-full h-full text-white font-bold text-[16px]">
+      <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[16px]">
         {loading ? (
           <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -124,20 +124,20 @@ export default function WaitlistPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-[#f2f0eb] overflow-x-hidden selection:bg-[#00754A] selection:text-white pb-32">
+    <main className="relative min-h-screen bg-surface overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
 
       {/* Aurora Animated Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[#f2f0eb] z-0" />
+        <div className="absolute inset-0 bg-surface z-0" />
         <motion.div
           animate={{ x: ["0%", "10%", "-10%", "0%"], y: ["0%", "-10%", "10%", "0%"], scale: [1, 1.2, 0.8, 1] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-[#d4e9e2] to-[#edebe9] blur-3xl opacity-70 will-change-transform"
+          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-primary-container to-surface-bright blur-3xl opacity-70 will-change-transform"
         />
         <motion.div
           animate={{ x: ["0%", "-15%", "15%", "0%"], y: ["0%", "15%", "-15%", "0%"], scale: [1, 0.9, 1.1, 1] }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear", delay: 2 }}
-          className="absolute top-[30%] -right-[20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-white to-[#00754A]/10 blur-3xl opacity-60 will-change-transform"
+          className="absolute top-[30%] -right-[20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-white to-primary/10 blur-3xl opacity-60 will-change-transform"
         />
       </div>
 
@@ -183,10 +183,10 @@ export default function WaitlistPage() {
       {/* Navbar */}
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
         <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-[#006241] flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
-          <span className="text-2xl font-bold text-[#006241] uppercase tracking-wider hidden sm:block">Curio</span>
+          <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
+          <span className="text-2xl font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
         </Link>
-        <Link href="/how-it-works" className="text-[#006241] font-bold text-sm md:text-base hover:underline underline-offset-4 mr-4">
+        <Link href="/how-it-works" className="text-primary font-bold text-sm md:text-base hover:underline underline-offset-4 mr-4">
           How it works
         </Link>
       </nav>
@@ -196,7 +196,7 @@ export default function WaitlistPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-col items-center w-full">
           <motion.div
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-1.5 mb-8 text-[12px] font-bold tracking-[0.15em] text-[#00754A] uppercase bg-white/80 backdrop-blur-md rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group"
+            className="inline-block px-4 py-1.5 mb-8 text-[12px] font-bold tracking-[0.15em] text-primary uppercase bg-white/80 backdrop-blur-md rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
             Coming Soon
@@ -204,12 +204,12 @@ export default function WaitlistPage() {
 
           <TextReveal
             text="The easiest way to buy & sell pre-loved fashion."
-            className="text-[32px] md:text-[54px] md:leading-[1.2] font-extrabold uppercase text-[#1E3932] mb-6 tracking-wide drop-shadow-sm max-w-3xl"
+            className="text-[32px] md:text-[54px] md:leading-[1.2] font-serif font-extrabold uppercase text-primary mb-6 tracking-wide drop-shadow-sm max-w-3xl"
           />
 
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8 }}
-            className="text-lg md:text-xl text-[#1E3932]/70 font-medium mb-10 max-w-md leading-relaxed tracking-tight"
+            className="text-lg md:text-xl text-primary/70 font-medium mb-10 max-w-md leading-relaxed tracking-tight"
           >
             Zero fees. High aesthetic. Join the exclusive waitlist today.
           </motion.p>
@@ -217,11 +217,11 @@ export default function WaitlistPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-sm">
             <button
               onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
-              className="relative w-full h-[56px] rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(0,117,74,0.2)] hover:shadow-[0_0_30px_rgba(0,117,74,0.4)]"
+              className="relative w-full h-[56px] rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
             >
-              <div className="absolute inset-0 bg-[#00754A] transition-colors z-0" />
+              <div className="absolute inset-0 bg-primary transition-colors z-0" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
-              <div className="relative z-10 flex items-center justify-center w-full h-full text-white font-bold text-[16px]">
+              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[16px]">
                 Join Exclusive Waitlist
               </div>
             </button>
@@ -231,30 +231,30 @@ export default function WaitlistPage() {
           {waitlistCount >= 0 && (
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} 
-              className="mt-6 flex items-center space-x-3 text-[#1E3932]/70 font-medium"
+              className="mt-6 flex items-center space-x-3 text-primary/70 font-medium"
             >
               <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full border-2 border-[#f2f0eb] bg-[#d4e9e2] flex items-center justify-center shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#00754A]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary-container flex items-center justify-center shadow-sm">
+                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </div>
-                <div className="w-8 h-8 rounded-full border-2 border-[#f2f0eb] bg-[#00754A]/20 flex items-center justify-center shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#00754A]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary/20 flex items-center justify-center shadow-sm">
+                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
                 </div>
                 {waitlistCount >= 1000 ? (
-                  <div className="w-8 h-8 rounded-full border-2 border-[#f2f0eb] bg-[#00754A] flex items-center justify-center shadow-sm text-[10px] text-white font-bold">
+                  <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary flex items-center justify-center shadow-sm text-[10px] text-on-primary font-bold">
                     +{waitlistCount}
                   </div>
                 ) : (
-                  <div className="w-8 h-8 rounded-full border-2 border-[#f2f0eb] bg-[#00754A] flex items-center justify-center shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                  <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary flex items-center justify-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-on-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                   </div>
                 )}
               </div>
               <span className="text-sm max-w-[250px] leading-snug">
                 {waitlistCount < 1000 ? (
-                  <>Join other fashion lovers for <strong className="text-[#00754A]">exclusive access</strong> & opening discounts.</>
+                  <>Join other fashion lovers for <strong className="text-primary">exclusive access</strong> & opening discounts.</>
                 ) : (
-                  <>Join <strong className="text-[#00754A] font-extrabold">{waitlistCount}</strong> fashion lovers</>
+                  <>Join <strong className="text-primary font-extrabold">{waitlistCount}</strong> fashion lovers</>
                 )}
               </span>
             </motion.div>
@@ -287,10 +287,10 @@ export default function WaitlistPage() {
           >
             <TextReveal 
               text="Redefining Thrift in Pakistan." 
-              className="text-3xl md:text-4xl font-extrabold text-[#1E3932] mb-8 tracking-tight justify-center"
+              className="text-3xl md:text-4xl font-serif font-extrabold text-primary mb-8 tracking-tight justify-center"
             />
             
-            <div className="space-y-6 text-lg md:text-xl text-[#1E3932]/80 font-medium leading-relaxed">
+            <div className="space-y-6 text-lg md:text-xl text-primary/80 font-medium leading-relaxed">
               <motion.p
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -314,7 +314,7 @@ export default function WaitlistPage() {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
                 }}
-                className="font-bold text-[#00754A] text-xl md:text-2xl pt-4"
+                className="font-serif font-bold text-primary text-xl md:text-2xl pt-4"
               >
                 Just pure style, sustainably shared.
               </motion.p>
@@ -332,21 +332,21 @@ export default function WaitlistPage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="bg-white/70 backdrop-blur-3xl border border-white p-10 rounded-[32px] shadow-2xl flex flex-col items-center w-full relative overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#00754A]/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
             <motion.div
               initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, -10, 0] }} transition={{ type: "spring", bounce: 0.6 }}
-              className="w-24 h-24 bg-gradient-to-br from-[#00754A] to-[#006241] rounded-full flex items-center justify-center mb-6 shadow-xl shadow-[#00754A]/40"
+              className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6 shadow-xl shadow-primary/40"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-on-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </motion.div>
-            <h2 className="text-4xl font-extrabold text-[#1E3932] mb-3 tracking-tight">You're on the list!</h2>
-            <p className="text-[#1E3932]/70 font-medium max-w-sm mb-8 text-center text-lg leading-relaxed">
+            <h2 className="text-4xl font-serif font-extrabold text-primary mb-3 tracking-tight">You're on the list!</h2>
+            <p className="text-primary/70 font-medium max-w-sm mb-8 text-center text-lg leading-relaxed">
               Keep an eye on your inbox. We'll let you know the moment you can turn your closet into cash.
             </p>
             <Link href="/">
-              <button className="h-14 px-10 bg-white text-[#00754A] border-2 border-[#00754A] font-bold rounded-full hover:bg-[#00754A] hover:text-white transition-all w-full active:scale-95 shadow-md">
+              <button className="h-14 px-10 bg-white text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-on-primary transition-all w-full active:scale-95 shadow-md">
                 Back to Curio
               </button>
             </Link>
@@ -359,7 +359,7 @@ export default function WaitlistPage() {
             transition={{ duration: 0.8 }}
             className="w-full flex flex-col items-center"
           >
-            <h3 className="text-2xl font-bold text-[#1E3932] mb-8">Secure your spot in line.</h3>
+            <h3 className="text-2xl font-serif font-bold text-primary mb-8">Secure your spot in line.</h3>
 
             <form
               action={handleSubmit}
@@ -380,7 +380,7 @@ export default function WaitlistPage() {
               </SweepButton>
             </form>
 
-            <p className="mt-8 text-[13px] text-[#1E3932]/50 font-medium">
+            <p className="mt-8 text-[13px] text-primary/50 font-medium">
               We promise to keep your data safe.
             </p>
           </motion.div>

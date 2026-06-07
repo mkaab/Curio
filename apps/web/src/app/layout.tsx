@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Libre_Caslon_Text, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { PWARegister } from "@/components/PWARegister";
 
-const inter = Inter({
-  variable: "--font-inter",
+const libreCaslonText = Libre_Caslon_Text({
+  weight: ["400", "700"],
+  variable: "--font-serif",
+  subsets: ["latin"],
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
@@ -27,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${hankenGrotesk.variable} ${libreCaslonText.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <PWARegister />
