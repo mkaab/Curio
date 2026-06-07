@@ -214,23 +214,23 @@ export default function SellPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white md:bg-neutral-warm pb-32 font-sans flex flex-col">
+    <main className="min-h-screen bg-white md:bg-surface-dim pb-32 font-sans flex flex-col">
       {/* Top Nav */}
-      <nav className="h-[60px] md:h-[72px] bg-white border-b border-ceramic flex items-center justify-between px-4 md:px-10 sticky top-0 z-50 shadow-sm">
+      <nav className="h-[60px] md:h-[72px] bg-white border-b border-surface-container flex items-center justify-between px-4 md:px-10 sticky top-0 z-50 shadow-sm">
         <Link href="/" className="flex items-center space-x-2 group">
-          <div className="h-8 w-8 rounded-full bg-brand-green flex items-center justify-center text-white font-bold transition-transform group-hover:rotate-12 shadow-inner">C</div>
-          <span className="text-lg font-bold text-brand-green uppercase tracking-wider hidden sm:block">Curio</span>
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold transition-transform group-hover:rotate-12 shadow-inner">C</div>
+          <span className="text-lg font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
         </Link>
         
         {/* Progress Bar */}
         <div className="flex items-center space-x-2">
           {[1, 2, 3].map((s) => (
-            <div key={s} className={`h-1.5 w-8 md:w-12 rounded-full transition-colors ${step >= s ? "bg-brand-green" : "bg-ceramic"}`} />
+            <div key={s} className={`h-1.5 w-8 md:w-12 rounded-full transition-colors ${step >= s ? "bg-primary" : "bg-surface-container"}`} />
           ))}
         </div>
 
         <Link href="/">
-          <Button variant="outline" size="sm" className="font-bold text-text-black-soft hover:text-text-black border-none">Cancel</Button>
+          <Button variant="outline" size="sm" className="font-bold text-surface-tint hover:text-on-surface border-none">Cancel</Button>
         </Link>
       </nav>
 
@@ -238,23 +238,23 @@ export default function SellPage() {
         {step === 1 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-extrabold text-text-black tracking-tight mb-2">Upload Photos</h1>
-              <p className="text-text-black-soft text-base">Add up to 10 photos of your item. Make sure they are clear and well lit.</p>
+              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Upload Photos</h1>
+              <p className="text-surface-tint text-base">Add up to 10 photos of your item. Make sure they are clear and well lit.</p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {photos.map((url, index) => (
-                <div key={index} className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-ceramic group bg-ceramic shadow-inner">
+                <div key={index} className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-surface-container group bg-surface-container shadow-inner">
                   <Image src={url} alt={`Upload ${index + 1}`} fill className="object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemovePhoto(index)}
-                    className="absolute top-2 right-2 h-7 w-7 rounded-full bg-white/80 backdrop-blur-md text-text-black flex items-center justify-center hover:bg-white transition-colors text-xs font-bold shadow z-10"
+                    className="absolute top-2 right-2 h-7 w-7 rounded-full bg-white/80 backdrop-blur-md text-on-surface flex items-center justify-center hover:bg-white transition-colors text-xs font-bold shadow z-10"
                   >
                     ✕
                   </button>
                   {index === 0 && (
-                    <span className="absolute bottom-2 left-2 bg-brand-green text-white text-[10px] uppercase font-bold px-2 py-1 rounded-md shadow-lg backdrop-blur-md z-10">Cover</span>
+                    <span className="absolute bottom-2 left-2 bg-primary text-on-primary text-[10px] uppercase font-bold px-2 py-1 rounded-md shadow-lg backdrop-blur-md z-10">Cover</span>
                   )}
                 </div>
               ))}
@@ -273,14 +273,14 @@ export default function SellPage() {
                     type="button"
                     onClick={handlePhotoUpload}
                     disabled={uploadingPhoto}
-                    className="aspect-[3/4] border-2 border-dashed border-ceramic rounded-2xl flex flex-col items-center justify-center text-text-black-soft hover:border-brand-green/60 hover:text-brand-green transition-all bg-ceramic/10 cursor-pointer"
+                    className="aspect-[3/4] border-2 border-dashed border-surface-container rounded-2xl flex flex-col items-center justify-center text-surface-tint hover:border-primary/60 hover:text-primary transition-all bg-surface-container/10 cursor-pointer"
                   >
                     {uploadingPhoto ? (
                       <span className="text-xs font-bold animate-pulse">Uploading...</span>
                     ) : (
                       <>
-                        <div className="h-10 w-10 rounded-full bg-brand-green/10 flex items-center justify-center mb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                         </div>
                         <span className="text-xs font-bold uppercase tracking-wider">Add Photo</span>
                       </>
@@ -295,8 +295,8 @@ export default function SellPage() {
         {step === 2 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-extrabold text-text-black tracking-tight mb-2">Item Details</h1>
-              <p className="text-text-black-soft text-base">Tell buyers about your item and its condition.</p>
+              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Item Details</h1>
+              <p className="text-surface-tint text-base">Tell buyers about your item and its condition.</p>
             </div>
             
             <div className="space-y-6">
@@ -307,9 +307,9 @@ export default function SellPage() {
                 onChange={(e) => setTitle(e.target.value)}
               />
               <div className="relative">
-                <label className="block text-sm font-bold text-text-black mb-2">Description</label>
+                <label className="block text-sm font-bold text-on-surface mb-2">Description</label>
                 <textarea
-                  className="w-full min-h-[120px] p-4 text-base text-text-black bg-white border border-ceramic rounded-2xl outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all resize-y"
+                  className="w-full min-h-[120px] p-4 text-base text-on-surface bg-white border border-surface-container rounded-2xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-y"
                   placeholder="Describe the item, any flaws, and how it fits..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -317,7 +317,7 @@ export default function SellPage() {
               </div>
               
               <div className="pt-4">
-                <label className="block text-sm font-bold text-text-black mb-3">Condition</label>
+                <label className="block text-sm font-bold text-on-surface mb-3">Condition</label>
                 <div className="space-y-3">
                   {CONDITIONS.map((cond) => (
                     <button
@@ -326,44 +326,44 @@ export default function SellPage() {
                       onClick={() => setCondition(cond.value)}
                       className={`w-full p-4 text-left rounded-2xl border-2 transition-all flex flex-col space-y-1 ${
                         condition === cond.value
-                          ? "border-brand-green bg-brand-green/5"
-                          : "border-ceramic bg-white hover:border-ceramic/80"
+                          ? "border-primary bg-primary/5"
+                          : "border-surface-container bg-white hover:border-surface-container/80"
                       }`}
                     >
-                      <span className="font-bold text-text-black text-base">{cond.label}</span>
-                      <span className="text-sm text-text-black-soft leading-tight">{cond.desc}</span>
+                      <span className="font-bold text-on-surface text-base">{cond.label}</span>
+                      <span className="text-sm text-surface-tint leading-tight">{cond.desc}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-ceramic/60">
-                <label className="block text-sm font-bold text-text-black mb-3">Category</label>
+              <div className="pt-4 border-t border-surface-container/60">
+                <label className="block text-sm font-bold text-on-surface mb-3">Category</label>
                 
                 {/* Category Picker Breadcrumbs */}
                 {(lvl1 || lvl2 || lvl3) && (
-                  <div className="flex items-center space-x-2 mb-4 bg-neutral-warm/40 border border-ceramic p-3.5 rounded-2xl text-xs font-bold text-brand-green">
+                  <div className="flex items-center space-x-2 mb-4 bg-surface-dim/40 border border-surface-container p-3.5 rounded-2xl text-xs font-bold text-primary">
                     <span className="cursor-pointer hover:underline" onClick={() => { setLvl1(""); setLvl2(""); setLvl3(""); }}>Category</span>
                     {lvl1 && (
                       <>
-                        <span className="text-text-black-soft/60">/</span>
-                        <span className="cursor-pointer hover:underline text-text-black" onClick={() => { setLvl2(""); setLvl3(""); }}>
+                        <span className="text-surface-tint/60">/</span>
+                        <span className="cursor-pointer hover:underline text-on-surface" onClick={() => { setLvl2(""); setLvl3(""); }}>
                           {CATEGORIES.find(c => c.id === lvl1)?.name}
                         </span>
                       </>
                     )}
                     {lvl2 && (
                       <>
-                        <span className="text-text-black-soft/60">/</span>
-                        <span className="cursor-pointer hover:underline text-text-black" onClick={() => { setLvl3(""); }}>
+                        <span className="text-surface-tint/60">/</span>
+                        <span className="cursor-pointer hover:underline text-on-surface" onClick={() => { setLvl3(""); }}>
                           {CATEGORIES.find(c => c.id === lvl2)?.name}
                         </span>
                       </>
                     )}
                     {lvl3 && (
                       <>
-                        <span className="text-text-black-soft/60">/</span>
-                        <span className="text-brand-green">
+                        <span className="text-surface-tint/60">/</span>
+                        <span className="text-primary">
                           {CATEGORIES.find(c => c.id === lvl3)?.name}
                         </span>
                       </>
@@ -379,7 +379,7 @@ export default function SellPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => { setLvl1(cat.id); setLvl2(""); setLvl3(""); }}
-                        className="p-3.5 rounded-xl border-2 border-ceramic bg-white text-center hover:border-brand-green/60 text-xs font-extrabold text-text-black hover:bg-neutral-warm/10 transition-all cursor-pointer active:scale-95"
+                        className="p-3.5 rounded-xl border-2 border-surface-container bg-white text-center hover:border-primary/60 text-xs font-extrabold text-on-surface hover:bg-surface-dim/10 transition-all cursor-pointer active:scale-95"
                       >
                         {cat.name}
                       </button>
@@ -395,7 +395,7 @@ export default function SellPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => { setLvl2(cat.id); setLvl3(""); }}
-                        className="p-3.5 rounded-xl border-2 border-ceramic bg-white text-center hover:border-brand-green/60 text-xs font-extrabold text-text-black hover:bg-neutral-warm/10 transition-all cursor-pointer active:scale-95"
+                        className="p-3.5 rounded-xl border-2 border-surface-container bg-white text-center hover:border-primary/60 text-xs font-extrabold text-on-surface hover:bg-surface-dim/10 transition-all cursor-pointer active:scale-95"
                       >
                         {cat.name}
                       </button>
@@ -411,7 +411,7 @@ export default function SellPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => setLvl3(cat.id)}
-                        className="p-3.5 rounded-xl border-2 border-ceramic bg-white text-center hover:border-brand-green/60 text-xs font-extrabold text-text-black hover:bg-neutral-warm/10 transition-all cursor-pointer active:scale-95"
+                        className="p-3.5 rounded-xl border-2 border-surface-container bg-white text-center hover:border-primary/60 text-xs font-extrabold text-on-surface hover:bg-surface-dim/10 transition-all cursor-pointer active:scale-95"
                       >
                         {cat.name}
                       </button>
@@ -421,17 +421,17 @@ export default function SellPage() {
 
                 {/* Finished State showing selection */}
                 {lvl3 && (
-                  <div className="flex items-center justify-between p-4 bg-brand-green/5 border-2 border-brand-green/20 rounded-2xl animate-slide-in">
+                  <div className="flex items-center justify-between p-4 bg-primary/5 border-2 border-primary/20 rounded-2xl animate-slide-in">
                     <div>
-                      <p className="text-[10px] font-bold text-text-black-soft/80 uppercase tracking-wider mb-0.5">Selected Category</p>
-                      <p className="text-sm font-extrabold text-text-black">
+                      <p className="text-[10px] font-bold text-surface-tint/80 uppercase tracking-wider mb-0.5">Selected Category</p>
+                      <p className="text-sm font-extrabold text-on-surface">
                         {CATEGORIES.find(c => c.id === lvl1)?.name} &gt; {CATEGORIES.find(c => c.id === lvl2)?.name} &gt; {CATEGORIES.find(c => c.id === lvl3)?.name}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => { setLvl1(""); setLvl2(""); setLvl3(""); }}
-                      className="px-3.5 py-1.5 border-2 border-ceramic hover:border-text-black text-xs font-bold bg-white text-text-black rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
+                      className="px-3.5 py-1.5 border-2 border-surface-container hover:border-on-surface text-xs font-bold bg-white text-on-surface rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
                     >
                       Change
                     </button>
@@ -445,20 +445,20 @@ export default function SellPage() {
         {step === 3 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-extrabold text-text-black tracking-tight mb-2">Set your price</h1>
-              <p className="text-text-black-soft text-base">You keep 100% of what you earn on Curio.</p>
+              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Set your price</h1>
+              <p className="text-surface-tint text-base">You keep 100% of what you earn on Curio.</p>
             </div>
             
             <div className="relative group pt-4">
               <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none z-10 pt-4">
-                <span className="text-3xl font-bold text-text-black-soft">₨</span>
+                <span className="text-3xl font-bold text-surface-tint">₨</span>
               </div>
               <input
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0"
-                className="w-full pl-16 pr-6 py-6 text-4xl font-extrabold text-text-black bg-white border-2 border-ceramic rounded-3xl outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 transition-all placeholder:text-ceramic/80"
+                className="w-full pl-16 pr-6 py-6 text-4xl font-extrabold text-on-surface bg-white border-2 border-surface-container rounded-3xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-surface-container/80"
               />
             </div>
 
@@ -481,22 +481,22 @@ export default function SellPage() {
       </div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-ceramic p-4 px-6 md:p-6 flex items-center justify-between z-50 md:bg-transparent md:border-none md:max-w-xl md:mx-auto md:w-full md:pb-10">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-surface-container p-4 px-6 md:p-6 flex items-center justify-between z-50 md:bg-transparent md:border-none md:max-w-xl md:mx-auto md:w-full md:pb-10">
         <div className="flex-1">
           {step > 1 ? (
-             <Button variant="outline" size="lg" onClick={prevStep} className="h-14 font-bold border-2 border-ceramic rounded-2xl w-32 bg-white">Back</Button>
+             <Button variant="outline" size="lg" onClick={prevStep} className="h-14 font-bold border-2 border-surface-container rounded-2xl w-32 bg-white">Back</Button>
           ) : (
              <div />
           )}
         </div>
         
         <div className="flex-1 flex justify-end">
-          {message && <span className="absolute -top-12 right-6 px-4 py-2 bg-brand-green text-white text-xs font-bold rounded-lg shadow-lg animate-fade-in">{message}</span>}
+          {message && <span className="absolute -top-12 right-6 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-lg animate-fade-in">{message}</span>}
           
           {step < 3 ? (
-            <Button variant="primary" size="lg" onClick={nextStep} className="h-14 font-bold text-lg rounded-2xl w-40 shadow-xl shadow-brand-green/20">Next</Button>
+            <Button variant="primary" size="lg" onClick={nextStep} className="h-14 font-bold text-lg rounded-2xl w-40 shadow-xl shadow-primary/20">Next</Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={handleSubmit} disabled={loading} className="h-14 font-bold text-lg rounded-2xl w-48 shadow-xl shadow-brand-green/20">
+            <Button variant="primary" size="lg" onClick={handleSubmit} disabled={loading} className="h-14 font-bold text-lg rounded-2xl w-48 shadow-xl shadow-primary/20">
               {loading ? "Publishing..." : "Publish Item"}
             </Button>
           )}
@@ -505,35 +505,35 @@ export default function SellPage() {
       
       {/* Guidelines Modal */}
       {showGuidelines && (
-        <div className="fixed inset-0 z-[100] bg-[#1E3932]/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl relative animate-slide-in">
-            <button onClick={() => setShowGuidelines(false)} className="absolute top-6 right-6 text-[#1E3932]/50 hover:text-[#1E3932] font-bold text-xl leading-none">✕</button>
-            <h3 className="text-2xl font-black text-[#1E3932] mb-2">Before you upload</h3>
-            <p className="text-[#1E3932]/70 text-sm mb-6 font-medium">Great photos sell 3x faster. Follow these rules.</p>
+            <button onClick={() => setShowGuidelines(false)} className="absolute top-6 right-6 text-primary/50 hover:text-primary font-bold text-xl leading-none">✕</button>
+            <h3 className="text-2xl font-serif font-black text-primary mb-2">Before you upload</h3>
+            <p className="text-primary/70 text-sm mb-6 font-medium">Great photos sell 3x faster. Follow these rules.</p>
             
             <div className="space-y-4 mb-8">
               <div className="flex items-start">
-                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">1</div>
-                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Bright, natural lighting.</strong> No dark rooms or harsh flash.</p>
+                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mr-3 shrink-0">1</div>
+                <p className="text-sm text-primary"><strong className="font-serif font-extrabold">Bright, natural lighting.</strong> No dark rooms or harsh flash.</p>
               </div>
               <div className="flex items-start">
-                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">2</div>
-                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Show all angles.</strong> Include tags, soles, and any flaws.</p>
+                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mr-3 shrink-0">2</div>
+                <p className="text-sm text-primary"><strong className="font-serif font-extrabold">Show all angles.</strong> Include tags, soles, and any flaws.</p>
               </div>
               <div className="flex items-start">
-                <div className="w-6 h-6 rounded-full bg-[#00754A]/10 text-[#00754A] flex items-center justify-center text-xs font-bold mr-3 shrink-0">3</div>
-                <p className="text-sm text-[#1E3932]"><strong className="font-extrabold">Clean background.</strong> Avoid messy beds or cluttered floors.</p>
+                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mr-3 shrink-0">3</div>
+                <p className="text-sm text-primary"><strong className="font-serif font-extrabold">Clean background.</strong> Avoid messy beds or cluttered floors.</p>
               </div>
             </div>
 
-            <label className="flex items-start space-x-3 mb-8 cursor-pointer bg-[#f2f0eb] p-4 rounded-xl border border-ceramic hover:border-[#00754A]/30 transition-colors">
+            <label className="flex items-start space-x-3 mb-8 cursor-pointer bg-surface p-4 rounded-xl border border-surface-container hover:border-primary/30 transition-colors">
               <input 
                 type="checkbox" 
                 checked={guidelinesCheckbox} 
                 onChange={(e) => setGuidelinesCheckbox(e.target.checked)} 
-                className="mt-0.5 w-5 h-5 rounded border-ceramic text-[#00754A] focus:ring-[#00754A]" 
+                className="mt-0.5 w-5 h-5 rounded border-surface-container text-primary focus:ring-primary" 
               />
-              <span className="text-sm font-bold text-[#1E3932] leading-tight">I promise to upload high-quality, honest photos.</span>
+              <span className="text-sm font-bold text-primary leading-tight">I promise to upload high-quality, honest photos.</span>
             </label>
 
             <Button 
