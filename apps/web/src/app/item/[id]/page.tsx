@@ -275,7 +275,28 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
         {/* Right Side: The Unified Vinted Details Pane Card */}
         <div className="w-full md:w-2/5 flex flex-col space-y-4">
           
-          <div className="bg-surface-bright border border-surface-container p-8 rounded-lg shadow-sm space-y-6 animate-slide-in">
+          {/* Dynamic Seller Profile Panel */}
+          <div className="bg-white border border-surface-container p-6 rounded-lg shadow-sm flex items-center justify-between animate-slide-in">
+            <div className="flex items-center space-x-4">
+              <div className="h-12 w-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-lg shrink-0">
+                {item.sellerName[0].toUpperCase()}
+              </div>
+              <div>
+                <p className="font-serif font-bold text-primary text-base leading-tight hover:underline cursor-pointer">{item.sellerName}</p>
+                <div className="flex items-center text-[10px] text-surface-tint font-bold mt-1 space-x-1">
+                  <span>★★★★★</span>
+                  <span className="text-on-surface-variant font-semibold ml-1">(141 reviews)</span>
+                </div>
+              </div>
+            </div>
+            <Link href={`/user/${item.seller_id}`}>
+              <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-9 px-4 rounded cursor-pointer bg-white text-xs">
+                View Profile
+              </Button>
+            </Link>
+          </div>
+
+          <div className="bg-white border border-surface-container p-8 rounded-lg shadow-sm space-y-6 animate-slide-in">
             
             {/* Pricing Section */}
             <div className="flex justify-between items-start">
@@ -290,7 +311,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               {/* Favorites heart button */}
               <button 
                 onClick={handleToggleFavorite}
-                className="h-10 w-10 flex items-center justify-center rounded border border-surface-container text-on-surface-variant hover:text-primary active:scale-95 transition-all bg-surface-bright cursor-pointer shadow-sm"
+                className="h-10 w-10 flex items-center justify-center rounded border border-surface-container text-on-surface-variant hover:text-primary active:scale-95 transition-all bg-white cursor-pointer shadow-sm shrink-0 ml-4"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -306,6 +327,45 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                 </svg>
               </button>
+            </div>
+
+            {/* Integrated Action Buttons */}
+            <div className="space-y-3 pt-2 pb-2">
+              {showOfferInput ? (
+                <div className="flex items-center space-x-2 bg-white border border-surface-container rounded pl-4 pr-1 h-12 overflow-hidden w-full animate-slide-in">
+                  <span className="font-bold text-on-surface text-sm">₨</span>
+                  <input 
+                    type="number" 
+                    value={offerAmount}
+                    onChange={(e) => setOfferAmount(e.target.value)}
+                    placeholder="0"
+                    className="flex-1 w-full outline-none font-bold text-base text-on-surface bg-transparent"
+                    autoFocus
+                  />
+                  <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-on-surface-variant hover:bg-surface-container rounded-full">✕</Button>
+                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-bold h-9 rounded px-4 text-xs whitespace-nowrap border-none cursor-pointer">
+                    Send Offer
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button 
+                    onClick={() => handleInitiateChat('buy')} 
+                    isDisabled={isProcessing} 
+                    className="bg-primary hover:bg-primary-container text-on-primary font-bold h-12 w-full rounded text-sm shadow-sm transition-all border-none cursor-pointer"
+                  >
+                    {isProcessing ? "Loading..." : "Buy Now"}
+                  </Button>
+                  <Button 
+                    onClick={() => setShowOfferInput(true)} 
+                    isDisabled={isProcessing} 
+                    variant="outline" 
+                    className="border border-surface-container hover:border-surface-tint bg-white hover:bg-surface text-on-surface font-bold h-12 w-full rounded text-sm transition-all cursor-pointer"
+                  >
+                    Make an Offer
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="h-px bg-surface-container/60" />
@@ -350,64 +410,6 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               Provides safety against fraud, ensuring full refunds if items are damaged, incorrect, or lost in transit.
             </div>
 
-            {/* Integrated Action Buttons */}
-            <div className="space-y-3 pt-4">
-              {showOfferInput ? (
-                <div className="flex items-center space-x-2 bg-surface-bright border border-surface-container rounded pl-4 pr-1 h-12 overflow-hidden w-full animate-slide-in">
-                  <span className="font-bold text-on-surface text-sm">₨</span>
-                  <input 
-                    type="number" 
-                    value={offerAmount}
-                    onChange={(e) => setOfferAmount(e.target.value)}
-                    placeholder="0"
-                    className="flex-1 w-full outline-none font-bold text-base text-on-surface bg-transparent"
-                    autoFocus
-                  />
-                  <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-on-surface-variant hover:bg-surface-container rounded-full">✕</Button>
-                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-bold h-9 rounded px-4 text-xs whitespace-nowrap border-none cursor-pointer">
-                    Send Offer
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <Button 
-                    onClick={() => handleInitiateChat('buy')} 
-                    isDisabled={isProcessing} 
-                    className="bg-primary hover:bg-primary-container text-on-primary font-bold h-12 w-full rounded text-sm shadow-sm transition-all border-none cursor-pointer"
-                  >
-                    {isProcessing ? "Loading..." : "Buy Now"}
-                  </Button>
-                  <Button 
-                    onClick={() => setShowOfferInput(true)} 
-                    isDisabled={isProcessing} 
-                    variant="outline" 
-                    className="border border-surface-container hover:border-surface-tint bg-surface-bright hover:bg-surface text-on-surface font-bold h-12 w-full rounded text-sm transition-all cursor-pointer"
-                  >
-                    Make an Offer
-                  </Button>
-                </>
-              )}
-            </div>
-
-          </div>
-
-          {/* Dynamic Seller Profile Panel */}
-          <div className="bg-surface-bright border border-surface-container p-6 rounded-lg shadow-sm flex items-center justify-between animate-slide-in mt-4">
-            <div className="flex items-center space-x-4">
-              <div className="h-12 w-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-lg shrink-0">
-                {item.sellerName[0].toUpperCase()}
-              </div>
-              <div>
-                <p className="font-serif font-bold text-primary text-base leading-tight hover:underline cursor-pointer">{item.sellerName}</p>
-                <div className="flex items-center text-[10px] text-tertiary-fixed-dim font-bold mt-1 space-x-1">
-                  <span>★★★★★</span>
-                  <span className="text-on-surface-variant font-semibold ml-1">(141 reviews)</span>
-                </div>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-9 px-4 rounded cursor-pointer bg-surface-bright text-xs">
-              Ask Seller
-            </Button>
           </div>
 
         </div>

@@ -78,24 +78,9 @@ const StepCard = ({
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-surface relative overflow-hidden font-sans selection:bg-primary selection:text-on-primary">
-      
-      {/* High-Performance Aurora Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-surface z-0" />
-        <motion.div 
-          animate={{ x: ["0%", "5%", "-5%", "0%"], y: ["0%", "-5%", "5%", "0%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[10%] -left-[10%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-primary-container to-transparent blur-3xl opacity-60 will-change-transform"
-        />
-        <motion.div 
-          animate={{ x: ["0%", "-8%", "8%", "0%"], y: ["0%", "8%", "-8%", "0%"] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 1 }}
-          className="absolute top-[40%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-white to-primary/10 blur-3xl opacity-50 will-change-transform"
-        />
-      </div>
+    <div className="min-h-screen bg-white relative overflow-hidden font-sans selection:bg-primary selection:text-on-primary">
 
-      {/* Navbar */}
+      {/* Navbar - Need to make sure it handles the beige background well, maybe no absolute, or absolute over the beige */}
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
         <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
           <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
@@ -106,27 +91,43 @@ export default function HowItWorksPage() {
         </Link>
       </nav>
 
-      <main className="relative z-10 pt-32 pb-24 px-6 md:px-10 max-w-6xl mx-auto flex flex-col items-center">
-        
-        {/* Hero Header */}
-        <div className="text-center max-w-3xl mb-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
-            className="inline-block px-4 py-1.5 mb-6 text-[12px] font-bold tracking-[0.15em] text-primary uppercase bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white"
-          >
-            The Process
-          </motion.div>
-          <TextReveal 
-            text="HOW CURIO WORKS." 
-            className="text-4xl md:text-6xl font-serif font-extrabold text-primary mb-6 tracking-wide drop-shadow-sm"
-          />
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-            className="text-lg md:text-xl text-primary/70 font-medium leading-relaxed tracking-tight"
-          >
-            The modern, aesthetic, and completely free way to rotate your wardrobe in Pakistan.
-          </motion.p>
+      {/* Vinted-Style Hero Section */}
+      <section className="relative w-full bg-[#f8efe6] pt-32 pb-20 md:pb-32 px-6 md:px-10 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12 relative z-10">
+          <div className="max-w-xl">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-serif font-black text-on-surface mb-6 tracking-tight leading-[1.1]"
+            >
+              The modern archive for curated, pre-loved fashion.
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="text-lg md:text-xl text-surface-tint font-medium leading-relaxed"
+            >
+              One community, thousands of brands, and a whole lot of second-hand style. Ready to get started? Here's how it works.
+            </motion.p>
+          </div>
+          <div className="relative h-[300px] md:h-[450px] w-full mt-8 md:mt-0">
+            <Image 
+              src="/assets/how_it_works_hero.png" 
+              alt="Person taking photo of clothes" 
+              fill 
+              priority
+              className="object-contain object-center md:object-right mix-blend-multiply" 
+            />
+          </div>
         </div>
+        
+        {/* Wavy SVG Divider */}
+        <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0]">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-[100%] h-[40px] md:h-[70px] relative top-[2px]" style={{ transform: "rotateY(180deg)" }}>
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" fill="#ffffff" />
+          </svg>
+        </div>
+      </section>
+
+      <main className="relative z-10 pt-20 pb-24 px-6 md:px-10 max-w-6xl mx-auto flex flex-col items-center">
 
         {/* Section: For Sellers */}
         <div className="w-full mb-32">

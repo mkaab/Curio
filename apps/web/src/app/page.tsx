@@ -17,9 +17,11 @@ export default function Home() {
   const [profile, setProfile] = useState<any>(null);
   const [items, setItems] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   
   // Search and Filtering States
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleToggleFavorite = async (id: string) => {
@@ -89,17 +91,19 @@ export default function Home() {
       try {
         let { data, error } = await supabase
           .from("listing")
-          .select("*, seller:public_user_profiles(name)")
+          .select("*, seller:public_user_profiles(name), favorite(count)")
           .eq("status", "active")
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(24);
 
         if (error) {
           // Fallback to simpler select if custom foreign key fails
           const fallback = await supabase
             .from("listing")
-            .select("*")
+            .select("*, favorite(count)")
             .eq("status", "active")
-            .order("created_at", { ascending: false });
+            .order("created_at", { ascending: false })
+            .limit(24);
           data = fallback.data;
           error = fallback.error;
         }
@@ -122,12 +126,15 @@ export default function Home() {
               size: item.size || "OS",
               image: parsedImages?.[0] || "/assets/hero.png",
               seller: item.seller?.name || "Curio Member",
-              department: item.department
+              department: item.department,
+              favoriteCount: item.favorite?.[0]?.count || 0
             };
           });
           setItems(mappedItems);
+          if (data.length < 24) setHasMore(false);
         } else {
           setItems([]);
+          setHasMore(false);
         }
       } catch (err) {
         console.error("fetchListings error:", err);
@@ -142,17 +149,66 @@ export default function Home() {
     };
   }, [supabase]);
 
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    
+    try {
+      let { data, error } = await supabase
+        .from("listing")
+        .select("*, seller:public_user_profiles(name), favorite(count)")
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .range(nextPage * 24, (nextPage + 1) * 24 - 1);
+
+      if (error) {
+        const fallback = await supabase
+          .from("listing")
+          .select("*, favorite(count)")
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .range(nextPage * 24, (nextPage + 1) * 24 - 1);
+        data = fallback.data;
+      }
+
+      if (data && data.length > 0) {
+        const mappedItems = data.map((item: any) => {
+          let parsedImages = [];
+          try {
+            parsedImages = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+          } catch (err) {
+            parsedImages = [item.images];
+          }
+          return {
+            id: item.id.toString(),
+            title: item.title,
+            price: item.price,
+            brand: item.brand || "Unbranded",
+            size: item.size || "OS",
+            image: parsedImages?.[0] || "/assets/hero.png",
+            seller: item.seller?.name || "Curio Member",
+            department: item.department,
+            favoriteCount: item.favorite?.[0]?.count || 0
+          };
+        });
+        setItems(prev => [...prev, ...mappedItems]);
+        setPage(nextPage);
+        if (data.length < 24) setHasMore(false);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   const sellPath = user ? "/sell" : "/signup";
 
-  // Filter local items based on search and category choice
+  // Filter local items based on category choice
   const filteredItems = items.filter(item => {
-    const matchesSearch = searchQuery === "" || 
-      item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.seller?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    if (!matchesSearch) return false;
-
     if (!selectedCategory || selectedCategory === "All") return true;
 
     // Direct classification helper for mock filters
@@ -178,7 +234,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col selection:bg-primary selection:text-on-primary bg-surface">
       {/* Search Header */}
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header />
 
       {/* Category Strip */}
       <div className="flex items-center justify-start md:justify-center space-x-8 md:space-x-12 px-6 md:px-10 h-14 bg-surface border-b border-surface-container overflow-x-auto no-scrollbar">
@@ -314,7 +370,7 @@ export default function Home() {
             <p className="text-surface-tint max-w-sm">Try modifying your search query or selecting a different category.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-[1600px] mx-auto">
             {filteredItems.map((item) => (
               <ProductCard
                 key={item.id}
@@ -326,9 +382,22 @@ export default function Home() {
                 size={item.size}
                 sellerName={item.seller}
                 isFavorite={!!favorites[item.id]}
+                favoriteCount={item.favoriteCount}
                 onToggleFavorite={() => handleToggleFavorite(item.id)}
               />
             ))}
+          </div>
+        )}
+
+        {filteredItems.length > 0 && hasMore && (
+          <div className="flex justify-center mt-12 mb-8">
+            <Button 
+              onClick={loadMore}
+              isDisabled={loadingMore}
+              className="bg-transparent border-2 border-surface-container hover:border-primary text-primary font-bold px-8 py-2 rounded-full transition-colors cursor-pointer"
+            >
+              {loadingMore ? "Loading..." : "See More"}
+            </Button>
           </div>
         )}
       </div>

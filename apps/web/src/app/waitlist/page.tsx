@@ -124,22 +124,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-surface overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
-
-      {/* Aurora Animated Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-surface z-0" />
-        <motion.div
-          animate={{ x: ["0%", "10%", "-10%", "0%"], y: ["0%", "-10%", "10%", "0%"], scale: [1, 1.2, 0.8, 1] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-primary-container to-surface-bright blur-3xl opacity-70 will-change-transform"
-        />
-        <motion.div
-          animate={{ x: ["0%", "-15%", "15%", "0%"], y: ["0%", "15%", "-15%", "0%"], scale: [1, 0.9, 1.1, 1] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear", delay: 2 }}
-          className="absolute top-[30%] -right-[20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-white to-primary/10 blur-3xl opacity-60 will-change-transform"
-        />
-      </div>
+    <main className="relative min-h-screen bg-white overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
 
       {/* Better Spaced Parallax Fashion Items (Now fixed across the viewport) */}
       <div className="fixed inset-0 pointer-events-none z-0">
