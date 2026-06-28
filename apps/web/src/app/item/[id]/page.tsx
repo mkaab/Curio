@@ -6,6 +6,7 @@ import { Button } from "@heroui/react";
 import { Header } from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
+import { ProductCard } from "@curio/ui";
 import { useRouter } from "next/navigation";
 
 export default function ListingPage({ params }: { params: Promise<{ id: string }> }) {
@@ -14,6 +15,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   const { id } = use(params);
 
   const [item, setItem] = useState<any>(null);
+  const [similarItems, setSimilarItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   
@@ -110,6 +112,47 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             parsedImages,
             sellerName: data.seller?.name || "Anonymous",
           });
+          
+          // Fetch similar items
+          if (data.department) {
+            let { data: similarData, error: similarError } = await supabase
+              .from("listing")
+              .select("*, seller:public_user_profiles(name), favorite(count)")
+              .eq("status", "active")
+              .eq("department", data.department)
+              .neq("id", id)
+              .order("created_at", { ascending: false })
+              .limit(5);
+              
+            if (similarError) {
+              const fallback = await supabase
+                .from("listing")
+                .select("*, favorite(count)")
+                .eq("status", "active")
+                .eq("department", data.department)
+                .neq("id", id)
+                .order("created_at", { ascending: false })
+                .limit(5);
+              similarData = fallback.data;
+            }
+            
+            if (similarData) {
+              const mappedSimilar = similarData.map((simItem: any) => {
+                let simParsed = [];
+                try {
+                  simParsed = typeof simItem.images === 'string' ? JSON.parse(simItem.images) : simItem.images;
+                } catch (e) {
+                  simParsed = [simItem.images];
+                }
+                return {
+                  ...simItem,
+                  image: simParsed?.[0] || "/assets/hero.png",
+                  favoriteCount: simItem.favorite?.[0]?.count || 0
+                };
+              });
+              setSimilarItems(mappedSimilar);
+            }
+          }
         }
       } catch (err) {
         console.error(err);
@@ -245,8 +288,8 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 md:py-20 w-full flex-1">
 
         {/* Left Side: Image Panel with Thumbnails Selection */}
-        <div className="w-full md:w-3/5 bg-surface border border-surface-container p-4 rounded-lg shadow-sm flex flex-col items-center animate-slide-in h-fit">
-          <div className="relative w-full aspect-[3/4] md:h-[600px] rounded-lg overflow-hidden bg-surface-dim">
+        <div className="w-full md:w-3/5 bg-surface border border-surface-container p-4 rounded-lg shadow-sm flex flex-col items-center animate-slide-in">
+          <div className="relative w-full aspect-[3/4] flex-1 min-h-[400px] rounded-lg overflow-hidden bg-surface-dim">
             <Image 
               src={item.parsedImages[currentImageIdx]} 
               alt={item.title} 
@@ -413,8 +456,31 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
           </div>
 
         </div>
-
       </div>
+
+      {/* Similar Items Section */}
+      {similarItems.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 md:px-8 pb-20 w-full animate-slide-in">
+          <h2 className="text-2xl font-serif font-black text-on-surface mb-6">Similar Products</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {similarItems.map(item => (
+              <ProductCard
+                key={item.id}
+                id={item.id.toString()}
+                title={item.title}
+                price={item.price}
+                image={item.image}
+                brand={item.brand}
+                size={item.size}
+                sellerName={item.seller?.name || "Curio Member"}
+                isFavorite={false}
+                favoriteCount={item.favoriteCount}
+                onToggleFavorite={() => {}}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Sticky Bottom Action Bar (Only shows on mobile viewports) */}
       <div className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-xl border-t border-surface-container p-4 flex items-center space-x-3 z-50 md:hidden shadow-lg animate-slide-in">
