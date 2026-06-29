@@ -61,7 +61,7 @@ const StepCard = ({
       transition={{ duration: 0.6, delay, type: "spring", stiffness: 100 }}
       className="bg-white/50 backdrop-blur-3xl p-8 rounded-[32px] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden group will-change-transform flex flex-col h-full"
     >
-      <div className="absolute top-0 right-0 p-8 text-6xl font-serif font-black text-primary/15 select-none pointer-events-none transition-transform duration-500 group-hover:scale-110">
+      <div className="absolute top-0 right-0 p-8 text-6xl font-serif font-black text-accent-green/25 select-none pointer-events-none transition-transform duration-500 group-hover:scale-110">
         {number}
       </div>
       <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary mb-6 relative z-10 border border-surface">
