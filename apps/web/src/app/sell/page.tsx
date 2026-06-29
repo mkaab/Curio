@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
 import { Button, Card, CardContent, Input, Select, Textarea } from "@curio/ui";
 import { CATEGORIES, getChildCategories } from "@curio/types";
 import { createClient } from "@/lib/supabase/client";
@@ -217,10 +218,9 @@ export default function SellPage() {
     <main className="min-h-screen bg-white md:bg-surface-dim pb-32 font-sans flex flex-col">
       {/* Top Nav */}
       <nav className="h-[60px] md:h-[72px] bg-white border-b border-surface-container flex items-center justify-between px-4 md:px-10 sticky top-0 z-50 shadow-sm">
-        <Link href="/" className="flex items-center space-x-2 group">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold transition-transform group-hover:rotate-12 shadow-inner">C</div>
-          <span className="text-lg font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
-        </Link>
+        <div className="flex items-center flex-1">
+          <Logo className="text-xl" />
+        </div>
         
         {/* Progress Bar */}
         <div className="flex items-center space-x-2">

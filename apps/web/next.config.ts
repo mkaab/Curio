@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/waitlist',
+        permanent: false, // Use temporary redirect for now so it doesn't cache globally if you want to switch back
+      },
+    ];
+  },
 };
 
 export default nextConfig;

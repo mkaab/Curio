@@ -3,20 +3,22 @@
 import { useState, useRef, useEffect, ReactNode } from "react";
 import { motion, useAnimation, useInView, Variants } from "framer-motion";
 import { joinWaitlist, getWaitlistCount } from "./actions";
+import { useTranslation } from "@/lib/i18n/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Logo } from "@/components/Logo";
 
 /* =========================================
    PREMIUM CULT UI / SKIPER UI COMPONENTS
    ========================================= */
 
-// 1. Text Reveal Component (Magic Animator style)
-function TextReveal({ text, className }: { text: string; className?: string }) {
-  const words = text.split(" ");
+function TextReveal({ text, className, dir = "ltr" }: { text: string; className?: string; dir?: "ltr" | "rtl" }) {
+  const lines = text.split("\n");
   return (
     <motion.h1
-      className={cn("flex flex-wrap justify-center overflow-hidden", className)}
+      dir={dir}
+      className={cn("flex flex-col items-center justify-center overflow-hidden", className)}
       initial="hidden"
       animate="visible"
       variants={{
@@ -24,21 +26,25 @@ function TextReveal({ text, className }: { text: string; className?: string }) {
         hidden: {},
       }}
     >
-      {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.25em]">
-          <motion.span
-            className={cn(
-              "inline-block", 
-              word.toLowerCase().includes("pre-loved") && "italic bg-primary text-on-primary px-4 py-0.5 rounded-lg shadow-lg"
-            )}
-            variants={{
-              hidden: { y: "100%", opacity: 0, rotate: 10 },
-              visible: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
-            }}
-          >
-            {word}
-          </motion.span>
-        </span>
+      {lines.map((line, lineIdx) => (
+        <div key={lineIdx} className="flex flex-wrap justify-center">
+          {line.split(" ").map((word, i) => (
+            <span key={`${lineIdx}-${i}`} className="inline-block overflow-hidden mr-[0.25em]">
+              <motion.span
+                className={cn(
+                  "inline-block", 
+                  word.toLowerCase().includes("pre-loved") && "italic bg-primary text-on-primary px-4 py-0.5 rounded-lg shadow-lg"
+                )}
+                variants={{
+                  hidden: { y: "100%", opacity: 0, rotate: 10 },
+                  visible: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+                }}
+              >
+                {word}
+              </motion.span>
+            </span>
+          ))}
+        </div>
       ))}
     </motion.h1>
   );
@@ -95,6 +101,7 @@ function SweepButton({ children, disabled, loading }: { children: ReactNode, dis
    ========================================= */
 
 export default function WaitlistPage() {
+  const { t, locale, setLocale } = useTranslation();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [waitlistCount, setWaitlistCount] = useState<number>(0);
@@ -165,15 +172,19 @@ export default function WaitlistPage() {
         </motion.div>
       </div>
 
-      {/* Navbar */}
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
-        <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
-          <span className="text-2xl font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
-        </Link>
-        <Link href="/how-it-works" className="text-primary font-bold text-sm md:text-base hover:underline underline-offset-4 mr-4">
-          How it works
-        </Link>
+        <Logo className="text-2xl" />
+        <div className="flex items-center space-x-6 mr-4">
+          <button 
+            onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
+            className="font-bold text-[10px] px-3 border-2 border-primary/20 text-primary rounded-full hover:bg-primary/5 transition-colors h-[32px] flex items-center justify-center cursor-pointer"
+          >
+            {locale === 'en' ? 'UR' : 'EN'}
+          </button>
+          <Link href="/how-it-works" className="text-primary font-bold text-sm md:text-base hover:underline underline-offset-4">
+            {t("waitlist.howItWorks")}
+          </Link>
+        </div>
       </nav>
 
       {/* Hero Section */}
@@ -184,19 +195,21 @@ export default function WaitlistPage() {
             className="inline-block px-4 py-1.5 mb-8 text-[12px] font-bold tracking-[0.15em] text-primary uppercase bg-white/80 backdrop-blur-md rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
-            Coming Soon
+            {t("waitlist.comingSoon")}
           </motion.div>
 
           <TextReveal
-            text="The easiest way to buy & sell pre-loved fashion."
-            className="text-[32px] md:text-[54px] md:leading-[1.2] font-serif font-extrabold uppercase text-primary mb-6 tracking-wide drop-shadow-sm max-w-3xl"
+            text={t("waitlist.heroTitle")}
+            dir={locale === 'ur' ? 'rtl' : 'ltr'}
+            className="text-[32px] md:text-[54px] md:leading-[1.2] font-serif font-extrabold uppercase text-primary mb-6 tracking-wide drop-shadow-sm max-w-4xl"
           />
 
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8 }}
             className="text-lg md:text-xl text-primary/70 font-medium mb-10 max-w-md leading-relaxed tracking-tight"
+            dir={locale === 'ur' ? 'rtl' : 'ltr'}
           >
-            Zero fees. High aesthetic. Join the exclusive waitlist today.
+            {t("waitlist.heroSubtitle")}
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-sm">
@@ -207,7 +220,7 @@ export default function WaitlistPage() {
               <div className="absolute inset-0 bg-primary transition-colors z-0" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
               <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[16px]">
-                Join Exclusive Waitlist
+                {t("waitlist.joinWaitlist")}
               </div>
             </button>
           </motion.div>

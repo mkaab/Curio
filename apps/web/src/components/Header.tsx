@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/client";
 import { 
   Button, 
@@ -20,6 +23,7 @@ interface HeaderProps {
 
 export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
   const router = useRouter();
+  const { t, locale, setLocale } = useTranslation();
   const supabase = createClient();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -96,10 +100,7 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
   return (
     <nav className="sticky top-0 z-50 flex h-[72px] items-center justify-between bg-white px-6 md:px-10 border-b border-surface-container shadow-sm">
       <div className="flex items-center flex-1 mr-4 md:mr-8">
-        <Link href="/" className="flex items-center space-x-2 mr-4 md:mr-10 cursor-pointer">
-          <div className="h-8 w-8 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">C</div>
-          <span className="text-xl font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
-        </Link>
+        <Logo className="text-xl hidden sm:flex mr-4 md:mr-10" />
 
         {showSearch && (
           <div className="relative flex-1 max-w-xl group" ref={suggestionRef}>
@@ -108,7 +109,7 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
             </div>
             <input
               type="text"
-              placeholder="Search for items, brands, or styles..."
+              placeholder={t("header.searchPlaceholder")}
               value={localQuery}
               onChange={(e) => setLocalQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
@@ -156,12 +157,12 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
             <DropdownPopover placement="bottom end" className="w-56 bg-surface rounded-2xl shadow-2xl border border-surface-container p-2 overflow-hidden z-[100]">
               <DropdownMenu aria-label="Mobile Navigation" className="outline-none">
                 <DropdownItem key="sell" className="font-extrabold text-primary mb-2 py-2" onAction={() => router.push(sellPath)}>
-                  Sell now
+                  {t("header.sell")}
                 </DropdownItem>
                 {user ? (
                    <DropdownItem key="profile" onAction={() => router.push("/profile")} className="font-bold border-b border-surface-container/40 pb-3 mb-2">My Profile</DropdownItem>
                 ) : (
-                   <DropdownItem key="login" onAction={() => router.push("/login")} className="font-bold border-b border-surface-container/40 pb-3 mb-2">Sign up | Log in</DropdownItem>
+                   <DropdownItem key="login" onAction={() => router.push("/login")} className="font-bold border-b border-surface-container/40 pb-3 mb-2">{t("header.signup")} | {t("header.login")}</DropdownItem>
                 )}
                 <DropdownItem key="women" className="font-semibold py-1.5" onAction={() => handleSearchSubmit("", "Women")}>Women</DropdownItem>
                 <DropdownItem key="men" className="font-semibold py-1.5" onAction={() => handleSearchSubmit("", "Men")}>Men</DropdownItem>
@@ -208,18 +209,26 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
                   variant="outline" 
                   className="border-2 border-surface-container hover:border-primary/30 bg-white hover:bg-surface-dim text-on-surface font-extrabold rounded-full px-5 h-[38px] text-xs shadow-sm hover:shadow transition-all duration-300 cursor-pointer"
                 >
-                  Sign up | Log in
+                  {t("header.signup")} | {t("header.login")}
                 </Button>
               </Link>
             </div>
           )}
 
           <div className="hidden sm:block">
+            <button 
+              onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
+              className="font-bold text-[10px] px-3 border-2 border-surface-container rounded-full hover:bg-surface-dim transition-colors h-[38px] flex items-center justify-center mr-2 cursor-pointer"
+            >
+              {locale === 'en' ? 'UR' : 'EN'}
+            </button>
+          </div>
+          <div className="hidden sm:block">
             <Link href={sellPath}>
               <Button 
                 className="bg-primary hover:bg-primary-container text-on-primary font-extrabold rounded-full px-6 h-[38px] text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-none cursor-pointer shrink-0"
               >
-                Sell
+                {t("header.sell")}
               </Button>
             </Link>
           </div>

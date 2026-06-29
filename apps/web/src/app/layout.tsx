@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Libre_Caslon_Text, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { PWARegister } from "@/components/PWARegister";
+import TranslationProvider from "@/lib/i18n/client";
+import { getServerTranslation } from "@/lib/i18n/server";
 
 const libreCaslonText = Libre_Caslon_Text({
   weight: ["400", "700"],
@@ -25,19 +27,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { locale } = await getServerTranslation();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${hankenGrotesk.variable} ${libreCaslonText.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <PWARegister />
-        {children}
+        <TranslationProvider defaultLocale={locale}>
+          {children}
+        </TranslationProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
 /* =========================================
@@ -80,15 +81,8 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden font-sans selection:bg-primary selection:text-on-primary">
 
-      {/* Navbar - Need to make sure it handles the beige background well, maybe no absolute, or absolute over the beige */}
-      <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
-        <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">C</div>
-          <span className="text-2xl font-serif font-bold text-primary uppercase tracking-wider hidden sm:block">Curio</span>
-        </Link>
-        <Link href="/" className="text-sm font-bold text-primary hover:text-primary-container transition-colors border-b border-transparent hover:border-primary">
-          Back to Marketplace
-        </Link>
+      <nav className="absolute top-0 w-full p-6 flex justify-start items-center z-50">
+        <Logo className="text-2xl" />
       </nav>
 
       {/* Vinted-Style Hero Section */}
@@ -253,24 +247,7 @@ export default function HowItWorksPage() {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="w-full max-w-2xl bg-primary p-12 rounded-[40px] text-center shadow-2xl relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary-container/50 to-transparent pointer-events-none" />
-          <h2 className="text-3xl font-serif font-extrabold text-on-primary mb-4 relative z-10">Ready to start?</h2>
-          <p className="text-on-primary/80 font-medium mb-8 relative z-10 max-w-md mx-auto">
-            Join thousands of others buying and selling pre-loved fashion in Pakistan.
-          </p>
-          <Link href="/" className="relative z-10">
-            <button className="bg-surface text-primary font-bold text-lg px-10 py-4 rounded-full shadow-lg hover:scale-105 transition-transform">
-              Start Exploring
-            </button>
-          </Link>
-        </motion.div>
+
 
       </main>
     </div>

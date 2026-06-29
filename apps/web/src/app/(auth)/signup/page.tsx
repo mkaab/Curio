@@ -5,6 +5,7 @@ import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Inpu
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
 
 function SignupForm() {
   const router = useRouter();
@@ -92,11 +93,8 @@ function SignupForm() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface md:bg-surface-dim px-6 py-12">
       <div className="w-full max-w-[420px] animate-fade-in">
-        <div className="text-center mb-10">
-           <Link href="/" className="inline-flex items-center space-x-2 group cursor-pointer">
-              <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold transition-transform group-hover:rotate-12 shadow-sm">C</div>
-              <span className="text-2xl font-serif font-bold text-primary uppercase tracking-[0.2em]">Curio</span>
-           </Link>
+        <div className="flex justify-center mb-10">
+           <Logo className="text-3xl tracking-[0.1em]" />
         </div>
 
         <Card className="border-none shadow-none md:shadow-2xl md:border md:border-surface-container/50 rounded-[24px]">
