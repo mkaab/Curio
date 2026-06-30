@@ -366,11 +366,14 @@ export default function WaitlistPage() {
             <p className="text-primary/70 font-medium max-w-sm mb-8 text-center text-lg leading-relaxed">
               Keep an eye on your inbox. We'll let you know the moment you can turn your closet into cash.
             </p>
-            <Link href="/">
-              <button className="h-14 px-10 bg-white text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-on-primary transition-all w-full active:scale-95 shadow-md">
-                Back to Curio
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="h-14 px-10 bg-white text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-on-primary transition-all w-full active:scale-95 shadow-md"
+            >
+              Back to Top
+            </button>
           </motion.div>
         ) : (
           <motion.div
