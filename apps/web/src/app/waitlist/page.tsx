@@ -386,9 +386,9 @@ export default function WaitlistPage() {
               action={handleSubmit}
               className="w-full bg-white/40 backdrop-blur-3xl p-6 md:p-8 rounded-[36px] border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col gap-5 relative"
             >
-              <ShinyInput label="Full Name" name="name" type="text" disabled={status === "loading"} />
-              <ShinyInput label="Email Address" name="email" type="email" disabled={status === "loading"} />
-              <ShinyInput label="Phone Number" name="phone" type="tel" disabled={status === "loading"} />
+              <ShinyInput label="Full Name" name="name" type="text" placeholder="" disabled={status === "loading"} />
+              <ShinyInput label="Email Address" name="email" type="email" placeholder="" disabled={status === "loading"} />
+              <ShinyInput label="Phone Number" name="phone" type="tel" placeholder="" disabled={status === "loading"} />
 
               {errorMessage && (
                 <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-bold text-sm text-center mt-1">
