@@ -24,12 +24,14 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: '/',
-        destination: '/waitlist',
-      },
-    ];
+    return {
+      beforeFiles: [
+        {
+          source: '/',
+          destination: '/waitlist',
+        },
+      ],
+    };
   },
 };
 
