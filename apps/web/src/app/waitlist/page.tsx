@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect, ReactNode } from "react";
 import { motion, useAnimation, useInView, Variants } from "framer-motion";
-import { joinWaitlist, getWaitlistCount } from "./actions";
+import { getWaitlistCount, joinWaitlist, getRecentWaitlistNames } from "./actions";
 import { useTranslation } from "@/lib/i18n/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Logo } from "@/components/Logo";
+import { LiveSignupsTicker } from "@/components/LiveSignupsTicker";
 
 /* =========================================
    PREMIUM CULT UI / SKIPER UI COMPONENTS
@@ -105,20 +106,41 @@ export default function WaitlistPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [waitlistCount, setWaitlistCount] = useState<number>(0);
+  const [recentNames, setRecentNames] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchCount() {
+    async function fetchData() {
       const count = await getWaitlistCount();
+      const names = await getRecentWaitlistNames();
       // Add a base number of 241 just to make it look hype immediately, 
       // but in real life you could just use 'count' directly if the table has enough entries.
       setWaitlistCount(count);
+      setRecentNames(names);
     }
-    fetchCount();
+    fetchData();
   }, []);
 
   async function handleSubmit(formData: FormData) {
     setStatus("loading");
     setErrorMessage("");
+
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+
+    // Regex Checks
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      setStatus("error");
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      setErrorMessage("Please enter a valid phone number (at least 10 digits).");
+      setStatus("error");
+      return;
+    }
 
     const result = await joinWaitlist(formData);
 
@@ -174,16 +196,14 @@ export default function WaitlistPage() {
 
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
         <Logo className="text-2xl" />
-        <div className="flex items-center space-x-6 mr-4">
+        <div className="flex items-center space-x-4 mr-4">
+          <LiveSignupsTicker names={recentNames} />
           <button 
             onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
-            className="font-bold text-[10px] px-3 border-2 border-primary/20 text-primary rounded-full hover:bg-primary/5 transition-colors h-[32px] flex items-center justify-center cursor-pointer"
+            className="font-bold text-[10px] px-3 border-2 border-primary/20 text-primary rounded-full hover:bg-primary/5 transition-colors h-[32px] flex items-center justify-center cursor-pointer shrink-0"
           >
             {locale === 'en' ? 'UR' : 'EN'}
           </button>
-          <Link href="/how-it-works" className="text-primary font-bold text-sm md:text-base hover:underline underline-offset-4">
-            {t("waitlist.howItWorks")}
-          </Link>
         </div>
       </nav>
 
@@ -212,14 +232,17 @@ export default function WaitlistPage() {
             {t("waitlist.heroSubtitle")}
           </motion.p>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-sm">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-md flex flex-col sm:flex-row items-center gap-4">
+            <Link href="/how-it-works" className="w-full sm:w-[45%] h-[56px] flex items-center justify-center rounded-full border-[1.5px] border-primary text-primary font-bold text-[15px] hover:bg-primary/5 transition-colors shadow-sm">
+              {t("waitlist.howItWorks")}
+            </Link>
             <button
               onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
-              className="relative w-full h-[56px] rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
+              className="relative w-full sm:w-[55%] h-[56px] rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
             >
               <div className="absolute inset-0 bg-primary transition-colors z-0" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
-              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[16px]">
+              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[15px]">
                 {t("waitlist.joinWaitlist")}
               </div>
             </button>
@@ -363,9 +386,9 @@ export default function WaitlistPage() {
               action={handleSubmit}
               className="w-full bg-white/40 backdrop-blur-3xl p-6 md:p-8 rounded-[36px] border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col gap-5 relative"
             >
-              <ShinyInput label="Full Name" name="name" type="text" placeholder="Jane Doe" disabled={status === "loading"} />
-              <ShinyInput label="Email Address" name="email" type="email" placeholder="jane@example.com" disabled={status === "loading"} />
-              <ShinyInput label="Phone Number" name="phone" type="tel" placeholder="+92 300 0000000" disabled={status === "loading"} />
+              <ShinyInput label="Full Name" name="name" type="text" disabled={status === "loading"} />
+              <ShinyInput label="Email Address" name="email" type="email" disabled={status === "loading"} />
+              <ShinyInput label="Phone Number" name="phone" type="tel" disabled={status === "loading"} />
 
               {errorMessage && (
                 <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-bold text-sm text-center mt-1">

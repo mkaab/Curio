@@ -38,3 +38,16 @@ export async function getWaitlistCount() {
   
   return data || 0;
 }
+
+export async function getRecentWaitlistNames() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('get_recent_waitlist_names');
+    
+  if (error) {
+    console.error("Recent waitlist names error:", error);
+    return [];
+  }
+  
+  // Extract just the name strings from the returned objects
+  return data ? data.map((row: any) => row.name) : [];
+}
