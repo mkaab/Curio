@@ -6,8 +6,9 @@ export async function joinWaitlist(formData: FormData) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
+  const intent = formData.get("intent") as string;
 
-  if (!name || !email || !phone) {
+  if (!name || !email || !phone || !intent) {
     return { error: "All fields are required." };
   }
 
@@ -15,7 +16,7 @@ export async function joinWaitlist(formData: FormData) {
   
   const { error } = await supabase
     .from("waitlist")
-    .insert({ name, email, phone_number: phone });
+    .insert({ name, email, phone_number: phone, intent });
 
   if (error) {
     if (error.code === '23505') {

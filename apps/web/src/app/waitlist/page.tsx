@@ -66,8 +66,38 @@ function ShinyInput({ label, name, type, placeholder, disabled }: { label: strin
           required
           disabled={disabled}
           placeholder={placeholder}
-          className="relative w-full h-14 bg-white/70 backdrop-blur-md px-5 rounded-2xl text-[16px] text-primary placeholder:text-primary/30 outline-none border border-white/50 focus:bg-white focus:shadow-[0_0_20px_var(--color-primary)] transition-all z-10"
+          className="relative w-full h-14 bg-white/70 backdrop-blur-md px-5 rounded-2xl text-[16px] text-primary placeholder:text-primary/30 outline-none border border-primary/20 focus:bg-white focus:shadow-[0_0_20px_var(--color-primary)] transition-all z-10"
         />
+      </div>
+    </div>
+  );
+}
+
+// 2b. Shiny Glowing Select
+function ShinySelect({ label, name, options, disabled }: { label: string, name: string, options: string[], disabled: boolean }) {
+  return (
+    <div className="flex flex-col text-left relative group">
+      <label className="text-[13px] font-bold text-black/60 mb-1.5 ml-1">{label}</label>
+      <div className="relative rounded-2xl overflow-hidden p-[2px] transition-all duration-300">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-focus-within:opacity-100 group-hover:opacity-50 blur-sm transition-opacity duration-500 animate-[spin_4s_linear_infinite]" />
+
+        <select
+          name={name}
+          required
+          disabled={disabled}
+          className="relative w-full h-14 bg-white/70 backdrop-blur-md px-5 rounded-2xl text-[16px] text-primary outline-none border border-primary/20 focus:bg-white focus:shadow-[0_0_20px_var(--color-primary)] transition-all z-10 appearance-none cursor-pointer"
+          defaultValue=""
+        >
+          <option value="" disabled hidden>Select an option</option>
+          {options.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none z-20">
+          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
     </div>
   );
@@ -392,6 +422,12 @@ export default function WaitlistPage() {
               <ShinyInput label="Full Name" name="name" type="text" placeholder="" disabled={status === "loading"} />
               <ShinyInput label="Email Address" name="email" type="email" placeholder="" disabled={status === "loading"} />
               <ShinyInput label="Phone Number" name="phone" type="tel" placeholder="" disabled={status === "loading"} />
+              <ShinySelect 
+                label="What will you use Curio for?" 
+                name="intent" 
+                options={["Buying", "Selling", "Browsing", "All of the above"]} 
+                disabled={status === "loading"} 
+              />
 
               {errorMessage && (
                 <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-bold text-sm text-center mt-1">
