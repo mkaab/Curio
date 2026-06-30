@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/',
+          missing: [
+            {
+              type: 'query',
+              key: 'dev',
+              value: '1',
+            },
+          ],
           destination: '/waitlist',
         },
       ],
