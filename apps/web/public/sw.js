@@ -1,6 +1,5 @@
-const CACHE_NAME = 'curio-cache-v1';
+const CACHE_NAME = 'curio-cache-v2';
 const ASSETS_TO_CACHE = [
-  '/',
   '/manifest.json',
   '/assets/hero.png',
   '/assets/streetwear.png',
