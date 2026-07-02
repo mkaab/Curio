@@ -156,8 +156,8 @@ export default function SellPage() {
   };
 
   const nextStep = () => {
-    if (step === 1 && photos.length === 0) {
-      setMessage("Please upload at least one photo.");
+    if (step === 1 && photos.length < 3) {
+      setMessage("Please upload at least 3 photos to give buyers a clear view.");
       return;
     }
     if (step === 2 && (!title || !description || !condition || !lvl3)) {

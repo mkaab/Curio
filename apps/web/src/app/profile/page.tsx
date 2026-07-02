@@ -65,7 +65,7 @@ export default function ProfilePage() {
       // Fetch active listings
       const { data: listingsData } = await supabase
         .from("listing")
-        .select("*")
+        .select("*, favorite(count)")
         .eq("seller_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -79,7 +79,11 @@ export default function ProfilePage() {
               try { parsedImages = JSON.parse(item.images); } catch (e) { parsedImages = [item.images]; }
             }
           }
-          return { ...item, images: parsedImages.length > 0 ? parsedImages : ["/assets/hero.png"] };
+          return { 
+            ...item, 
+            images: parsedImages.length > 0 ? parsedImages : ["/assets/hero.png"],
+            favoriteCount: item.favorite?.[0]?.count || 0
+          };
         });
         setListings(parsedListings);
       }
@@ -87,7 +91,7 @@ export default function ProfilePage() {
       // Fetch Favorites
       const { data: favData } = await supabase
         .from("favorite")
-        .select("listing(*, seller:public_user_profiles(name))")
+        .select("listing(*, seller:public_user_profiles(name), favorite(count))")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -111,6 +115,7 @@ export default function ProfilePage() {
               size: item.size || "OS",
               image: parsedImages.length > 0 ? parsedImages[0] : "/assets/hero.png",
               seller: item.seller?.name || "Curio Member",
+              favoriteCount: item.favorite?.[0]?.count || 0
             };
           });
         setFavoritesList(parsedFavs);
@@ -201,10 +206,10 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-surface font-sans pb-24 md:pb-12">
       <Header showSearch={false} />
       {/* Top Header */}
-      <div className="bg-surface-bright border-b border-surface-container">
-        <div className="max-w-6xl mx-auto px-4 md:px-10 py-6 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className="bg-white">
+        <div className="max-w-6xl mx-auto px-4 md:px-10 pt-6 md:pt-10 flex flex-col">
           <div className="flex items-center space-x-4">
-            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary text-on-primary flex items-center justify-center text-2xl font-bold shadow-inner overflow-hidden">
+            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary text-on-primary flex items-center justify-center text-2xl font-bold shadow-sm overflow-hidden">
               {profile?.avatar_url || profile?.avatarUrl ? (
                 <Image src={profile.avatar_url || profile.avatarUrl} alt="Avatar" fill className="object-cover" />
               ) : (
@@ -217,15 +222,15 @@ export default function ProfilePage() {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+          <div className="flex items-center space-x-6 overflow-x-auto mt-8 border-b border-surface-container hide-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full font-bold transition-all text-sm ${
+                className={`whitespace-nowrap pb-3 border-b-2 font-bold transition-all text-sm cursor-pointer ${
                   activeTab === tab.id
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "bg-surface-dim text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-on-surface-variant hover:text-on-surface hover:border-surface-container"
                 }`}
               >
                 {tab.label}
@@ -248,7 +253,7 @@ export default function ProfilePage() {
             </div>
             
             {listings.length === 0 ? (
-              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+              <div className="flex flex-col items-center justify-center text-center py-20">
                 <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
                 </div>
@@ -268,6 +273,7 @@ export default function ProfilePage() {
                     price={item.price}
                     image={item.images[0]}
                     brand={item.brand}
+                    favoriteCount={item.favoriteCount}
                   />
                 ))}
               </div>
@@ -280,7 +286,7 @@ export default function ProfilePage() {
           <div className="animate-slide-in">
             <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Orders</h2>
             {ordersList.length === 0 ? (
-              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+              <div className="flex flex-col items-center justify-center text-center py-20">
                 <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M21 10.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8.5"/><path d="M21 5.5v5l-9 4-9-4v-5"/><path d="m3 5.5 9-4 9 4"/></svg>
                 </div>
@@ -437,7 +443,7 @@ export default function ProfilePage() {
           <div className="animate-slide-in">
             <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Favorites</h2>
             {favoritesList.length === 0 ? (
-              <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+              <div className="flex flex-col items-center justify-center text-center py-20">
                  <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                  </div>
@@ -460,6 +466,7 @@ export default function ProfilePage() {
                     size={item.size}
                     sellerName={item.seller}
                     isFavorite={true}
+                    favoriteCount={item.favoriteCount}
                     onToggleFavorite={() => handleToggleFavorite(item.id)}
                   />
                 ))}
@@ -473,7 +480,7 @@ export default function ProfilePage() {
           <div className="animate-slide-in">
              <h2 className="text-2xl font-serif font-bold text-primary mb-6">My Chats</h2>
              {conversationsList.length === 0 ? (
-               <div className="bg-surface-bright rounded-lg border border-surface-container p-12 flex flex-col items-center justify-center text-center">
+               <div className="flex flex-col items-center justify-center text-center py-20">
                  <div className="h-16 w-16 bg-surface-dim rounded-full flex items-center justify-center mb-4">
                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
                  </div>
@@ -529,8 +536,7 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-serif font-bold text-primary">Account Settings</h2>
               {saveMessage && <span className="text-primary font-bold text-sm bg-secondary-fixed px-3 py-1 rounded-full">{saveMessage}</span>}
             </div>
-            
-            <div className="bg-surface-bright rounded-lg border border-surface-container p-6 space-y-6">
+            <div className="space-y-8">
               {/* Avatar Upload */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="relative h-20 w-20 rounded-full bg-surface-container/50 border border-surface-container flex items-center justify-center overflow-hidden">

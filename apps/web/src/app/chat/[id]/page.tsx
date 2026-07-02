@@ -17,6 +17,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const [messages, setMessages] = useState<any[]>([]);
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [transaction, setTransaction] = useState<any>(null);
   
   const [counterMessageId, setCounterMessageId] = useState<string | null>(null);
   const [counterAmount, setCounterAmount] = useState("");
@@ -54,6 +55,15 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         .order("timestamp", { ascending: true });
         
       if (msgData) setMessages(msgData);
+
+      // Fetch Transaction
+      const { data: txData } = await supabase
+        .from("transaction")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .maybeSingle();
+      if (txData) setTransaction(txData);
+
       setLoading(false);
       scrollToBottom();
     }
@@ -69,6 +79,12 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_message', filter: `conversation_id=eq.${conversationId}` }, (payload: any) => {
         setMessages(prev => prev.map(m => m.id === payload.new.id ? payload.new : m));
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction', filter: `conversation_id=eq.${conversationId}` }, (payload: any) => {
+        setTransaction(payload.new);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transaction', filter: `conversation_id=eq.${conversationId}` }, (payload: any) => {
+        setTransaction(payload.new);
       })
       .subscribe();
 
@@ -129,17 +145,32 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         agreed_amount: amount,
         platform_fee: 0,
         seller_payout: amount,
-        status: 'pending', // Switched back to pending
+        status: 'placed',
         payment_gateway: 'cod' 
       });
       if (txErr) {
         console.error("Failed to create transaction:", txErr);
         alert("Offer accepted, but failed to create order: " + txErr.message);
-      } else {
-        alert("Order created successfully!");
       }
     }
   };
+
+  const updateTransactionStatus = async (newStatus: string, systemMessage: string) => {
+    if (!transaction) return;
+    await supabase.from("transaction").update({ status: newStatus }).eq("id", transaction.id);
+    await supabase.from("chat_message").insert({
+      conversation_id: conversationId,
+      sender_id: session.user.id,
+      type: "system",
+      text: systemMessage,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  const handleSellerAccept = () => updateTransactionStatus('accepted', 'Seller accepted the order.');
+  const handleSellerShip = () => updateTransactionStatus('shipped', 'Order has been shipped.');
+  const handleBuyerReceive = () => updateTransactionStatus('received', 'Order was received by the buyer.');
+  const handleComplete = () => updateTransactionStatus('completed', 'Transaction completed.');
 
   const handleCounterOffer = async (originalMessageId: string) => {
     const amount = Number(counterAmount);
@@ -187,7 +218,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   return (
     <main className="flex flex-col h-screen bg-surface font-sans">
       {/* Header */}
-      <header className="bg-surface-bright border-b border-surface-container px-4 py-3 flex items-center justify-between z-10 shrink-0">
+      <header className="bg-white px-4 py-4 flex items-center justify-between z-10 shrink-0 border-b border-surface-container/60">
         <div className="flex items-center space-x-3">
           <Button variant="ghost" onClick={() => router.push("/profile?tab=chats")} className="h-10 w-10 p-0 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -214,6 +245,36 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         )}
       </header>
 
+      {/* Transaction Banner */}
+      {transaction && (
+        <div className="bg-surface border-b border-surface-container/60 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm animate-slide-in shadow-sm z-10 relative">
+          <div className="font-serif font-bold text-primary flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>
+              {transaction.status === 'placed' && (isBuyer ? "Order placed. Waiting for seller to accept." : "Buyer placed an order.")}
+              {transaction.status === 'accepted' && "Order accepted. Awaiting shipment."}
+              {transaction.status === 'shipped' && (isBuyer ? "Order shipped! Mark as received when it arrives." : "Order shipped. Waiting for buyer to receive.")}
+              {transaction.status === 'received' && "Order received. Please leave a review."}
+              {transaction.status === 'completed' && "Transaction completed."}
+            </span>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            {transaction.status === 'placed' && !isBuyer && (
+              <Button onClick={handleSellerAccept} className="w-full sm:w-auto font-bold rounded-full bg-brand-green hover:bg-green-600 text-white h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Accept Order</Button>
+            )}
+            {transaction.status === 'accepted' && !isBuyer && (
+              <Button onClick={handleSellerShip} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark Shipped</Button>
+            )}
+            {transaction.status === 'shipped' && isBuyer && (
+              <Button onClick={handleBuyerReceive} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark Received</Button>
+            )}
+            {transaction.status === 'received' && (
+              <Button onClick={handleComplete} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Leave a Review</Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
         {messages.map((msg) => {
@@ -221,20 +282,21 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           
           if (msg.type === 'system') {
              return (
-               <div key={msg.id} className="flex justify-center my-4">
-                 <span className="text-xs font-bold text-on-surface-variant bg-surface-dim px-3 py-1 rounded-full uppercase tracking-wider">
-                   {msg.text}
-                 </span>
+               <div key={msg.id} className="flex justify-center my-6">
+                 <div className="max-w-[90%] md:max-w-[70%] text-center px-5 py-3 bg-white rounded-xl flex flex-col items-center gap-1 border border-surface-container shadow-sm">
+                   <span className="uppercase tracking-widest text-[9px] font-bold text-surface-tint">Transaction Update</span>
+                   <span className="text-xs font-bold text-primary">{msg.text}</span>
+                 </div>
                </div>
              );
           }
 
           return (
             <div key={msg.id} className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-              <div className={`max-w-[80%] md:max-w-[60%] p-3.5 rounded-2xl shadow-sm border ${
+              <div className={`max-w-[80%] md:max-w-[60%] p-3.5 ${
                 isMine 
-                  ? 'bg-primary text-on-primary rounded-br-sm border-transparent' 
-                  : 'bg-surface-bright text-on-surface rounded-bl-sm border-surface-container'
+                  ? 'bg-primary text-on-primary rounded-2xl rounded-tr-sm border-transparent' 
+                  : 'bg-white text-on-surface rounded-2xl rounded-tl-sm border border-surface-container shadow-sm'
               }`}>
                 <p className="text-sm font-medium whitespace-pre-wrap">{msg.text}</p>
                 
@@ -297,17 +359,17 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {/* Input Area */}
-      <div className="bg-surface-bright border-t border-surface-container p-4 shrink-0 pb-safe">
-        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="max-w-4xl mx-auto flex gap-2">
+      <div className="bg-white p-4 shrink-0 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-10 relative">
+        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="max-w-4xl mx-auto flex gap-3">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 h-12 bg-surface-dim border border-surface-container rounded px-5 text-sm font-sans focus:outline-none focus:border-primary transition-colors text-on-surface"
+            className="flex-1 h-12 bg-surface-dim border-none rounded-full px-6 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-surface-container transition-all text-on-surface"
           />
-          <Button type="submit" disabled={!inputText.trim()} className="h-12 w-12 rounded p-0 flex items-center justify-center bg-primary hover:bg-primary-container text-on-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          <Button type="submit" disabled={!inputText.trim()} className="h-12 w-12 rounded-full p-0 flex items-center justify-center bg-primary hover:bg-primary-container text-on-primary border-none shadow-sm cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="ml-0.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
           </Button>
         </form>
       </div>

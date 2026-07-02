@@ -288,8 +288,8 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 md:py-20 w-full flex-1">
 
         {/* Left Side: Image Panel with Thumbnails Selection */}
-        <div className="w-full md:w-3/5 bg-surface border border-surface-container p-4 rounded-lg shadow-sm flex flex-col items-center animate-slide-in">
-          <div className="relative w-full aspect-[3/4] flex-1 min-h-[400px] rounded-lg overflow-hidden bg-surface-dim">
+        <div className="w-full md:w-3/5 flex flex-col items-center animate-slide-in">
+          <div className="relative w-full aspect-[3/4] flex-1 min-h-[400px] rounded-lg overflow-hidden bg-surface-dim group">
             <Image 
               src={item.parsedImages[currentImageIdx]} 
               alt={item.title} 
@@ -297,6 +297,22 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               className="object-cover"
               priority
             />
+            {item.parsedImages.length > 1 && (
+              <>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(prev => (prev === 0 ? item.parsedImages.length - 1 : prev - 1)); }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/90 backdrop-blur-sm text-black opacity-0 group-hover:opacity-100 transition-all shadow-sm z-10"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(prev => (prev === item.parsedImages.length - 1 ? 0 : prev + 1)); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/90 backdrop-blur-sm text-black opacity-0 group-hover:opacity-100 transition-all shadow-sm z-10"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </>
+            )}
           </div>
           
           {/* Thumbnails strip selector */}
@@ -315,11 +331,11 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
           )}
         </div>
 
-        {/* Right Side: The Unified Vinted Details Pane Card */}
-        <div className="w-full md:w-2/5 flex flex-col space-y-4">
+        {/* Right Side: Minimalist Details Pane */}
+        <div className="w-full md:w-2/5 flex flex-col space-y-8 animate-slide-in">
           
           {/* Dynamic Seller Profile Panel */}
-          <div className="bg-white border border-surface-container p-6 rounded-lg shadow-sm flex items-center justify-between animate-slide-in">
+          <div className="flex items-center justify-between pb-6 border-b border-surface-container/60">
             <div className="flex items-center space-x-4">
               <div className="h-12 w-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-lg shrink-0">
                 {item.sellerName[0].toUpperCase()}
@@ -333,13 +349,13 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
             <Link href={`/user/${item.seller_id}`}>
-              <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-9 px-4 rounded cursor-pointer bg-white text-xs">
+              <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-9 px-4 rounded-full cursor-pointer bg-transparent text-xs">
                 View Profile
               </Button>
             </Link>
           </div>
 
-          <div className="bg-white border border-surface-container p-8 rounded-lg shadow-sm space-y-6 animate-slide-in">
+          <div className="space-y-6">
             
             {/* Pricing Section */}
             <div className="flex justify-between items-start">
@@ -386,7 +402,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     autoFocus
                   />
                   <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-on-surface-variant hover:bg-surface-container rounded-full">✕</Button>
-                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-bold h-9 rounded px-4 text-xs whitespace-nowrap border-none cursor-pointer">
+                  <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-on-primary font-bold h-9 rounded-full px-4 text-xs whitespace-nowrap border-none cursor-pointer">
                     Send Offer
                   </Button>
                 </div>
@@ -395,7 +411,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                   <Button 
                     onClick={() => handleInitiateChat('buy')} 
                     isDisabled={isProcessing} 
-                    className="bg-primary hover:bg-primary-container text-on-primary font-bold h-12 w-full rounded text-sm shadow-sm transition-all border-none cursor-pointer"
+                    className="bg-primary hover:bg-primary-container text-on-primary font-bold h-12 w-full rounded-full text-sm shadow-sm transition-all border-none cursor-pointer"
                   >
                     {isProcessing ? "Loading..." : "Buy Now"}
                   </Button>
@@ -403,7 +419,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     onClick={() => setShowOfferInput(true)} 
                     isDisabled={isProcessing} 
                     variant="outline" 
-                    className="border border-surface-container hover:border-surface-tint bg-white hover:bg-surface text-on-surface font-bold h-12 w-full rounded text-sm transition-all cursor-pointer"
+                    className="border border-surface-container hover:border-surface-tint bg-transparent hover:bg-surface-container text-on-surface font-bold h-12 w-full rounded-full text-sm transition-all cursor-pointer"
                   >
                     Make an Offer
                   </Button>
