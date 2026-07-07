@@ -17,6 +17,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   const handleToggleFavorite = async (listingId: string) => {
     if (!currentUser) {
@@ -70,13 +71,27 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
           console.error("Error fetching profile:", profileError);
         }
 
+        // Fetch Review Stats and Reviews
+        const { data: reviewsData } = await supabase
+          .from("review")
+          .select("*, reviewer:public_user_profiles!reviewer_id(name)")
+          .eq("reviewee_id", id)
+          .order("created_at", { ascending: false });
+
+        let averageRating = 5.0;
+        let reviewCount = 0;
+        if (reviewsData && reviewsData.length > 0) {
+          reviewCount = reviewsData.length;
+          averageRating = reviewsData.reduce((acc: number, curr: any) => acc + curr.rating, 0) / reviewCount;
+          setReviews(reviewsData);
+        }
+
         const sellerName = profileData?.name || "Curio Member";
         setSellerProfile({
           id,
           name: sellerName,
-          // Mocking rating as requested since there is no reviews table yet
-          rating: 5.0,
-          reviewCount: 141,
+          rating: averageRating,
+          reviewCount: reviewCount,
         });
 
         // Fetch Seller's Active Listings
@@ -152,7 +167,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
           </div>
           <h1 className="text-3xl font-serif font-bold text-primary mb-2">{sellerProfile.name}</h1>
           <div className="flex items-center space-x-1.5 text-sm text-surface-tint font-bold">
-            <span className="text-primary">★★★★★</span>
+            <span className="text-[#eab308]">{'★'.repeat(Math.round(sellerProfile.rating))}{'☆'.repeat(5 - Math.round(sellerProfile.rating))}</span>
             <span>{sellerProfile.rating.toFixed(1)}</span>
             <span className="text-on-surface-variant font-normal">({sellerProfile.reviewCount} reviews)</span>
           </div>
@@ -194,8 +209,40 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
             </div>
           )}
         </div>
-      </div>
 
+        {/* Reviews Section */}
+        {reviews.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-xl font-serif font-bold text-primary mb-6 border-t border-surface-container/60 pt-10">
+              Reviews ({reviews.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {reviews.map((review) => (
+                <div key={review.id} className="bg-surface-bright rounded-xl p-6 border border-surface-container">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 rounded-full bg-surface-container flex items-center justify-center font-serif font-bold text-primary">
+                        {review.reviewer?.name?.[0]?.toUpperCase() || "A"}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-primary">{review.reviewer?.name || "Anonymous"}</p>
+                        <p className="text-xs text-surface-tint">
+                          {new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[#eab308] text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                  </div>
+                  {review.comment && (
+                    <p className="text-surface-tint text-sm leading-relaxed">{review.comment}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
       <Footer />
     </main>
   );

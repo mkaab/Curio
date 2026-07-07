@@ -27,6 +27,16 @@ function SearchContent() {
   const [condition, setCondition] = useState("All");
   const [sortBy, setSortBy] = useState("Curated Picks");
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const ITEMS_PER_PAGE = 12;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [q, category, condition, priceRange, sortBy]);
+
   // Sync category state if URL changes
   useEffect(() => {
     if (initialCategory !== category) {
@@ -86,7 +96,7 @@ function SearchContent() {
       try {
         let query = supabase
           .from("listing")
-          .select("*, seller:public_user_profiles(name), favorite(count)")
+          .select("*, seller:public_user_profiles(name), favorite(count)", { count: 'exact' })
           .eq("status", "active");
 
         if (q) {
@@ -101,6 +111,14 @@ function SearchContent() {
            query = query.eq("condition", condition);
         }
 
+        if (priceRange === "Under $50") {
+           query = query.lt('price', 5000);
+        } else if (priceRange === "$50 - $200") {
+           query = query.gte('price', 5000).lte('price', 20000);
+        } else if (priceRange === "Over $200") {
+           query = query.gt('price', 20000);
+        }
+
         // Apply sort
         if (sortBy === "Newest") {
            query = query.order("created_at", { ascending: false });
@@ -113,36 +131,40 @@ function SearchContent() {
            query = query.order("created_at", { ascending: false });
         }
 
-        let { data, error } = await query;
+        // Apply Pagination
+        const from = (page - 1) * ITEMS_PER_PAGE;
+        const to = from + ITEMS_PER_PAGE - 1;
+        query = query.range(from, to);
+
+        let { data, count, error } = await query;
 
         if (error) {
           console.error("Query failed, falling back:", error);
-          let fallbackQuery = supabase.from("listing").select("*, favorite(count)").eq("status", "active");
+          let fallbackQuery = supabase.from("listing").select("*, favorite(count)", { count: 'exact' }).eq("status", "active");
           if (q) fallbackQuery = fallbackQuery.or(`title.ilike.%${q}%,brand.ilike.%${q}%,department.ilike.%${q}%`);
           if (category !== "All") fallbackQuery = fallbackQuery.eq("department", category);
           if (condition !== "All") fallbackQuery = fallbackQuery.eq("condition", condition);
           
+          if (priceRange === "Under $50") fallbackQuery = fallbackQuery.lt('price', 5000);
+          else if (priceRange === "$50 - $200") fallbackQuery = fallbackQuery.gte('price', 5000).lte('price', 20000);
+          else if (priceRange === "Over $200") fallbackQuery = fallbackQuery.gt('price', 20000);
+
           if (sortBy === "Newest") fallbackQuery = fallbackQuery.order("created_at", { ascending: false });
           else if (sortBy === "Price: Low to High") fallbackQuery = fallbackQuery.order("price", { ascending: true });
           else if (sortBy === "Price: High to Low") fallbackQuery = fallbackQuery.order("price", { ascending: false });
           else fallbackQuery = fallbackQuery.order("created_at", { ascending: false });
 
+          fallbackQuery = fallbackQuery.range(from, to);
           const fallback = await fallbackQuery;
           data = fallback.data;
+          count = fallback.count;
         }
 
         if (data) {
-          // Manual price filter for ranges
-          let filteredData = data;
-          if (priceRange === "Under $50") {
-             filteredData = data.filter((i:any) => i.price < 5000);
-          } else if (priceRange === "$50 - $200") {
-             filteredData = data.filter((i:any) => i.price >= 5000 && i.price <= 20000);
-          } else if (priceRange === "Over $200") {
-             filteredData = data.filter((i:any) => i.price > 20000);
-          }
-
-          const mappedItems = filteredData.map((item: any) => {
+          setTotalCount(count || 0);
+          setTotalPages(Math.max(1, Math.ceil((count || 0) / ITEMS_PER_PAGE)));
+          
+          const mappedItems = data.map((item: any) => {
             let parsedImages = [];
             try {
               parsedImages = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
@@ -175,7 +197,7 @@ function SearchContent() {
       loadData();
     }, 50);
     return () => clearTimeout(timeoutId);
-  }, [supabase, q, category, condition, priceRange, sortBy]);
+  }, [supabase, q, category, condition, priceRange, sortBy, page]);
 
   return (
     <main className="flex min-h-screen flex-col bg-surface-bright selection:bg-primary selection:text-on-primary">
@@ -244,7 +266,7 @@ function SearchContent() {
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             {!loading && (
               <span className="text-xs font-bold text-surface-tint uppercase tracking-wider">
-                {items.length} Artifacts
+                {totalCount} Artifacts
               </span>
             )}
             <div className="flex items-center gap-2">
@@ -311,20 +333,29 @@ function SearchContent() {
           </div>
         )}
 
-        {/* Pagination Mock */}
-        {items.length > 0 && !loading && (
+        {/* Pagination UI */}
+        {totalPages > 1 && !loading && items.length > 0 && (
           <div className="mt-20 pt-10 border-t border-surface-container/60 flex items-center justify-center">
             <div className="flex items-center gap-2">
-              <button className="px-4 py-2 text-sm font-medium text-surface-tint hover:text-primary transition-colors flex items-center gap-2">
+              <button 
+                onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                disabled={page === 1}
+                className="px-4 py-2 text-sm font-medium text-surface-tint hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 Previous
               </button>
               
               <div className="flex items-center gap-1 mx-4">
-                <button className="w-8 h-8 rounded-full bg-primary text-white font-medium text-sm flex items-center justify-center">1</button>
+                <button className="w-8 h-8 rounded-full bg-primary text-white font-medium text-sm flex items-center justify-center">{page}</button>
+                <span className="text-surface-tint text-sm ml-2 font-semibold">of {totalPages}</span>
               </div>
 
-              <button className="px-4 py-2 text-sm font-medium text-primary hover:text-primary-container transition-colors flex items-center gap-2">
+              <button 
+                onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                disabled={page === totalPages}
+                className="px-4 py-2 text-sm font-medium text-primary hover:text-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer"
+              >
                 Next
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Logo } from "@/components/Logo";
+import { Footer } from "@/components/Footer";
 import { cn } from "@/lib/utils";
 
 /* =========================================
@@ -248,8 +249,8 @@ export default function HowItWorksPage() {
         </div>
 
 
-
       </main>
+      <Footer />
     </div>
   );
 }

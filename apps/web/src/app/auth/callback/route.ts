@@ -28,14 +28,7 @@ export async function GET(request: Request) {
           id: data.user.id,
           name: fullName,
           email: data.user.email,
-          email_verified: data.user.user_metadata?.email_verified || false,
-        })
-        
-        // Insert user profile
-        await supabase.from('user_profile').insert({
-          user_id: data.user.id,
-          verified: false,
-          banned: false,
+          email_verified: data.user.user_metadata?.email_verified ?? true,
         })
         
         // Redirect to origin for new users

@@ -4,6 +4,11 @@ import { useEffect, useState, use, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@curio/ui";
+import { ShippingModal } from "@/components/ShippingModal";
+import { ReviewModal } from "@/components/ReviewModal";
+import { DisputeModal } from "@/components/DisputeModal";
+import { PaymentModal } from "@/components/PaymentModal";
+import { createNotification } from "@/lib/notifications";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,7 +23,16 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(true);
   const [transaction, setTransaction] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+
   const [counterMessageId, setCounterMessageId] = useState<string | null>(null);
   const [counterAmount, setCounterAmount] = useState("");
   
@@ -32,6 +46,14 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         return;
       }
       setSession(session);
+
+      // Fetch user profile for shipping address
+      const { data: profile } = await supabase
+        .from("user")
+        .select("shipping_address")
+        .eq("id", session.user.id)
+        .single();
+      if (profile) setUserProfile(profile);
 
       // Fetch Conversation with listing details
       const { data: convData, error: convErr } = await supabase
@@ -137,16 +159,19 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     }).eq("id", conversationId);
 
     if (status === 'accepted' && amount !== undefined) {
+      const platformFee = Math.round(amount * 0.05);
+      const shippingFee = 250;
       const { error: txErr } = await supabase.from("transaction").insert({
         listing_id: conversation.listing_id,
         conversation_id: Number(conversationId),
         buyer_id: conversation.buyer_id,
         seller_id: conversation.seller_id,
         agreed_amount: amount,
-        platform_fee: 0,
-        seller_payout: amount,
-        status: 'placed',
-        payment_gateway: 'cod' 
+        platform_fee: platformFee,
+        seller_payout: amount - platformFee + shippingFee,
+        shipping_fee: shippingFee,
+        status: 'pending',
+        payment_gateway: 'cod'
       });
       if (txErr) {
         console.error("Failed to create transaction:", txErr);
@@ -155,22 +180,175 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  const updateTransactionStatus = async (newStatus: string, systemMessage: string) => {
+  const handlePayCOD = async () => {
     if (!transaction) return;
-    await supabase.from("transaction").update({ status: newStatus }).eq("id", transaction.id);
+    setIsProcessingPayment(true);
+    await supabase.from("transaction").update({ status: 'placed', payment_gateway: 'cod' }).eq("id", transaction.id);
     await supabase.from("chat_message").insert({
       conversation_id: conversationId,
       sender_id: session.user.id,
       type: "system",
-      text: systemMessage,
+      text: "Buyer selected Cash on Delivery.",
       timestamp: new Date().toISOString()
     });
+    setIsProcessingPayment(false);
   };
 
-  const handleSellerAccept = () => updateTransactionStatus('accepted', 'Seller accepted the order.');
-  const handleSellerShip = () => updateTransactionStatus('shipped', 'Order has been shipped.');
-  const handleBuyerReceive = () => updateTransactionStatus('received', 'Order was received by the buyer.');
-  const handleComplete = () => updateTransactionStatus('completed', 'Transaction completed.');
+  const handlePaySwich = async (shippingAddress: any) => {
+    if (!transaction || !conversation.listing) return;
+    setIsProcessingPayment(true);
+    
+    try {
+      // 1. Save shipping address to user profile
+      await supabase.from("user").update({
+        shipping_address: shippingAddress
+      }).eq("id", session.user.id);
+
+      // 2. Save shipping details to transaction
+      await supabase.from("transaction").update({
+        shipping_details: shippingAddress
+      }).eq("id", transaction.id);
+
+      // 3. Initiate Swich Payment
+      const res = await fetch('/api/payment/swich/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerTransactionId: transaction.id.toString(),
+          amount: transaction.agreed_amount,
+          item: conversation.listing.title,
+          payeename: session.user.email?.split('@')[0] || 'User',
+          email: session.user.email || 'guest@curio.com',
+          msisdn: '03000000000'
+        })
+      });
+      const data = await res.json();
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        alert(data.error || 'Failed to initiate payment');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Payment error');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const updateTransactionStatus = async (newStatus: string, systemMessage: string) => {
+    if (!transaction) return;
+    try {
+      const { updateTransactionStatusSecure } = await import('@/app/actions/transaction');
+      await updateTransactionStatusSecure(transaction.id, newStatus);
+      
+      await supabase.from("chat_message").insert({
+        conversation_id: conversationId,
+        sender_id: session.user.id,
+        type: "system",
+        text: systemMessage,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err: any) {
+      alert(err.message);
+      throw err;
+    }
+  };
+
+  const handleSellerAccept = async () => {
+    await updateTransactionStatus('accepted', 'Seller accepted the order.');
+    await createNotification(supabase, transaction.buyer_id, 'order_accepted', `Your order for ${conversation?.listing?.title} has been accepted!`, `/chat/${conversationId}`);
+  };
+  
+  const handleSellerShip = async (trackingId: string, courierName: string) => {
+    try {
+      // Save tracking info to transaction
+      await supabase.from("transaction").update({ 
+        shipping_tracking_id: `${courierName}: ${trackingId}` 
+      }).eq("id", transaction.id);
+
+      await updateTransactionStatus('shipped', `Order has been shipped via ${courierName}. Tracking: ${trackingId}`);
+      await createNotification(supabase, transaction.buyer_id, 'order_shipped', `Your order for ${conversation?.listing?.title} has been shipped!`, `/chat/${conversationId}`);
+    } catch (err: any) {
+      alert("Failed to save shipping info");
+    }
+  };
+
+  const handleDisputeSubmit = async (reason: string, description: string) => {
+    try {
+      // Create dispute record
+      await supabase.from("dispute").insert({
+        transaction_id: transaction.id,
+        reporter_id: session.user.id,
+        reason: reason,
+        description: description,
+        status: 'open'
+      });
+
+      await updateTransactionStatus('disputed', `Buyer has opened a dispute: ${reason}. Support will review this shortly.`);
+      await createNotification(supabase, transaction.seller_id, 'dispute_opened', `A dispute has been opened for ${conversation?.listing?.title}.`, `/chat/${conversationId}`);
+    } catch (err: any) {
+      alert("Failed to open dispute");
+    }
+  };
+
+  const handleBuyerReceive = async () => {
+    await updateTransactionStatus('received', 'Order was received by the buyer.');
+    await createNotification(supabase, transaction.seller_id, 'order_received', `The buyer has received ${conversation?.listing?.title}! Earnings will be transferred.`, `/chat/${conversationId}`);
+    
+    if (transaction.payment_gateway !== 'cod') {
+      try {
+        const { creditSellerEarning } = await import('@/app/actions/wallet');
+        await creditSellerEarning(transaction.id);
+      } catch (err) {
+        console.error("Failed to credit seller:", err);
+      }
+    }
+  };
+
+  const handleComplete = () => {
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async (rating: number, comment: string) => {
+    if (!transaction) return;
+    setIsSubmittingReview(true);
+    
+    try {
+      // 1. Save the review
+      const { error: reviewErr } = await supabase.from("review").insert({
+        transaction_id: transaction.id,
+        reviewer_id: session.user.id,
+        reviewee_id: isBuyer ? transaction.seller_id : transaction.buyer_id,
+        rating,
+        comment
+      });
+
+      if (reviewErr) {
+        alert("Failed to submit review: " + reviewErr.message);
+        return;
+      }
+
+      // 2. Mark transaction as completed
+      await updateTransactionStatus('completed', 'Order completed and review left.');
+      
+      // 3. Notify the reviewee
+      await createNotification(
+        supabase, 
+        isBuyer ? transaction.seller_id : transaction.buyer_id, 
+        'review_left', 
+        `You received a new ${rating}-star review for ${conversation?.listing?.title}!`, 
+        `/user/${session.user.id}`
+      );
+
+      setIsReviewModalOpen(false);
+    } catch (e) {
+      console.error(e);
+      alert("Something went wrong");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleCounterOffer = async (originalMessageId: string) => {
     const amount = Number(counterAmount);
@@ -217,6 +395,36 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <main className="flex flex-col h-screen bg-surface font-sans">
+      <ShippingModal 
+        isOpen={isShippingModalOpen} 
+        onClose={() => setIsShippingModalOpen(false)} 
+        onSubmit={handleSellerShip} 
+      />
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleSubmitReview}
+      />
+
+      <DisputeModal
+        isOpen={isDisputeModalOpen}
+        onClose={() => setIsDisputeModalOpen(false)}
+        onSubmit={handleDisputeSubmit}
+      />
+
+      <PaymentModal 
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        initialAddress={userProfile?.shipping_address}
+        isProcessing={isProcessingPayment}
+        onConfirm={async (address) => {
+          await handlePaySwich(address);
+          setIsPaymentModalOpen(false);
+        }}
+      />
+
+
       {/* Header */}
       <header className="bg-white px-4 py-4 flex items-center justify-between z-10 shrink-0 border-b border-surface-container/60">
         <div className="flex items-center space-x-3">
@@ -251,26 +459,56 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           <div className="font-serif font-bold text-primary flex items-center space-x-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-brand-green"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>
-              {transaction.status === 'placed' && (isBuyer ? "Order placed. Waiting for seller to accept." : "Buyer placed an order.")}
+              {transaction.status === 'pending_seller_approval' && (isBuyer ? "Order requested. Waiting for seller to accept." : "Buyer wants to purchase this item.")}
+              {transaction.status === 'pending' && (isBuyer ? "Please select a payment method to complete your order." : "Waiting for buyer to complete payment.")}
+              {transaction.status === 'placed' && (isBuyer ? "Order placed. Waiting for seller to ship." : "Buyer placed an order! Please ship the item.")}
               {transaction.status === 'accepted' && "Order accepted. Awaiting shipment."}
               {transaction.status === 'shipped' && (isBuyer ? "Order shipped! Mark as received when it arrives." : "Order shipped. Waiting for buyer to receive.")}
               {transaction.status === 'received' && "Order received. Please leave a review."}
               {transaction.status === 'completed' && "Transaction completed."}
             </span>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            {transaction.status === 'placed' && !isBuyer && (
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            {transaction.status === 'pending_seller_approval' && !isBuyer && (
               <Button onClick={handleSellerAccept} className="w-full sm:w-auto font-bold rounded-full bg-brand-green hover:bg-green-600 text-white h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Accept Order</Button>
             )}
-            {transaction.status === 'accepted' && !isBuyer && (
-              <Button onClick={handleSellerShip} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark Shipped</Button>
+            {transaction.status === 'pending' && isBuyer && (
+              <div className="flex gap-2">
+                <Button onClick={() => setIsPaymentModalOpen(true)} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Pay with Card / Wallet</Button>
+                <Button onClick={handlePayCOD} className="w-full sm:w-auto font-bold rounded-full bg-surface-dim hover:bg-surface-container text-on-surface-variant h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Cash on Delivery</Button>
+              </div>
+            )}
+            {transaction.status === 'placed' && !isBuyer && (
+              <div className="flex flex-col gap-2">
+                <Button onClick={() => setIsShippingModalOpen(true)} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark as Shipped</Button>
+              </div>
             )}
             {transaction.status === 'shipped' && isBuyer && (
-              <Button onClick={handleBuyerReceive} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark Received</Button>
+              <>
+                <Button onClick={handleBuyerReceive} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Mark Received</Button>
+                <Button onClick={() => setIsDisputeModalOpen(true)} className="w-full sm:w-auto font-bold rounded-full bg-red-100 hover:bg-red-200 text-red-700 h-9 px-5 text-xs cursor-pointer border-none shadow-sm ml-2">I have an issue</Button>
+              </>
             )}
             {transaction.status === 'received' && (
               <Button onClick={handleComplete} className="w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-container text-on-primary h-9 px-5 text-xs cursor-pointer border-none shadow-sm">Leave a Review</Button>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Shipping Details Panel for Seller */}
+      {transaction && transaction.status === 'placed' && !isBuyer && transaction.shipping_details && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-4 flex flex-col gap-1 text-sm animate-slide-in shadow-sm z-10 relative">
+          <h3 className="font-bold text-amber-900 mb-1 flex items-center gap-2">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+             Shipping Directions
+          </h3>
+          <p className="text-amber-800 font-medium">Please pack the item securely and ship it to the following address:</p>
+          <div className="bg-white/60 p-3 rounded-lg border border-amber-200 mt-2 font-mono text-xs text-amber-900 shadow-sm inline-block self-start">
+            <p className="font-bold">{transaction.shipping_details.fullName}</p>
+            <p>{transaction.shipping_details.addressLine1}</p>
+            <p>{transaction.shipping_details.city}</p>
+            <p>Phone: {transaction.shipping_details.phone}</p>
           </div>
         </div>
       )}

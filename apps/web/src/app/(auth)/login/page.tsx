@@ -44,6 +44,7 @@ export default function LoginPage() {
 
         if (dbUser) {
           setMessage("Welcome back! Redirecting to feed...");
+          await supabase.from("user").update({ last_seen: new Date().toISOString() }).eq("id", data.session.user.id);
           setTimeout(() => router.push("/"), 1000);
         } else {
           setMessage("Account verification completed. Setting up your profile...");

@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ProductCard } from "@curio/ui";
-import { Button } from "@heroui/react";
+import { Button, Switch } from "@heroui/react";
 import { Header } from "@/components/Header";
+import { WalletTab } from "@/components/WalletTab";
 import Image from "next/image";
 import Link from "next/link";
 
-type Tab = "listings" | "orders" | "favorites" | "chats" | "settings";
+type Tab = "listings" | "orders" | "favorites" | "chats" | "wallet" | "settings";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    if (tab && ["listings", "orders", "favorites", "chats", "settings"].includes(tab)) {
+    if (tab && ["listings", "orders", "favorites", "chats", "wallet", "settings"].includes(tab)) {
       setActiveTab(tab as Tab);
     }
   }, []);
@@ -37,8 +38,99 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
+  const [editBankName, setEditBankName] = useState("");
+  const [editBankAccountTitle, setEditBankAccountTitle] = useState("");
+  const [editBankAccountNumber, setEditBankAccountNumber] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  
+  // CNIC Verification State
+  const [cnicLoading, setCnicLoading] = useState(false);
+  const [cnicError, setCnicError] = useState("");
+  const [cnicSuccess, setCnicSuccess] = useState("");
+
+  // Push Notifications State
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  useEffect(() => {
+    async function checkPush() {
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          const subscription = await registration.pushManager.getSubscription();
+          setPushEnabled(!!subscription);
+        }
+      }
+    }
+    checkPush();
+  }, []);
+
+  const handleTogglePush = async (isSelected: boolean) => {
+    setPushLoading(true);
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        alert("Push notifications are not supported by your browser.");
+        return;
+      }
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        alert("Service worker not found.");
+        return;
+      }
+
+      if (isSelected) {
+        // Subscribe
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert("Permission to show notifications was denied.");
+          return;
+        }
+
+        const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+        if (!vapidPublicKey) {
+          console.error("VAPID public key not found in env.");
+          return;
+        }
+        
+        // Convert base64 to Uint8Array for the browser
+        const padding = '='.repeat((4 - vapidPublicKey.length % 4) % 4);
+        const base64 = (vapidPublicKey + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: outputArray
+        });
+
+        // Send to backend
+        const res = await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription })
+        });
+        
+        if (res.ok) setPushEnabled(true);
+      } else {
+        // Unsubscribe
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          // Ideally also tell backend to delete, but for now just local is fine
+          setPushEnabled(false);
+        }
+      }
+    } catch (e) {
+      console.error("Error toggling push:", e);
+      alert("Failed to change push notification settings.");
+    } finally {
+      setPushLoading(false);
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -60,7 +152,10 @@ export default function ProfilePage() {
       setProfile(pData);
       setEditName(pData.name || "");
       setEditBio(pData.bio || "");
-      setEditAvatar(pData.avatar_url || pData.avatarUrl || "");
+      setEditAvatar(pData.image || "");
+      setEditBankName(pData.bank_name || "");
+      setEditBankAccountTitle(pData.bank_account_title || "");
+      setEditBankAccountNumber(pData.bank_account_number || "");
 
       // Fetch active listings
       const { data: listingsData } = await supabase
@@ -167,24 +262,90 @@ export default function ProfilePage() {
     setIsSaving(true);
     setSaveMessage("");
     try {
-      await supabase.from("user").update({
-        name: editName.trim(),
-        bio: editBio.trim(),
-        avatar_url: editAvatar,
-      }).eq("id", session.user.id);
+      const { error } = await supabase
+        .from("user")
+        .update({
+          name: editName,
+          bio: editBio,
+          image: editAvatar,
+          bank_name: editBankName,
+          bank_account_title: editBankAccountTitle,
+          bank_account_number: editBankAccountNumber,
+        })
+        .eq("id", session.user.id);
+      
+      if (error) throw error;
+
       setSaveMessage("Profile updated successfully!");
-      setProfile((prev: any) => ({ ...prev, name: editName, bio: editBio, avatar_url: editAvatar }));
-    } catch (e) {
-      setSaveMessage("Error saving profile.");
+      setProfile((prev: any) => ({ ...prev, name: editName, bio: editBio, image: editAvatar }));
+      window.dispatchEvent(new Event("profile-updated"));
+    } catch (e: any) {
+      console.error("Error saving profile:", JSON.stringify(e));
+      setSaveMessage("Error saving profile: " + (e.message || JSON.stringify(e) || "Unknown error"));
     } finally {
       setIsSaving(false);
-      setTimeout(() => setSaveMessage(""), 3000);
+      setTimeout(() => setSaveMessage(""), 5000);
     }
   };
 
-  const handleSimulateAvatarUpload = () => {
-    const avatars = ["/assets/hero.png", "/assets/luxury.png", "/assets/streetwear.png"];
-    setEditAvatar(avatars[Math.floor(Math.random() * avatars.length)]);
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 800 * 1024) {
+      alert("File size exceeds 800KB. Please choose a smaller image.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setEditAvatar(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCnicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setCnicError("File size exceeds 2MB. Please choose a smaller image.");
+      return;
+    }
+
+    setCnicLoading(true);
+    setCnicError("");
+    setCnicSuccess("");
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string;
+      try {
+        const res = await fetch('/api/verify-cnic', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64 })
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
+          setCnicSuccess(`Verified successfully! CNIC: ${data.cnic}`);
+          setProfile((prev: any) => ({ 
+            ...prev, 
+            cnic_number: data.cnic, 
+            verification_status: 'verified' 
+          }));
+        } else {
+          setCnicError(data.error || "Failed to verify CNIC. Please try again with a clearer image.");
+        }
+      } catch (err) {
+        setCnicError("Network error occurred during verification.");
+      } finally {
+        setCnicLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading) {
@@ -200,6 +361,7 @@ export default function ProfilePage() {
     { id: "orders", label: "Orders" },
     { id: "favorites", label: "Favorites" },
     { id: "chats", label: "Chats" },
+    { id: "wallet", label: "Wallet" },
     { id: "settings", label: "Settings" },
   ];
   return (
@@ -208,18 +370,41 @@ export default function ProfilePage() {
       {/* Top Header */}
       <div className="bg-white">
         <div className="max-w-6xl mx-auto px-4 md:px-10 pt-6 md:pt-10 flex flex-col">
-          <div className="flex items-center space-x-4">
-            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary text-on-primary flex items-center justify-center text-2xl font-bold shadow-sm overflow-hidden">
-              {profile?.avatar_url || profile?.avatarUrl ? (
-                <Image src={profile.avatar_url || profile.avatarUrl} alt="Avatar" fill className="object-cover" />
-              ) : (
-                profile?.name?.[0]?.toUpperCase() || "C"
-              )}
+          {/* Top Bar Area */}
+          <div className="flex flex-wrap gap-4 items-center justify-between pb-8 border-b border-surface-container">
+            <div className="flex items-center space-x-6">
+              <div className="relative h-24 w-24 rounded-full border-4 border-surface bg-surface-dim shadow-xl overflow-hidden shrink-0 flex items-center justify-center">
+                {profile?.image ? (
+                  profile.image.startsWith("data:image") ? (
+                    <img src={profile.image} alt="Profile" className="object-cover w-full h-full" />
+                  ) : (
+                    <Image src={profile.image} alt="Profile" fill className="object-cover" />
+                  )
+                ) : (
+                  <span className="text-3xl text-surface-tint font-bold">{profile?.name?.[0]?.toUpperCase() || "U"}</span>
+                )}
+              </div>
+              <div className="flex flex-col items-start">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-serif font-extrabold text-primary">{profile?.name || "Curio Member"}</h1>
+                  {profile?.is_admin && (
+                    <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded border border-primary/20">Admin</span>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-surface-tint mt-1 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Verified Member
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-serif font-bold text-primary tracking-tight">{profile?.name || "Curio User"}</h1>
-              <p className="text-on-surface-variant text-sm mt-1">{profile?.email}</p>
-            </div>
+            
+            {profile?.is_admin && (
+              <Link href="/admin">
+                <Button className="font-bold bg-primary text-on-primary hover:bg-primary-container h-10 px-6 rounded-lg shadow-sm border-none">
+                  Admin Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
           
           <div className="flex items-center space-x-6 overflow-x-auto mt-8 border-b border-surface-container hide-scrollbar">
@@ -529,6 +714,11 @@ export default function ProfilePage() {
           </div>
         )}
 
+        {/* WALLET TAB */}
+        {activeTab === "wallet" && (
+           <WalletTab userId={session.user.id} />
+        )}
+
         {/* SETTINGS TAB */}
         {activeTab === "settings" && (
           <div className="max-w-2xl animate-slide-in">
@@ -541,13 +731,18 @@ export default function ProfilePage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="relative h-20 w-20 rounded-full bg-surface-container/50 border border-surface-container flex items-center justify-center overflow-hidden">
                   {editAvatar ? (
-                    <Image src={editAvatar} alt="Profile" fill className="object-cover" />
+                    editAvatar.startsWith("data:image") ? (
+                      <img src={editAvatar} alt="Profile" className="object-cover w-full h-full" />
+                    ) : (
+                      <Image src={editAvatar} alt="Profile" fill className="object-cover" />
+                    )
                   ) : (
                     <span className="text-2xl text-surface-tint font-bold">{editName?.[0]?.toUpperCase() || "U"}</span>
                   )}
                 </div>
                 <div className="flex flex-col items-start">
-                  <Button variant="outline" size="sm" onClick={handleSimulateAvatarUpload} className="mb-2 font-bold text-sm border-2">Change Picture</Button>
+                  <input type="file" id="avatar-upload" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
+                  <label htmlFor="avatar-upload" className="mb-2 font-bold text-sm border-2 border-surface-container rounded-lg px-4 py-2 cursor-pointer hover:bg-surface-bright transition-colors text-on-surface">Change Picture</label>
                   <p className="text-xs text-surface-tint">JPG, GIF or PNG. Max size of 800K</p>
                 </div>
               </div>
@@ -574,6 +769,106 @@ export default function ProfilePage() {
                   className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors min-h-[100px] resize-y"
                 />
               </div>
+
+              <div className="h-px w-full bg-surface-container/50 my-8" />
+              
+              <div>
+                <h3 className="text-lg font-serif font-bold text-primary mb-4">Bank Details for Payouts</h3>
+                <p className="text-xs text-surface-tint mb-4">Enter your bank details to withdraw funds from your Curio wallet.</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface mb-2">Bank Name</label>
+                    <input 
+                      type="text" 
+                      value={editBankName}
+                      onChange={(e) => setEditBankName(e.target.value)}
+                      placeholder="e.g. Meezan Bank, HBL"
+                      className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors text-sm"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface mb-2">Account Title</label>
+                    <input 
+                      type="text" 
+                      value={editBankAccountTitle}
+                      onChange={(e) => setEditBankAccountTitle(e.target.value)}
+                      placeholder="e.g. Muhammad Ali"
+                      className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors text-sm"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface mb-2">IBAN or Account Number</label>
+                    <input 
+                      type="text" 
+                      value={editBankAccountNumber}
+                      onChange={(e) => setEditBankAccountNumber(e.target.value)}
+                      placeholder="PK00 MEEZ 0000 0000 0000 0000"
+                      className="w-full px-4 py-3 bg-surface-bright border border-surface-container rounded focus:outline-none focus:border-primary transition-colors text-sm font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="h-px w-full bg-surface-container/50 my-8" />
+              
+              <div>
+                <h3 className="text-lg font-serif font-bold text-primary mb-4">Identity Verification</h3>
+                {profile?.verification_status === 'verified' ? (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Identity Verified
+                      </p>
+                      <p className="text-xs text-green-700 mt-1">CNIC: {profile.cnic_number?.replace(/\d(?=\d{4})/g, "*")}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-surface-bright border border-surface-container p-4 rounded">
+                    <p className="text-sm font-bold text-on-surface mb-2">Verify Your Identity</p>
+                    <p className="text-xs text-surface-tint mb-4">Upload a clear photo of your CNIC. We will automatically extract the ID number and verify it instantly. Your image will not be saved.</p>
+                    
+                    {cnicError && (
+                      <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-xs font-bold">
+                        {cnicError}
+                      </div>
+                    )}
+                    
+                    {cnicSuccess && (
+                      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-700 text-xs font-bold">
+                        {cnicSuccess}
+                      </div>
+                    )}
+
+                    <div className="relative border-2 border-dashed border-surface-container rounded-lg p-6 flex flex-col items-center justify-center hover:bg-surface-dim transition-colors">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleCnicUpload}
+                        disabled={cnicLoading}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      {cnicLoading ? (
+                        <div className="flex flex-col items-center">
+                          <div className="h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2"></div>
+                          <span className="text-sm font-bold text-primary">Running AI Verification...</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint mb-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                          <span className="text-sm font-bold text-primary">Tap to upload CNIC</span>
+                          <span className="text-xs text-surface-tint mt-1">JPEG/PNG under 2MB</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="h-px w-full bg-surface-container/50 my-8" />
               
               <div>
                 <label className="block text-sm font-bold text-primary mb-2">Email Address</label>
@@ -584,6 +879,28 @@ export default function ProfilePage() {
                   disabled
                 />
                 <p className="text-xs text-on-surface-variant mt-2">Email changes currently require support assistance.</p>
+              </div>
+
+              <div className="h-px w-full bg-surface-container/50 my-8" />
+              
+              <div>
+                <h3 className="text-lg font-serif font-bold text-primary mb-4">Push Notifications</h3>
+                <div className="flex items-center justify-between bg-surface-bright border border-surface-container p-4 rounded">
+                  <div>
+                    <p className="text-sm font-bold text-on-surface">Enable Mobile & Desktop Push</p>
+                    <p className="text-xs text-surface-tint">Get instantly notified about new chats and orders.</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={pushEnabled} 
+                      onChange={(e) => handleTogglePush(e.target.checked)} 
+                      disabled={pushLoading} 
+                    />
+                    <div className="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  </label>
+                </div>
               </div>
 
               <div className="pt-6 border-t border-surface-container flex items-center justify-between">

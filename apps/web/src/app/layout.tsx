@@ -17,9 +17,23 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://curio.pk"),
   title: "Curio | Preloved Fashion Marketplace",
   description: "Curated preloved fashion and lifestyle marketplace in Pakistan.",
   manifest: "/manifest.json",
+  openGraph: {
+    title: "Curio | Preloved Fashion Marketplace",
+    description: "Curated preloved fashion and lifestyle marketplace in Pakistan.",
+    url: "https://curio.pk",
+    siteName: "Curio",
+    locale: "en_PK",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Curio | Preloved Fashion",
+    description: "Curated preloved fashion and lifestyle marketplace in Pakistan.",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

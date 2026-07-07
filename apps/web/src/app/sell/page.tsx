@@ -70,6 +70,7 @@ export default function SellPage() {
   const supabase = createClient();
 
   const [userId, setUserId] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   
@@ -102,6 +103,12 @@ export default function SellPage() {
         router.push("/login");
       } else {
         setUserId(session.user.id);
+        const { data: user } = await supabase.from('user').select('verification_status').eq('id', session.user.id).single();
+        if (user && user.verification_status !== 'verified') {
+          setIsVerified(false);
+        } else {
+          setIsVerified(true);
+        }
       }
     }
     checkSession();
@@ -235,7 +242,20 @@ export default function SellPage() {
       </nav>
 
       <div className="max-w-xl w-full mx-auto px-4 mt-8 md:mt-16 flex-1">
-        {step === 1 && (
+        {isVerified === false ? (
+          <div className="flex flex-col items-center justify-center text-center py-10 animate-fade-in">
+            <div className="h-20 w-20 bg-surface-dim rounded-full flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h2 className="text-3xl font-serif font-extrabold text-primary mb-4">Identity Verification Required</h2>
+            <p className="text-on-surface-variant text-base mb-8 max-w-md">To keep our community safe from scammers, we require all sellers to verify their identity before listing an item. It only takes a few seconds!</p>
+            <Link href="/profile?tab=settings">
+              <Button className="w-full font-bold bg-primary hover:bg-primary-container text-on-primary h-12 text-lg rounded shadow-xl">Verify Identity in Settings</Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            {step === 1 && (
           <div className="space-y-6 animate-slide-in">
             <div>
               <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Upload Photos</h1>
@@ -478,33 +498,37 @@ export default function SellPage() {
             </div>
           </div>
         )}
+          </>
+        )}
       </div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-surface-container p-4 px-6 md:p-6 flex items-center justify-between z-50 md:bg-transparent md:border-none md:max-w-xl md:mx-auto md:w-full md:pb-10">
-        <div className="flex-1">
-          {step > 1 ? (
-             <Button variant="outline" size="lg" onClick={prevStep} className="h-14 font-bold border-2 border-surface-container rounded-2xl w-32 bg-white">Back</Button>
-          ) : (
-             <div />
-          )}
-        </div>
-        
-        <div className="flex-1 flex justify-end">
-          {message && <span className="absolute -top-12 right-6 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-lg animate-fade-in">{message}</span>}
+      {isVerified !== false && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-surface-container p-4 px-6 md:p-6 flex items-center justify-between z-50 md:bg-transparent md:border-none md:max-w-xl md:mx-auto md:w-full md:pb-10">
+          <div className="flex-1">
+            {step > 1 ? (
+               <Button variant="outline" size="lg" onClick={prevStep} className="h-14 font-bold border-2 border-surface-container rounded-2xl w-32 bg-white">Back</Button>
+            ) : (
+               <div />
+            )}
+          </div>
           
-          {step < 3 ? (
-            <Button variant="primary" size="lg" onClick={nextStep} className="h-14 font-bold text-lg rounded-2xl w-40 shadow-xl shadow-primary/20">Next</Button>
-          ) : (
-            <Button variant="primary" size="lg" onClick={handleSubmit} disabled={loading} className="h-14 font-bold text-lg rounded-2xl w-48 shadow-xl shadow-primary/20">
-              {loading ? "Publishing..." : "Publish Item"}
-            </Button>
-          )}
+          <div className="flex-1 flex justify-end">
+            {message && <span className="absolute -top-12 right-6 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-lg animate-fade-in">{message}</span>}
+            
+            {step < 3 ? (
+              <Button variant="primary" size="lg" onClick={nextStep} className="h-14 font-bold text-lg rounded-2xl w-40 shadow-xl shadow-primary/20">Next</Button>
+            ) : (
+              <Button variant="primary" size="lg" onClick={handleSubmit} disabled={loading} className="h-14 font-bold text-lg rounded-2xl w-48 shadow-xl shadow-primary/20">
+                {loading ? "Publishing..." : "Publish Item"}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       
       {/* Guidelines Modal */}
-      {showGuidelines && (
+      {isVerified !== false && showGuidelines && (
         <div className="fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl relative animate-slide-in">
             <button onClick={() => setShowGuidelines(false)} className="absolute top-6 right-6 text-primary/50 hover:text-primary font-bold text-xl leading-none">✕</button>

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/client";
@@ -27,10 +28,30 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
   const supabase = createClient();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const [localQuery, setLocalQuery] = useState(initialQuery);
   const [isFocused, setIsFocused] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
+
+  const fetchNotifications = async (userId: string) => {
+    const { data } = await supabase
+      .from("notification")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_read", false)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (data) setNotifications(data);
+  };
+
+  const handleMarkAsRead = async (notif: any) => {
+    await supabase.from("notification").update({ is_read: true }).eq("id", notif.id);
+    setNotifications(prev => prev.filter(n => n.id !== notif.id));
+    if (notif.link) {
+      router.push(notif.link);
+    }
+  };
 
   useEffect(() => {
     setLocalQuery(initialQuery);
@@ -42,11 +63,13 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
       if (session) {
         setUser(session.user);
         const { data: prof } = await supabase
-          .from("user_profile")
+          .from("user")
           .select("*")
           .eq("id", session.user.id)
           .single();
         if (prof) setProfile(prof);
+        
+        fetchNotifications(session.user.id);
       }
     }
     loadSession();
@@ -55,9 +78,11 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
       (_event: any, session: any) => {
         if (session) {
           setUser(session.user);
+          fetchNotifications(session.user.id);
         } else {
           setUser(null);
           setProfile(null);
+          setNotifications([]);
         }
       }
     );
@@ -66,6 +91,17 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  useEffect(() => {
+    const handleProfileUpdate = async () => {
+      if (user?.id) {
+        const { data } = await supabase.from("user").select("*").eq("id", user.id).single();
+        if (data) setProfile(data);
+      }
+    };
+    window.addEventListener("profile-updated", handleProfileUpdate);
+    return () => window.removeEventListener("profile-updated", handleProfileUpdate);
+  }, [user, supabase]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -173,65 +209,114 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
           </Dropdown>
         </div>
 
+        <div className="hidden sm:block">
+          <button 
+            onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
+            className="font-bold text-[10px] px-3 border-2 border-surface-container rounded-full hover:bg-surface-dim transition-colors h-[38px] flex items-center justify-center cursor-pointer"
+          >
+            {locale === 'en' ? 'UR' : 'EN'}
+          </button>
+        </div>
+
         {user ? (
-          <div className="hidden sm:block">
+          <div className="hidden sm:flex items-center space-x-3">
             <Dropdown>
               <DropdownTrigger>
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-primary/20 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
-                {profile?.name ? profile.name[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : 'U')}
-              </div>
-            </DropdownTrigger>
-            <DropdownPopover placement="bottom end" className="w-52 bg-white rounded-2xl shadow-xl border border-surface-container p-1 overflow-hidden z-50">
-              <DropdownMenu aria-label="Profile Actions" className="outline-none">
-                <DropdownItem key="profile" id="profile" onAction={() => router.push("/profile")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
-                  Profile Settings
-                </DropdownItem>
-                <DropdownItem key="orders" id="orders" onAction={() => router.push("/profile?tab=orders")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
-                  My Orders
-                </DropdownItem>
-                <DropdownItem key="listings" id="listings" onAction={() => router.push("/profile?tab=listings")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
-                  My Listings
-                </DropdownItem>
-                <DropdownItem key="favorites" id="favorites" onAction={() => router.push("/profile?tab=favorites")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
-                  Favorites
-                </DropdownItem>
-                <DropdownItem key="logout" id="logout" className="block px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl cursor-pointer" onAction={handleSignOut}>
-                  Sign Out
-                </DropdownItem>
-              </DropdownMenu>
-            </DropdownPopover>
-          </Dropdown>
-          </div>
-          ) : (
-            <div className="hidden sm:block">
-              <Link href="/login">
-                <Button 
-                  variant="outline" 
-                  className="border-2 border-surface-container hover:border-primary/30 bg-white hover:bg-surface-dim text-on-surface font-extrabold rounded-full px-5 h-[38px] text-xs shadow-sm hover:shadow transition-all duration-300 cursor-pointer"
-                >
-                  {t("header.signup")} | {t("header.login")}
-                </Button>
-              </Link>
-            </div>
-          )}
+                <div className="relative h-9 w-9 rounded-full bg-surface-dim hover:bg-surface-container flex items-center justify-center text-on-surface-variant cursor-pointer transition-colors border border-surface-container/50">
+                  <Bell size={18} strokeWidth={2.5} />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                  )}
+                </div>
+              </DropdownTrigger>
+              <DropdownPopover placement="bottom end" className="w-80 bg-white rounded-2xl shadow-xl border border-surface-container overflow-hidden z-50">
+                <div className="p-4 border-b border-surface-container/60 bg-surface-bright flex justify-between items-center">
+                  <h3 className="font-bold text-primary">Notifications</h3>
+                  <span className="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{notifications.length} unread</span>
+                </div>
+                <div className="max-h-[300px] overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-surface-tint text-sm font-medium">
+                      No new notifications
+                    </div>
+                  ) : (
+                    notifications.map(notif => (
+                      <div 
+                        key={notif.id} 
+                        onClick={() => handleMarkAsRead(notif)}
+                        className="p-4 border-b border-surface-container/30 hover:bg-surface-dim cursor-pointer transition-colors flex items-start gap-3"
+                      >
+                        <div className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />
+                        <div>
+                          <p className="text-sm font-semibold text-on-surface leading-tight">{notif.message}</p>
+                          <span className="text-[10px] text-surface-tint font-bold mt-1 block uppercase">
+                            {new Date(notif.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </DropdownPopover>
+            </Dropdown>
 
-          <div className="hidden sm:block">
-            <button 
-              onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
-              className="font-bold text-[10px] px-3 border-2 border-surface-container rounded-full hover:bg-surface-dim transition-colors h-[38px] flex items-center justify-center mr-2 cursor-pointer"
-            >
-              {locale === 'en' ? 'UR' : 'EN'}
-            </button>
+            <Dropdown>
+              <DropdownTrigger>
+                <div className="relative h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-primary/20 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+                  {profile?.image ? (
+                    profile.image.startsWith("data:image") ? (
+                      <img src={profile.image} alt="Profile" className="object-cover w-full h-full" />
+                    ) : (
+                      <Image src={profile.image} alt="Profile" fill className="object-cover" />
+                    )
+                  ) : (
+                    profile?.name ? profile.name[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : 'U')
+                  )}
+                </div>
+              </DropdownTrigger>
+              <DropdownPopover placement="bottom end" className="w-52 bg-white rounded-2xl shadow-xl border border-surface-container p-1 overflow-hidden z-50">
+                <DropdownMenu aria-label="Profile Actions" className="outline-none">
+                  <DropdownItem key="profile" id="profile" onAction={() => router.push("/profile")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
+                    Profile Settings
+                  </DropdownItem>
+                  <DropdownItem key="orders" id="orders" onAction={() => router.push("/profile?tab=orders")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
+                    My Orders
+                  </DropdownItem>
+                  <DropdownItem key="listings" id="listings" onAction={() => router.push("/profile?tab=listings")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
+                    My Listings
+                  </DropdownItem>
+                  <DropdownItem key="favorites" id="favorites" onAction={() => router.push("/profile?tab=favorites")} className="block px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-dim rounded-xl cursor-pointer">
+                    Favorites
+                  </DropdownItem>
+                  <DropdownItem key="logout" id="logout" className="block px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl cursor-pointer" onAction={handleSignOut}>
+                    Sign Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </DropdownPopover>
+            </Dropdown>
           </div>
+        ) : (
           <div className="hidden sm:block">
-            <Link href={sellPath}>
+            <Link href="/login">
               <Button 
-                className="bg-primary hover:bg-primary-container text-on-primary font-extrabold rounded-full px-6 h-[38px] text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-none cursor-pointer shrink-0"
+                variant="outline" 
+                className="border-2 border-surface-container hover:border-primary/30 bg-white hover:bg-surface-dim text-on-surface font-extrabold rounded-full px-5 h-[38px] text-xs shadow-sm hover:shadow transition-all duration-300 cursor-pointer"
               >
-                {t("header.sell")}
+                {t("header.signup")} | {t("header.login")}
               </Button>
             </Link>
           </div>
+        )}
+
+        <div className="hidden sm:block">
+          <Link href={sellPath}>
+            <Button 
+              className="bg-primary hover:bg-primary-container text-on-primary font-extrabold rounded-full px-6 h-[38px] text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-none cursor-pointer shrink-0"
+            >
+              {t("header.sell")}
+            </Button>
+          </Link>
+        </div>
       </div>
     </nav>
   );

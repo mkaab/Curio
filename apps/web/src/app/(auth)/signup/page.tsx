@@ -50,18 +50,6 @@ function SignupForm() {
           setMessage(`User Table Warning: ${userError.message}. Continuing...`);
         }
 
-        const { error: profileError } = await supabase
-          .from("user_profile")
-          .insert({
-            user_id: data.user.id,
-            verified: false,
-            banned: false,
-          });
-
-        if (profileError) {
-          console.error("user_profile insertion warning:", profileError.message);
-        }
-
         setMessage("Account registered successfully! Redirecting to setup...");
         setTimeout(() => {
           router.push("/");

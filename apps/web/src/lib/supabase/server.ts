@@ -22,12 +22,27 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have proxy refreshing
-            // user sessions.
+            // Ignored in Server Components
           }
         },
       },
+    }
+  )
+}
+
+export async function createAdminClient() {
+  const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = (envUrl && envUrl.startsWith('http')) ? envUrl : 'https://placeholder.supabase.co';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
+
+  return createServerClient(
+    supabaseUrl,
+    supabaseServiceKey,
+    {
+      cookies: {
+        getAll: () => [],
+        setAll: () => {},
+      }
     }
   )
 }

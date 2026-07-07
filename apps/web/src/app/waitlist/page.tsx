@@ -8,6 +8,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Logo } from "@/components/Logo";
+import { Footer } from "@/components/Footer";
 import { LiveSignupsTicker } from "@/components/LiveSignupsTicker";
 
 /* =========================================
@@ -183,7 +184,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-white overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
+    <main className="relative min-h-screen bg-background overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
 
       {/* Better Spaced Parallax Fashion Items (Now fixed across the viewport) */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -193,7 +194,7 @@ export default function WaitlistPage() {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[10%] left-[8%] md:left-[12%] w-32 h-32 md:w-56 md:h-56 opacity-80 will-change-transform"
         >
-          <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill quality={100} className="object-contain drop-shadow-2xl" />
+          <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="(max-width: 768px) 100vw, 50vw" priority quality={100} className="object-contain drop-shadow-2xl" />
         </motion.div>
 
         {/* Sunglasses - Top Right */}
@@ -202,7 +203,7 @@ export default function WaitlistPage() {
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           className="absolute top-[25%] right-[8%] md:right-[15%] w-24 h-24 md:w-40 md:h-40 opacity-70 will-change-transform"
         >
-          <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill quality={100} className="object-contain drop-shadow-xl" />
+          <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-xl" />
         </motion.div>
 
         {/* Denim Jacket - Middle Left */}
@@ -211,7 +212,7 @@ export default function WaitlistPage() {
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           className="absolute top-[50%] left-[5%] md:left-[10%] w-32 h-32 md:w-48 md:h-48 opacity-50 will-change-transform"
         >
-          <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill quality={100} className="object-contain drop-shadow-xl" />
+          <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-xl" />
         </motion.div>
 
         {/* Handbag - Bottom Right */}
@@ -220,7 +221,7 @@ export default function WaitlistPage() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           className="absolute bottom-[10%] right-[5%] md:right-[12%] w-32 h-32 md:w-64 md:h-64 opacity-70 will-change-transform"
         >
-          <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill quality={100} className="object-contain drop-shadow-2xl" />
+          <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-2xl" />
         </motion.div>
       </div>
 
@@ -321,7 +322,7 @@ export default function WaitlistPage() {
           whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-          className="bg-white/40 backdrop-blur-3xl p-10 md:p-16 rounded-[40px] border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] relative overflow-hidden"
+          className="bg-white backdrop-blur-3xl p-10 md:p-16 rounded-[40px] border-2 border-primary/10 shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] relative overflow-hidden"
         >
           {/* Subtle gradient glow inside the card */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
@@ -381,7 +382,7 @@ export default function WaitlistPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-white/70 backdrop-blur-3xl border border-white p-10 rounded-[32px] shadow-2xl flex flex-col items-center w-full relative overflow-hidden"
+            className="bg-white backdrop-blur-3xl border-2 border-primary/10 p-10 rounded-[32px] shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] flex flex-col items-center w-full relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
             <motion.div
@@ -411,13 +412,14 @@ export default function WaitlistPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="w-full flex flex-col items-center"
+            className="w-full flex flex-col items-center bg-white backdrop-blur-3xl border-2 border-primary/10 p-10 md:p-16 rounded-[40px] shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] relative overflow-hidden"
           >
-            <h3 className="text-2xl font-serif font-bold text-primary mb-8">Secure your spot in line.</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
+            <h3 className="text-3xl font-serif font-bold text-primary mb-8 relative z-10 text-center">Secure your spot in line.</h3>
 
             <form
               action={handleSubmit}
-              className="w-full bg-white/40 backdrop-blur-3xl p-6 md:p-8 rounded-[36px] border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col gap-5 relative"
+              className="w-full flex flex-col gap-5 relative z-10"
             >
               <ShinyInput label="Full Name" name="name" type="text" placeholder="" disabled={status === "loading"} />
               <ShinyInput label="Email Address" name="email" type="email" placeholder="" disabled={status === "loading"} />
@@ -440,11 +442,14 @@ export default function WaitlistPage() {
               </SweepButton>
             </form>
 
-            <p className="mt-8 text-[13px] text-primary/50 font-medium">
+            <p className="mt-8 text-[13px] text-primary/50 font-medium relative z-10">
               We promise to keep your data safe.
             </p>
           </motion.div>
         )}
+      </div>
+      <div className="relative z-50 w-full bg-white">
+        <Footer />
       </div>
     </main>
   );
