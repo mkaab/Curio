@@ -132,46 +132,38 @@ const ParallaxImages = () => (
   <>
     {/* Sneaker - Top Left */}
     <motion.div
-      animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+      animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute top-0 left-0 w-64 h-64 opacity-90 will-change-transform"
+      className="absolute top-0 left-[-10px] md:left-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 opacity-90 will-change-transform z-10"
     >
-      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-        <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="300px" priority quality={100} className="object-contain drop-shadow-xl p-4" />
-      </div>
+      <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="(max-width: 768px) 150px, 300px" priority quality={100} className="object-contain drop-shadow-xl" />
     </motion.div>
 
     {/* Sunglasses - Top Right */}
     <motion.div
-      animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
+      animate={{ y: [0, 10, 0], rotate: [0, -10, 0] }}
       transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-      className="absolute top-10 right-0 w-48 h-48 opacity-80 will-change-transform"
+      className="absolute top-4 right-[-10px] md:top-10 md:right-0 w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 opacity-90 will-change-transform z-20"
     >
-      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-        <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="200px" quality={100} className="object-contain drop-shadow-md p-4" />
-      </div>
+      <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="(max-width: 768px) 150px, 200px" quality={100} className="object-contain drop-shadow-md" />
     </motion.div>
 
     {/* Denim Jacket - Bottom Left */}
     <motion.div
-      animate={{ y: [0, -15, 0], x: [0, 5, 0], rotate: [0, -5, 0] }}
+      animate={{ y: [0, -10, 0], x: [0, 5, 0], rotate: [0, -5, 0] }}
       transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      className="absolute bottom-10 left-10 w-56 h-56 opacity-80 will-change-transform"
+      className="absolute bottom-4 left-4 md:bottom-10 md:left-10 w-36 h-36 sm:w-44 sm:h-44 md:w-56 md:h-56 opacity-85 will-change-transform z-0"
     >
-      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-        <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="250px" quality={100} className="object-contain drop-shadow-lg p-4" />
-      </div>
+      <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="(max-width: 768px) 150px, 250px" quality={100} className="object-contain drop-shadow-lg" />
     </motion.div>
 
     {/* Handbag - Bottom Right */}
     <motion.div
-      animate={{ y: [0, 20, 0], rotate: [0, 8, 0] }}
+      animate={{ y: [0, 15, 0], rotate: [0, 8, 0] }}
       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      className="absolute bottom-0 right-10 w-64 h-64 opacity-90 will-change-transform"
+      className="absolute bottom-[-10px] right-4 md:bottom-0 md:right-10 w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 opacity-95 will-change-transform z-30"
     >
-      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-        <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="300px" quality={100} className="object-contain drop-shadow-xl p-4" />
-      </div>
+      <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="(max-width: 768px) 200px, 300px" quality={100} className="object-contain drop-shadow-2xl" />
     </motion.div>
   </>
 );
