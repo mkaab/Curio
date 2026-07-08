@@ -34,7 +34,7 @@ function TextReveal({ text, className, dir = "ltr" }: { text: string; className?
             <span key={`${lineIdx}-${i}`} className="inline-block overflow-hidden mr-[0.25em]">
               <motion.span
                 className={cn(
-                  "inline-block", 
+                  "inline-block",
                   word.toLowerCase().includes("pre-loved") && "italic bg-primary text-on-primary px-4 py-0.5 rounded-lg shadow-lg"
                 )}
                 variants={{
@@ -186,50 +186,11 @@ export default function WaitlistPage() {
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden selection:bg-primary selection:text-on-primary pb-32">
 
-      {/* Better Spaced Parallax Fashion Items (Now fixed across the viewport) */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Sneaker - Top Left */}
-        <motion.div
-          animate={{ y: [0, -30, 0], rotate: [0, 5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] left-[8%] md:left-[12%] w-32 h-32 md:w-56 md:h-56 opacity-80 will-change-transform"
-        >
-          <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="(max-width: 768px) 100vw, 50vw" priority quality={100} className="object-contain drop-shadow-2xl" />
-        </motion.div>
-
-        {/* Sunglasses - Top Right */}
-        <motion.div
-          animate={{ y: [0, 35, 0], rotate: [0, 12, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="absolute top-[25%] right-[8%] md:right-[15%] w-24 h-24 md:w-40 md:h-40 opacity-70 will-change-transform"
-        >
-          <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-xl" />
-        </motion.div>
-
-        {/* Denim Jacket - Middle Left */}
-        <motion.div
-          animate={{ y: [0, -25, 0], x: [0, 10, 0], rotate: [0, -5, 0] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute top-[50%] left-[5%] md:left-[10%] w-32 h-32 md:w-48 md:h-48 opacity-50 will-change-transform"
-        >
-          <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-xl" />
-        </motion.div>
-
-        {/* Handbag - Bottom Right */}
-        <motion.div
-          animate={{ y: [0, 40, 0], rotate: [0, -8, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[10%] right-[5%] md:right-[12%] w-32 h-32 md:w-64 md:h-64 opacity-70 will-change-transform"
-        >
-          <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="(max-width: 768px) 100vw, 50vw" quality={100} className="object-contain drop-shadow-2xl" />
-        </motion.div>
-      </div>
-
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
         <Logo className="text-2xl" />
         <div className="flex items-center space-x-4 mr-4">
           <LiveSignupsTicker names={recentNames} />
-          <button 
+          <button
             onClick={() => setLocale(locale === 'en' ? 'ur' : 'en')}
             className="font-bold text-[10px] px-3 border-2 border-primary/20 text-primary rounded-full hover:bg-primary/5 transition-colors h-[32px] flex items-center justify-center cursor-pointer shrink-0"
           >
@@ -238,59 +199,70 @@ export default function WaitlistPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 pt-20 md:pt-28 pb-20 flex flex-col items-center text-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-col items-center w-full">
+      {/* Hero Section (2-Column Grid) */}
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-20 md:pt-20 pb-20 flex flex-col md:flex-row items-center justify-between gap-12">
+
+        {/* Left Column: Text */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-col items-start w-full md:w-1/2 text-left">
+
           <motion.div
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-1.5 mb-8 text-[12px] font-bold tracking-[0.15em] text-primary uppercase bg-white/80 backdrop-blur-md rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group"
+            className="text-[11.5px] uppercase tracking-[0.2em] var(--font-editorial-sans) text-primary/60 mb-6 font-bold"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
-            {t("waitlist.comingSoon")}
+            PRELOVED FASHION · PAKISTAN
           </motion.div>
 
-          <TextReveal
-            text={t("waitlist.heroTitle")}
-            dir={locale === 'ur' ? 'rtl' : 'ltr'}
-            className="text-[32px] md:text-[54px] md:leading-[1.2] font-serif font-extrabold uppercase text-primary mb-6 tracking-wide drop-shadow-sm max-w-4xl"
-          />
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="text-[48px] md:text-[102px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-0"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            Buy. Sell.
+          </motion.h1>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+            className="text-[48px] md:text-[102px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary/70 italic mb-8"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            Browse.
+          </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8 }}
-            className="text-lg md:text-xl text-primary/70 font-medium mb-10 max-w-md leading-relaxed tracking-tight"
-            dir={locale === 'ur' ? 'rtl' : 'ltr'}
+            className="text-[16px] md:text-[20px] font-light text-primary/80 mb-10 max-w-md leading-relaxed tracking-wide"
+            style={{ fontFamily: 'var(--font-jost)' }}
           >
-            {t("waitlist.heroSubtitle")}
+            Curated pre-loved pieces, rotated with ease. Zero fees, high aesthetic — a marketplace for fashion lovers.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-md flex flex-col sm:flex-row items-center gap-4">
-            <Link href="/how-it-works" className="w-full sm:w-[45%] h-[56px] flex items-center justify-center rounded-full border-[1.5px] border-primary text-primary font-bold text-[15px] hover:bg-primary/5 transition-colors shadow-sm">
-              {t("waitlist.howItWorks")}
-            </Link>
             <button
               onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
-              className="relative w-full sm:w-[55%] h-[56px] rounded-full overflow-hidden group active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
+              className="relative w-full sm:w-[50%] h-[56px] rounded-none overflow-hidden group active:scale-95 transition-all duration-300 bg-primary"
             >
-              <div className="absolute inset-0 bg-primary transition-colors z-0" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
-              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[15px]">
-                {t("waitlist.joinWaitlist")}
+              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[12px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-jost)' }}>
+                Join the Waitlist
               </div>
             </button>
+            <Link href="/how-it-works" className="w-full sm:w-[50%] h-[56px] flex items-center justify-center rounded-none border-[1.5px] border-primary text-primary font-bold text-[12px] uppercase tracking-widest hover:bg-primary/5 transition-colors" style={{ fontFamily: 'var(--font-jost)' }}>
+              How it Works
+            </Link>
           </motion.div>
 
           {/* Social Proof Count */}
           {waitlistCount >= 0 && (
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} 
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
               className="mt-6 flex items-center space-x-3 text-primary/70 font-medium"
             >
               <div className="flex -space-x-2">
                 <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary-container flex items-center justify-center shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </div>
                 <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary/20 flex items-center justify-center shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
                 </div>
                 {waitlistCount >= 1000 ? (
                   <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary flex items-center justify-center shadow-sm text-[10px] text-on-primary font-bold">
@@ -313,98 +285,130 @@ export default function WaitlistPage() {
           )}
 
         </motion.div>
+
+        {/* Right Column: Parallax Images */}
+        <div className="w-full md:w-1/2 relative h-[500px] hidden md:block pointer-events-none">
+          {/* Sneaker - Top Left */}
+          <motion.div
+            animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 left-0 w-64 h-64 opacity-90 will-change-transform"
+          >
+            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+              <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="300px" priority quality={100} className="object-contain drop-shadow-xl p-4" />
+            </div>
+          </motion.div>
+
+          {/* Sunglasses - Top Right */}
+          <motion.div
+            animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute top-10 right-0 w-48 h-48 opacity-80 will-change-transform"
+          >
+            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+              <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="200px" quality={100} className="object-contain drop-shadow-md p-4" />
+            </div>
+          </motion.div>
+
+          {/* Denim Jacket - Bottom Left */}
+          <motion.div
+            animate={{ y: [0, -15, 0], x: [0, 5, 0], rotate: [0, -5, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute bottom-10 left-10 w-56 h-56 opacity-80 will-change-transform"
+          >
+            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+              <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="250px" quality={100} className="object-contain drop-shadow-lg p-4" />
+            </div>
+          </motion.div>
+
+          {/* Handbag - Bottom Right */}
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: [0, 8, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute bottom-0 right-10 w-64 h-64 opacity-90 will-change-transform"
+          >
+            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+              <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="300px" quality={100} className="object-contain drop-shadow-xl p-4" />
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       {/* About Section for Pakistan */}
-      <div className="relative z-10 w-full max-w-3xl mx-auto px-6 py-20 text-center">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 40, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 py-20 text-left">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-          className="bg-white backdrop-blur-3xl p-10 md:p-16 rounded-[40px] border-2 border-primary/10 shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] relative overflow-hidden"
+          transition={{ duration: 0.8 }}
+          className="w-full relative flex flex-col md:flex-row gap-12"
         >
-          {/* Subtle gradient glow inside the card */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+          <div className="w-full md:w-1/2">
+            <h2 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary tracking-tight sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              Redefining Thrift in Pakistan.
+            </h2>
+          </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: { transition: { staggerChildren: 0.2 } },
-              hidden: {},
-            }}
-            className="relative z-10"
-          >
-            <TextReveal 
-              text="Redefining Thrift in Pakistan." 
-              className="text-3xl md:text-4xl font-serif font-extrabold text-primary mb-8 tracking-tight justify-center"
-            />
-            
-            <div className="space-y-6 text-lg md:text-xl text-primary/80 font-medium leading-relaxed">
-              <motion.p
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
-                }}
-              >
-                Pakistan's fashion landscape is vibrant, but letting go of great clothes shouldn't be complicated or expensive. We noticed a huge gap: there is no aesthetic, dedicated, and truly free platform to rotate your wardrobe.
-              </motion.p>
-              
-              <motion.p
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
-                }}
-              >
-                That's why we're building Curio. A marketplace designed for fashion lovers, where you can buy and sell premium pre-loved clothing directly to each other. <strong>No hidden cuts, no massive commission fees, no middlemen.</strong>
-              </motion.p>
-              
-              <motion.p
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
-                }}
-                className="font-serif font-bold text-primary text-xl md:text-2xl pt-4"
-              >
-                Just pure style, sustainably shared.
-              </motion.p>
-            </div>
-          </motion.div>
+          <div className="w-full md:w-1/2 space-y-6 text-lg md:text-[20px] text-primary/80 font-light leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+              }}
+            >
+              Pakistan's fashion landscape is vibrant, but letting go of great clothes shouldn't be complicated or expensive. We noticed a huge gap: there is no aesthetic, dedicated, and truly free platform to rotate your wardrobe.
+            </motion.p>
+
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+              }}
+            >
+              That's why we're building Curio. A marketplace designed for fashion lovers, where you can buy and sell premium pre-loved clothing directly to each other. <strong className="font-medium">No hidden cuts, no massive commission fees, no middlemen.</strong>
+            </motion.p>
+
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+              }}
+              className="var(--font-editorial-serif) font-medium text-primary text-[24px] md:text-[32px] pt-4 italic" style={{ fontFamily: 'var(--font-cormorant)' }}
+            >
+              Just pure style, sustainably shared.
+            </motion.p>
+          </div>
         </motion.div>
       </div>
 
       {/* Form Section */}
-      <div id="waitlist-form" className="relative z-10 w-full max-w-xl mx-auto px-6 py-20 flex flex-col items-center">
+      <div id="waitlist-form" className="relative z-10 w-full max-w-6xl mx-auto px-6 py-20 flex flex-col items-start">
 
         {status === "success" ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-white backdrop-blur-3xl border-2 border-primary/10 p-10 rounded-[32px] shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] flex flex-col items-center w-full relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full flex flex-col md:flex-row gap-12 relative overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
-            <motion.div
-              initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, -10, 0] }} transition={{ type: "spring", bounce: 0.6 }}
-              className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6 shadow-xl shadow-primary/40"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-on-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </motion.div>
-            <h2 className="text-4xl font-serif font-extrabold text-primary mb-3 tracking-tight">You're on the list!</h2>
-            <p className="text-primary/70 font-medium max-w-sm mb-8 text-center text-lg leading-relaxed">
-              Keep an eye on your inbox. We'll let you know the moment you can turn your closet into cash.
-            </p>
-            <button 
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="h-14 px-10 bg-white text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-on-primary transition-all w-full active:scale-95 shadow-md"
-            >
-              Back to Top
-            </button>
+            <div className="w-full md:w-1/2">
+              <h2 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-6 tracking-tight sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                You're on the list!
+              </h2>
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col items-start">
+              <p className="text-primary/70 font-light max-w-md mb-10 text-left text-[16px] md:text-[20px] leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>
+                Keep an eye on your inbox. We'll let you know the moment you can turn your closet into cash.
+              </p>
+              <button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="h-[56px] px-10 bg-white text-primary border border-primary font-bold rounded-none hover:bg-primary/5 transition-all active:scale-95 text-[12px] uppercase tracking-widest"
+                style={{ fontFamily: 'var(--font-jost)' }}
+              >
+                Back to Top
+              </button>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -412,39 +416,44 @@ export default function WaitlistPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="w-full flex flex-col items-center bg-white backdrop-blur-3xl border-2 border-primary/10 p-10 md:p-16 rounded-[40px] shadow-[0_30px_100px_-15px_rgba(0,0,0,0.2)] relative overflow-hidden"
+            className="w-full flex flex-col md:flex-row gap-12 relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
-            <h3 className="text-3xl font-serif font-bold text-primary mb-8 relative z-10 text-center">Secure your spot in line.</h3>
+            <div className="w-full md:w-1/2">
+              <h3 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-8 relative z-10 text-left sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                Secure your spot <br /><span className="italic text-primary/70">in line.</span>
+              </h3>
+            </div>
 
-            <form
-              action={handleSubmit}
-              className="w-full flex flex-col gap-5 relative z-10"
-            >
-              <ShinyInput label="Full Name" name="name" type="text" placeholder="" disabled={status === "loading"} />
-              <ShinyInput label="Email Address" name="email" type="email" placeholder="" disabled={status === "loading"} />
-              <ShinyInput label="Phone Number" name="phone" type="tel" placeholder="" disabled={status === "loading"} />
-              <ShinySelect 
-                label="What will you use Curio for?" 
-                name="intent" 
-                options={["Buying", "Selling", "Browsing", "All of the above"]} 
-                disabled={status === "loading"} 
-              />
+            <div className="w-full md:w-1/2">
+              <form
+                action={handleSubmit}
+                className="w-full max-w-md flex flex-col gap-5 relative z-10"
+              >
+                <ShinyInput label="Full Name" name="name" type="text" placeholder="" disabled={status === "loading"} />
+                <ShinyInput label="Email Address" name="email" type="email" placeholder="" disabled={status === "loading"} />
+                <ShinyInput label="Phone Number" name="phone" type="tel" placeholder="" disabled={status === "loading"} />
+                <ShinySelect
+                  label="What will you use Curio for?"
+                  name="intent"
+                  options={["Buying", "Selling", "Browsing", "All of the above"]}
+                  disabled={status === "loading"}
+                />
 
-              {errorMessage && (
-                <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-bold text-sm text-center mt-1">
-                  {errorMessage}
-                </motion.p>
-              )}
+                {errorMessage && (
+                  <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-bold text-sm text-center mt-1">
+                    {errorMessage}
+                  </motion.p>
+                )}
 
-              <SweepButton disabled={status === "loading"} loading={status === "loading"}>
-                Submit Details
-              </SweepButton>
-            </form>
+                <SweepButton disabled={status === "loading"} loading={status === "loading"}>
+                  Submit Details
+                </SweepButton>
+              </form>
 
-            <p className="mt-8 text-[13px] text-primary/50 font-medium relative z-10">
-              We promise to keep your data safe.
-            </p>
+              <p className="mt-8 text-[13px] text-primary/50 font-medium relative z-10">
+                We promise to keep your data safe.
+              </p>
+            </div>
           </motion.div>
         )}
       </div>
