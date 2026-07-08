@@ -128,6 +128,54 @@ function SweepButton({ children, disabled, loading }: { children: ReactNode, dis
   );
 }
 
+const ParallaxImages = () => (
+  <>
+    {/* Sneaker - Top Left */}
+    <motion.div
+      animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute top-0 left-0 w-64 h-64 opacity-90 will-change-transform"
+    >
+      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+        <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="300px" priority quality={100} className="object-contain drop-shadow-xl p-4" />
+      </div>
+    </motion.div>
+
+    {/* Sunglasses - Top Right */}
+    <motion.div
+      animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
+      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+      className="absolute top-10 right-0 w-48 h-48 opacity-80 will-change-transform"
+    >
+      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+        <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="200px" quality={100} className="object-contain drop-shadow-md p-4" />
+      </div>
+    </motion.div>
+
+    {/* Denim Jacket - Bottom Left */}
+    <motion.div
+      animate={{ y: [0, -15, 0], x: [0, 5, 0], rotate: [0, -5, 0] }}
+      transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      className="absolute bottom-10 left-10 w-56 h-56 opacity-80 will-change-transform"
+    >
+      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+        <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="250px" quality={100} className="object-contain drop-shadow-lg p-4" />
+      </div>
+    </motion.div>
+
+    {/* Handbag - Bottom Right */}
+    <motion.div
+      animate={{ y: [0, 20, 0], rotate: [0, 8, 0] }}
+      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      className="absolute bottom-0 right-10 w-64 h-64 opacity-90 will-change-transform"
+    >
+      <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
+        <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="300px" quality={100} className="object-contain drop-shadow-xl p-4" />
+      </div>
+    </motion.div>
+  </>
+);
+
 /* =========================================
    MAIN PAGE
    ========================================= */
@@ -236,6 +284,11 @@ export default function WaitlistPage() {
             Curated pre-loved pieces, rotated with ease. Zero fees, high aesthetic — a marketplace for fashion lovers.
           </motion.p>
 
+          {/* Mobile Only Parallax Images (Above Buttons) */}
+          <div className="md:hidden w-full relative h-[350px] mb-8 pointer-events-none scale-75 sm:scale-90 origin-top">
+            <ParallaxImages />
+          </div>
+
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="w-full max-w-md flex flex-col sm:flex-row items-center gap-4">
             <button
               onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
@@ -287,50 +340,8 @@ export default function WaitlistPage() {
         </motion.div>
 
         {/* Right Column: Parallax Images */}
-        <div className="w-full md:w-1/2 relative h-[500px] hidden md:block pointer-events-none">
-          {/* Sneaker - Top Left */}
-          <motion.div
-            animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-0 w-64 h-64 opacity-90 will-change-transform"
-          >
-            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-              <Image src="/assets/vintage_sneaker.png" alt="Vintage Sneaker" fill sizes="300px" priority quality={100} className="object-contain drop-shadow-xl p-4" />
-            </div>
-          </motion.div>
-
-          {/* Sunglasses - Top Right */}
-          <motion.div
-            animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-            className="absolute top-10 right-0 w-48 h-48 opacity-80 will-change-transform"
-          >
-            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-              <Image src="/assets/chic_sunglasses.png" alt="Chic Sunglasses" fill sizes="200px" quality={100} className="object-contain drop-shadow-md p-4" />
-            </div>
-          </motion.div>
-
-          {/* Denim Jacket - Bottom Left */}
-          <motion.div
-            animate={{ y: [0, -15, 0], x: [0, 5, 0], rotate: [0, -5, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-10 left-10 w-56 h-56 opacity-80 will-change-transform"
-          >
-            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-              <Image src="/assets/vintage_denim_jacket.png" alt="Denim Jacket" fill sizes="250px" quality={100} className="object-contain drop-shadow-lg p-4" />
-            </div>
-          </motion.div>
-
-          {/* Handbag - Bottom Right */}
-          <motion.div
-            animate={{ y: [0, 20, 0], rotate: [0, 8, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute bottom-0 right-10 w-64 h-64 opacity-90 will-change-transform"
-          >
-            <div className="w-full h-full relative bg-white/50 backdrop-blur-sm p-4 shadow-sm border border-primary/5">
-              <Image src="/assets/designer_handbag.png" alt="Designer Handbag" fill sizes="300px" quality={100} className="object-contain drop-shadow-xl p-4" />
-            </div>
-          </motion.div>
+        <div className="w-full md:w-1/2 relative h-[400px] md:h-[500px] mt-12 md:mt-0 hidden md:block pointer-events-none scale-75 sm:scale-90 md:scale-100 origin-top">
+          <ParallaxImages />
         </div>
       </div>
 

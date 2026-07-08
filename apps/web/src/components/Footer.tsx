@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
-    <footer className="bg-primary pt-20 pb-10 px-8 md:px-16 w-full text-white">
+    <footer className="bg-primary pt-20 pb-10 px-8 md:px-16 w-full text-white" style={{ fontFamily: 'var(--font-jost)' }}>
       <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between mb-20 gap-12">
         <div className="max-w-xs">
-          <h2 className="text-3xl font-serif font-bold mb-6">Curio</h2>
-          <p className="text-white/70 text-sm leading-relaxed mb-8">
+          <Logo className="text-4xl mb-6" colorClass="text-white" />
+          <p className="text-white/70 text-sm leading-relaxed mb-8 font-light tracking-wide">
             Elevating the experience of finding and owning preloved artifacts for the modern home.
           </p>
           <div className="flex gap-4">
@@ -24,16 +25,16 @@ export function Footer() {
         
         <div className="flex gap-16 md:gap-24">
           <div>
-            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6">Marketplace</h4>
-            <ul className="space-y-4 text-sm text-white/70">
+            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">Marketplace</h4>
+            <ul className="space-y-4 text-sm text-white/70 font-light">
               <li><Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
               <li><Link href="/mission" className="hover:text-white transition-colors">Our Mission</Link></li>
               <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6">Support</h4>
-            <ul className="space-y-4 text-sm text-white/70">
+            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">Support</h4>
+            <ul className="space-y-4 text-sm text-white/70 font-light">
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
@@ -45,7 +46,7 @@ export function Footer() {
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto w-full pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-white/50">
+      <div className="max-w-7xl mx-auto w-full pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-white/50 font-light tracking-wide">
         <p>© 2024 Curio Marketplace. Sustainably Curated.</p>
         <p className="mt-4 md:mt-0 tracking-wide">Curating for the future, honoring the past.</p>
       </div>
