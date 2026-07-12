@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Tesseract from 'tesseract.js';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +10,15 @@ export async function POST(request: Request) {
 
     if (authError || !user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate Limit: Max 3 OCR attempts per 5 minutes per user
+    const rateLimitResult = rateLimit(`cnic-verify-${user.id}`, 3, 5 * 60 * 1000);
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Too many verification attempts. Please wait 5 minutes before trying again." 
+      }, { status: 429 });
     }
 
     // Block re-verification — once verified, CNIC cannot be changed

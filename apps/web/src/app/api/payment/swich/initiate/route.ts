@@ -1,8 +1,25 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createClient } from '@/lib/supabase/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate Limit: Max 5 payment initiations per minute per user
+    const rateLimitResult = rateLimit(`payment-init-${user.id}`, 5, 60 * 1000);
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ 
+        error: "Too many payment attempts. Please wait a minute before trying again." 
+      }, { status: 429 });
+    }
+
     const body = await request.json();
     const { customerTransactionId, payeename, email, msisdn } = body;
 
@@ -22,8 +39,8 @@ export async function POST(request: Request) {
     }
 
     // SECURITY FIX: Fetch amount and item from DB, do not trust client
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabaseAdmin = createClient(
+    const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+    const supabaseAdmin = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
