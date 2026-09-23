@@ -247,23 +247,21 @@ export default function WaitlistPage() {
 
           <motion.div
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="text-[11.5px] uppercase tracking-[0.2em] var(--font-editorial-sans) text-primary/60 mb-6 font-bold"
+            className="text-[11.5px] uppercase tracking-[0.2em] text-primary/60 mb-6 font-bold"
           >
             PRELOVED FASHION · PAKISTAN
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="text-[48px] md:text-[102px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-0"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
+            className="text-[48px] md:text-[102px] leading-[1.1] font-serif font-medium text-primary mb-0"
           >
             Buy. Sell.
           </motion.h1>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-            className="text-[48px] md:text-[102px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary/70 italic mb-8"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
+            className="text-[48px] md:text-[102px] leading-[1.1] font-serif font-medium text-primary/70 italic mb-8"
           >
             Browse.
           </motion.h2>
@@ -271,7 +269,6 @@ export default function WaitlistPage() {
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8 }}
             className="text-[16px] md:text-[20px] font-light text-primary/80 mb-10 max-w-md leading-relaxed tracking-wide"
-            style={{ fontFamily: 'var(--font-jost)' }}
           >
             Curated pre-loved pieces, rotated with ease. Zero fees, high aesthetic — a marketplace for fashion lovers.
           </motion.p>
@@ -287,11 +284,11 @@ export default function WaitlistPage() {
               className="relative w-full sm:w-[50%] h-[56px] rounded-none overflow-hidden group active:scale-95 transition-all duration-300 bg-primary"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out z-0" />
-              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[12px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-jost)' }}>
+              <div className="relative z-10 flex items-center justify-center w-full h-full text-on-primary font-bold text-[12px] uppercase tracking-widest">
                 Join the Waitlist
               </div>
             </button>
-            <Link href="/how-it-works" className="w-full sm:w-[50%] h-[56px] flex items-center justify-center rounded-none border-[1.5px] border-primary text-primary font-bold text-[12px] uppercase tracking-widest hover:bg-primary/5 transition-colors" style={{ fontFamily: 'var(--font-jost)' }}>
+            <Link href="/how-it-works" className="w-full sm:w-[50%] h-[56px] flex items-center justify-center rounded-none border-[1.5px] border-primary text-primary font-bold text-[12px] uppercase tracking-widest hover:bg-primary/5 transition-colors">
               How it Works
             </Link>
           </motion.div>
@@ -347,12 +344,12 @@ export default function WaitlistPage() {
           className="w-full relative flex flex-col md:flex-row gap-12"
         >
           <div className="w-full md:w-1/2">
-            <h2 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary tracking-tight sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+            <h2 className="text-[32px] md:text-[54px] leading-[1.1] font-serif font-medium text-primary tracking-tight sticky top-24">
               Redefining Thrift in Pakistan.
             </h2>
           </div>
 
-          <div className="w-full md:w-1/2 space-y-6 text-lg md:text-[20px] text-primary/80 font-light leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>
+          <div className="w-full md:w-1/2 space-y-6 text-lg md:text-[20px] text-primary/80 font-light leading-relaxed tracking-wide">
             <motion.p
               variants={{
                 hidden: { opacity: 0, y: 20 },
@@ -376,7 +373,7 @@ export default function WaitlistPage() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
               }}
-              className="var(--font-editorial-serif) font-medium text-primary text-[24px] md:text-[32px] pt-4 italic" style={{ fontFamily: 'var(--font-cormorant)' }}
+              className="font-serif font-medium text-primary text-[24px] md:text-[32px] pt-4 italic"
             >
               Just pure style, sustainably shared.
             </motion.p>
@@ -394,12 +391,12 @@ export default function WaitlistPage() {
             className="w-full flex flex-col md:flex-row gap-12 relative overflow-hidden"
           >
             <div className="w-full md:w-1/2">
-              <h2 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-6 tracking-tight sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              <h2 className="text-[32px] md:text-[54px] leading-[1.1] font-serif font-medium text-primary mb-6 tracking-tight sticky top-24">
                 You're on the list!
               </h2>
             </div>
             <div className="w-full md:w-1/2 flex flex-col items-start">
-              <p className="text-primary/70 font-light max-w-md mb-10 text-left text-[16px] md:text-[20px] leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>
+              <p className="text-primary/70 font-light max-w-md mb-10 text-left text-[16px] md:text-[20px] leading-relaxed tracking-wide">
                 Keep an eye on your inbox. We'll let you know the moment you can turn your closet into cash.
               </p>
               <button
@@ -407,7 +404,6 @@ export default function WaitlistPage() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className="h-[56px] px-10 bg-white text-primary border border-primary font-bold rounded-none hover:bg-primary/5 transition-all active:scale-95 text-[12px] uppercase tracking-widest"
-                style={{ fontFamily: 'var(--font-jost)' }}
               >
                 Back to Top
               </button>
@@ -422,7 +418,7 @@ export default function WaitlistPage() {
             className="w-full flex flex-col md:flex-row gap-12 relative"
           >
             <div className="w-full md:w-1/2">
-              <h3 className="text-[32px] md:text-[54px] leading-[1.1] var(--font-editorial-serif) font-medium text-primary mb-8 relative z-10 text-left sticky top-24" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              <h3 className="text-[32px] md:text-[54px] leading-[1.1] font-serif font-medium text-primary mb-8 relative z-10 text-left sticky top-24">
                 Secure your spot <br /><span className="italic text-primary/70">in line.</span>
               </h3>
             </div>

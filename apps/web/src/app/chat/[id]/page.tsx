@@ -159,23 +159,12 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     }).eq("id", conversationId);
 
     if (status === 'accepted' && amount !== undefined) {
-      const platformFee = Math.round(amount * 0.05);
-      const shippingFee = 250;
-      const { error: txErr } = await supabase.from("transaction").insert({
-        listing_id: conversation.listing_id,
-        conversation_id: Number(conversationId),
-        buyer_id: conversation.buyer_id,
-        seller_id: conversation.seller_id,
-        agreed_amount: amount,
-        platform_fee: platformFee,
-        seller_payout: amount - platformFee + shippingFee,
-        shipping_fee: shippingFee,
-        status: 'pending',
-        payment_gateway: 'cod'
-      });
-      if (txErr) {
-        console.error("Failed to create transaction:", txErr);
-        alert("Offer accepted, but failed to create order: " + txErr.message);
+      try {
+        const { createTransaction } = await import('@/app/actions/transaction');
+        await createTransaction(Number(conversationId), amount);
+      } catch (err: any) {
+        console.error("Failed to create transaction:", err);
+        alert("Offer accepted, but failed to create order: " + err.message);
       }
     }
   };
@@ -183,15 +172,23 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const handlePayCOD = async () => {
     if (!transaction) return;
     setIsProcessingPayment(true);
-    await supabase.from("transaction").update({ status: 'placed', payment_gateway: 'cod' }).eq("id", transaction.id);
-    await supabase.from("chat_message").insert({
-      conversation_id: conversationId,
-      sender_id: session.user.id,
-      type: "system",
-      text: "Buyer selected Cash on Delivery.",
-      timestamp: new Date().toISOString()
-    });
-    setIsProcessingPayment(false);
+    
+    try {
+      const { placeOrderCOD } = await import('@/app/actions/transaction');
+      await placeOrderCOD(transaction.id);
+
+      await supabase.from("chat_message").insert({
+        conversation_id: conversationId,
+        sender_id: session.user.id,
+        type: "system",
+        text: "Buyer selected Cash on Delivery.",
+        timestamp: new Date().toISOString()
+      });
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handlePaySwich = async (shippingAddress: any) => {

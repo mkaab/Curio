@@ -10,6 +10,7 @@ export interface ProductCardProps {
   price: number;
   image: string;
   size?: string;
+  condition?: string;
   brand?: string;
   sellerName?: string;
   sellerAvatar?: string;
@@ -25,6 +26,7 @@ export function ProductCard({
   price,
   image,
   size,
+  condition,
   brand,
   isFavorite,
   favoriteCount = 0,
@@ -91,28 +93,30 @@ export function ProductCard({
         </div>
         
         <CardContent className="p-0 pt-2 flex flex-col flex-grow">
-          {/* Brand or Title */}
-          <p className="text-[12px] text-on-surface-variant font-medium truncate mb-0.5">
-            {brand || title}
-          </p>
-          
-          {/* Size and Condition */}
-          <p className="text-[12px] text-on-surface-variant mb-1 truncate">
-            {size || "OS"} · Good
-          </p>
-          
-          {/* Base Price */}
-          <p className="text-[15px] font-bold text-on-surface leading-tight mb-0.5">
-            ₨ {price.toLocaleString()}
-          </p>
-          
-          {/* Price with Buyer Protection (incl.) */}
-          <div className="text-[11px] text-surface-tint mt-0.5 flex items-center space-x-1">
-            <span>₨ {(price + 150 + Math.round(price * 0.05)).toLocaleString()} incl.</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
+          {/* Price Section */}
+          <div className="flex flex-col mb-1 leading-tight">
+            <span className="text-[11px] text-on-surface-variant">
+              ₨ {price.toLocaleString()}
+            </span>
+            <div className="flex items-center space-x-1 text-primary">
+              <span className="text-[14px] font-bold">
+                ₨ {(price + 150 + Math.round(price * 0.05)).toLocaleString()} incl.
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
           </div>
+
+          {/* Brand */}
+          <p className="text-xs text-on-surface-variant truncate">
+            {brand || "Unbranded"}
+          </p>
+          
+          {/* Size / Condition */}
+          <p className="text-xs text-on-surface-variant truncate">
+            {size || "OS"} {condition ? `• ${condition}` : ""}
+          </p>
         </CardContent>
       </Card>
     </Link>

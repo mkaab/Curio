@@ -13,7 +13,7 @@ export default function ContactPage() {
       <Header showSearch={true} />
 
       <div className="flex-1 max-w-4xl mx-auto px-6 py-12 md:py-20 animate-fade-in w-full">
-        <h1 className="text-4xl md:text-5xl font-serif font-black text-primary mb-8 tracking-tight">Contact Us</h1>
+        <h1 className="text-4xl md:text-5xl font-serif font-medium text-primary mb-8 tracking-tight">Contact Us</h1>
 
         <div className="bg-surface-bright border border-surface-container rounded-lg p-8">
           <h2 className="text-2xl font-serif font-bold text-primary mb-4">We're here to help</h2>

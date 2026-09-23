@@ -6,6 +6,7 @@ import { ProductCard } from "@curio/ui";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useRouter } from "next/navigation";
+import { parseListingImages } from "@/lib/listings";
 
 export default function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -108,19 +109,14 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
         if (listingsData) {
           const mappedItems = listingsData.map((item: any) => {
-            let parsedImages = [];
-            try {
-              parsedImages = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
-            } catch (err) {
-              parsedImages = [item.images];
-            }
+            const parsedImages = parseListingImages(item.images);
             return {
               id: item.id.toString(),
               title: item.title,
               price: item.price,
               brand: item.brand || "Unbranded",
               size: item.size || "OS",
-              image: parsedImages?.[0] || "/assets/hero.png",
+              image: parsedImages[0],
               seller: sellerName,
               favoriteCount: item.favorite?.[0]?.count || 0
             };
@@ -165,7 +161,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
           <div className="h-24 w-24 rounded-full bg-surface-container text-primary flex items-center justify-center font-serif font-bold text-4xl mb-4 border border-surface-container-high shadow-sm">
             {sellerProfile.name[0].toUpperCase()}
           </div>
-          <h1 className="text-3xl font-serif font-bold text-primary mb-2">{sellerProfile.name}</h1>
+          <h1 className="text-3xl font-serif font-medium text-primary mb-2">{sellerProfile.name}</h1>
           <div className="flex items-center space-x-1.5 text-sm text-surface-tint font-bold">
             <span className="text-[#eab308]">{'★'.repeat(Math.round(sellerProfile.rating))}{'☆'.repeat(5 - Math.round(sellerProfile.rating))}</span>
             <span>{sellerProfile.rating.toFixed(1)}</span>
@@ -181,7 +177,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
         {/* Listings Grid */}
         <div className="mb-6">
-          <h2 className="text-xl font-serif font-bold text-primary mb-6">
+          <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-primary mb-6">
             Wardrobe ({listings.length})
           </h2>
           
@@ -213,7 +209,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
         {/* Reviews Section */}
         {reviews.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-xl font-serif font-bold text-primary mb-6 border-t border-surface-container/60 pt-10">
+            <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-primary mb-6 border-t border-surface-container/60 pt-10">
               Reviews ({reviews.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { calculatePricing } from '@/lib/pricing';
 
 // Initialize Supabase Admin client to bypass RLS for server-side updates
 const supabaseAdmin = createClient(
@@ -59,7 +60,7 @@ export async function GET(request: Request) {
       // Security check: Verify amount matches the database
       const { data: tx, error: fetchErr } = await supabaseAdmin
         .from('transaction')
-        .select('agreed_amount, shipping_fee, status, conversation_id, buyer_id')
+        .select('agreed_amount, shipping_fee, status, conversation_id, buyer_id, listing_id')
         .eq('id', realCustomerTransactionId)
         .single();
 
@@ -69,25 +70,34 @@ export async function GET(request: Request) {
       }
 
       // Check if amount matches to prevent price tampering
-      const shipping_fee = tx.shipping_fee || 250;
-      const buyer_protection_fee = 150 + Math.round(tx.agreed_amount * 0.05);
-      const expectedAmount = tx.agreed_amount + shipping_fee + buyer_protection_fee;
+      const pricing = calculatePricing(tx.agreed_amount, tx.shipping_fee || 250);
       
-      if (parseFloat(amount) !== parseFloat(expectedAmount.toString())) {
-        console.error(`Amount mismatch! Swich amount: ${amount}, DB expected: ${expectedAmount}`);
+      if (parseFloat(amount) !== parseFloat(pricing.totalBuyerPayment.toString())) {
+        console.error(`Amount mismatch! Swich amount: ${amount}, DB expected: ${pricing.totalBuyerPayment}`);
         return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 });
       }
 
-      // Idempotent update: Only update if it is currently pending
+      // Idempotent + atomic: Only update if status is still 'pending'
       if (tx.status === 'pending') {
-        const { error: updateErr } = await supabaseAdmin
+        const { data: updated, error: updateErr } = await supabaseAdmin
           .from('transaction')
           .update({ status: 'placed', payment_gateway: 'swich' })
-          .eq('id', realCustomerTransactionId);
+          .eq('id', realCustomerTransactionId)
+          .eq('status', 'pending')
+          .select('id');
 
         if (updateErr) {
           console.error('Failed to update transaction status:', updateErr);
           return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
+        }
+
+        // Only lock inventory if we actually updated the transaction
+        if (updated && updated.length > 0 && tx.listing_id) {
+          await supabaseAdmin
+            .from('listing')
+            .update({ status: 'sold' })
+            .eq('id', tx.listing_id)
+            .eq('status', 'active');
         }
 
         // Insert a system message into the chat so both parties see the payment confirmation

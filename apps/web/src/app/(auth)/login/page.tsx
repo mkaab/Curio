@@ -83,8 +83,8 @@ export default function LoginPage() {
 
         <Card className="border-none shadow-none md:shadow-2xl md:border md:border-surface-container/50 rounded-[24px]">
           <CardContent className="p-0 md:p-10">
-            <h1 className="text-2xl font-serif font-bold text-on-surface text-center mb-2 tracking-tight">Log in to your account</h1>
-            <p className="text-sm text-surface-tint text-center mb-8">Welcome back! Please enter your details.</p>
+            <h1 className="text-2xl font-serif font-medium text-on-surface text-center mb-2">Log in to your account</h1>
+            <p className="text-sm text-surface-tint text-center mb-8 font-light tracking-wide">Welcome back! Please enter your details.</p>
 
             <Button
               type="button"

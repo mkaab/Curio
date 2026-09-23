@@ -35,6 +35,12 @@ export type Locale = keyof typeof dictionaries;
 export type DictionaryPath = string; // In a full app, we'd strongly type the dot notation paths.
 
 // Helper to get nested value by dot notation (e.g. "header.sell")
-export function getNestedTranslation(obj: any, path: string): string {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj) || path;
+export function getNestedTranslation(obj: Record<string, unknown>, path: string): string {
+  const result = path.split('.').reduce((acc: unknown, part) => {
+    if (acc && typeof acc === 'object' && !Array.isArray(acc)) {
+      return (acc as Record<string, unknown>)[part];
+    }
+    return undefined;
+  }, obj);
+  return typeof result === 'string' ? result : path;
 }

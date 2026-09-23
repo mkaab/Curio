@@ -87,8 +87,8 @@ function SignupForm() {
 
         <Card className="border-none shadow-none md:shadow-2xl md:border md:border-surface-container/50 rounded-[24px]">
           <CardContent className="p-0 md:p-10">
-            <h1 className="text-2xl font-serif font-bold text-on-surface text-center mb-2 tracking-tight">Create your account</h1>
-            <p className="text-sm text-surface-tint text-center mb-8">Join Curio to buy and sell curated fashion.</p>
+            <h1 className="text-2xl font-serif font-medium text-on-surface text-center mb-2">Create your account</h1>
+            <p className="text-sm text-surface-tint text-center mb-8 font-light tracking-wide">Join Curio to buy and sell curated fashion.</p>
 
             <Button
               type="button"

@@ -1,31 +1,20 @@
 import type { Metadata } from "next";
-import { Libre_Caslon_Text, Hanken_Grotesk, Cormorant_Garamond, Jost } from "next/font/google";
+import { Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { PWARegister } from "@/components/PWARegister";
 import TranslationProvider from "@/lib/i18n/client";
 import { getServerTranslation } from "@/lib/i18n/server";
 
-const libreCaslonText = Libre_Caslon_Text({
-  weight: ["400", "700"],
-  variable: "--font-serif",
-  subsets: ["latin"],
-});
-
-const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
 const cormorantGaramond = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  variable: "--font-serif",
   subsets: ["latin"],
 });
 
 const jost = Jost({
   weight: ["300", "400", "500", "600"],
-  variable: "--font-jost",
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
@@ -64,7 +53,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${hankenGrotesk.variable} ${libreCaslonText.variable} ${cormorantGaramond.variable} ${jost.variable} h-full antialiased`}
+      className={`${jost.variable} ${cormorantGaramond.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <PWARegister />

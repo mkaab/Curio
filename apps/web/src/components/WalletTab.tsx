@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@curio/ui";
 import { getWalletBalance, requestWithdrawal, Wallet, WalletTransaction } from "@/app/actions/wallet";
 
@@ -13,21 +13,22 @@ export function WalletTab({ userId }: { userId: string }) {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [error, setError] = useState("");
 
-  const fetchWallet = async () => {
+  const fetchWallet = useCallback(async () => {
     try {
       const data = await getWalletBalance(userId);
       setWallet(data.wallet);
       setTransactions(data.transactions);
-    } catch (err: any) {
-      setError(err.message || "Failed to load wallet.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to load wallet.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchWallet();
-  }, [userId]);
+  }, [fetchWallet]);
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +45,8 @@ export function WalletTab({ userId }: { userId: string }) {
       setWithdrawAmount("");
       await fetchWallet(); // Refresh balance
       alert("Withdrawal request submitted! It is now pending approval.");
-    } catch (err: any) {
-      setError(err.message || "Failed to process withdrawal.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to process withdrawal.");
     } finally {
       setIsWithdrawing(false);
     }

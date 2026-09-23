@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@/lib/supabase/server';
 import { rateLimit } from '@/lib/rate-limit';
+import { calculatePricing } from '@/lib/pricing';
 
 export async function POST(request: Request) {
   try {
@@ -55,9 +56,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Transaction not found.' }, { status: 404 });
     }
 
-    const shipping_fee = tx.shipping_fee || 250;
-    const buyer_protection_fee = 150 + Math.round(tx.agreed_amount * 0.05);
-    const amount = tx.agreed_amount + shipping_fee + buyer_protection_fee;
+    const pricing = calculatePricing(tx.agreed_amount, tx.shipping_fee || 250);
+    const amount = pricing.totalBuyerPayment;
     
     const item = Array.isArray(tx.listing) ? tx.listing[0].title : (tx.listing as any).title;
 
@@ -90,12 +90,8 @@ export async function POST(request: Request) {
     // Build the query string MANUALLY without URL encoding, because Swich's backend 
     // might be failing to decode %40 (@) and %2F (/) just like it failed with + (space).
     const redirectUrl = `${swichBaseUrl}?clientid=${clientId}&customerTransactionId=${uniqueTransactionId}&item=${sanitizedItem}&amount=${amount.toString()}&channel=0&description=Paymentfor${sanitizedItem}&payeename=${sanitizedPayeeName.substring(0, 50)}&email=${email}&msisdn=${msisdn}&currency=PKR&checksum=${checksum}&successRedirectUrl=${successRedirectUrl}`;
-    
-    console.log('--- SWICH PAYMENT INITIATION ---');
-    console.log('Raw Checksum String:', rawString);
-    console.log('Generated Checksum:', checksum);
-    console.log('Redirect URL:', redirectUrl);
-    console.log('--------------------------------');
+
+
 
     return NextResponse.json({ 
       redirectUrl: redirectUrl

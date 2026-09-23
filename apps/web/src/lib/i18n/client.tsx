@@ -23,6 +23,7 @@ export default function TranslationProvider({
   useEffect(() => {
     const saved = localStorage.getItem("curio_locale") as Locale;
     if (saved && (saved === "en" || saved === "ur")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocaleState(saved);
     }
   }, []);

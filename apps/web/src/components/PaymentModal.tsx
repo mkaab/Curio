@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Button, Card, CardContent } from "@heroui/react";
 
+export interface ShippingAddress {
+  fullName: string;
+  addressLine1: string;
+  city: string;
+  phone: string;
+}
+
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialAddress?: any;
+  initialAddress?: ShippingAddress;
   isProcessing: boolean;
-  onConfirm: (address: any) => Promise<void>;
+  onConfirm: (address: ShippingAddress) => Promise<void>;
 }
 
 export function PaymentModal({ isOpen, onClose, initialAddress, isProcessing, onConfirm }: PaymentModalProps) {

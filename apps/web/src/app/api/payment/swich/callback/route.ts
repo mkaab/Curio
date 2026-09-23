@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { calculatePricing } from '@/lib/pricing';
 
 // Initialize Supabase Admin client to bypass RLS for server-side updates
 const supabaseAdmin = createClient(
@@ -13,10 +14,8 @@ export async function GET(request: Request) {
     const requestUrl = new URL(request.url);
     const searchParams = requestUrl.searchParams;
     
-    // Log the full URL to see exactly what Swich sent us
-    console.log('--- SWICH CALLBACK RECEIVED ---');
-    console.log('Full URL:', request.url);
-    console.log('-------------------------------');
+
+
 
     // Case-insensitive param extraction
     const params = Object.fromEntries(searchParams.entries());
@@ -67,7 +66,7 @@ export async function GET(request: Request) {
 
       const { data: tx, error: txErr } = await supabaseAdmin
         .from('transaction')
-        .select('conversation_id, status, agreed_amount, shipping_fee')
+        .select('conversation_id, status, agreed_amount, shipping_fee, listing_id')
         .eq('id', realCustomerTransactionId)
         .single();
 
@@ -75,14 +74,21 @@ export async function GET(request: Request) {
         // Fallback: If webhook was dropped, update status here
         if (tx.status === 'pending' && status?.toLowerCase() === '0') {
           // Verify amount matches
-          const shipping_fee = tx.shipping_fee || 250;
-          const buyer_protection_fee = 150 + Math.round(tx.agreed_amount * 0.05);
-          const expectedAmount = tx.agreed_amount + shipping_fee + buyer_protection_fee;
-          if (amount && parseFloat(amount) === parseFloat(expectedAmount.toString())) {
+          const pricing = calculatePricing(tx.agreed_amount, tx.shipping_fee || 250);
+          if (amount && parseFloat(amount) === parseFloat(pricing.totalBuyerPayment.toString())) {
             await supabaseAdmin
               .from('transaction')
               .update({ status: 'placed', payment_gateway: 'swich' })
-              .eq('id', realCustomerTransactionId);
+              .eq('id', realCustomerTransactionId)
+              .eq('status', 'pending');
+              
+            if (tx.listing_id) {
+              await supabaseAdmin
+                .from('listing')
+                .update({ status: 'sold' })
+                .eq('id', tx.listing_id)
+                .eq('status', 'active');
+            }
               
             if (tx.conversation_id) {
               await supabaseAdmin.from('chat_message').insert({

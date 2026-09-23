@@ -1,6 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-let client: any = null;
+let client: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createClient() {
   const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@curio/ui";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { parseListingImages } from "@/lib/listings";
 
 function SearchContent() {
   const router = useRouter();
@@ -165,19 +166,14 @@ function SearchContent() {
           setTotalPages(Math.max(1, Math.ceil((count || 0) / ITEMS_PER_PAGE)));
           
           const mappedItems = data.map((item: any) => {
-            let parsedImages = [];
-            try {
-              parsedImages = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
-            } catch (err) {
-              parsedImages = [item.images];
-            }
+            const parsedImages = parseListingImages(item.images);
             return {
               id: item.id.toString(),
               title: item.title,
               price: item.price,
               brand: item.brand || "Unbranded",
               size: item.size || "OS",
-              image: parsedImages?.[0] || "/assets/hero.png",
+              image: parsedImages[0],
               seller: item.seller?.name || "Curio Member",
               department: item.department,
               favoriteCount: item.favorite?.[0]?.count || 0
@@ -208,15 +204,15 @@ function SearchContent() {
         {/* Page Header */}
         <div className="mb-12">
           {q ? (
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif font-medium text-primary mb-4 italic">
               Results for "{q}" {category !== "All" && `in ${category}`}
             </h1>
           ) : (
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif font-medium text-primary mb-4">
               Browse {category !== "All" ? category : "Curio"}
             </h1>
           )}
-          <p className="text-surface-tint text-base md:text-lg max-w-2xl leading-relaxed">
+          <p className="text-surface-tint text-sm md:text-base max-w-2xl leading-relaxed tracking-wide font-light">
             Discover an archival collection of pre-loved treasures, curated for longevity and character.
           </p>
         </div>
@@ -265,12 +261,12 @@ function SearchContent() {
 
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             {!loading && (
-              <span className="text-xs font-bold text-surface-tint uppercase tracking-wider">
+              <span className="text-[10px] font-medium text-surface-tint uppercase tracking-[0.15em]">
                 {totalCount} Artifacts
               </span>
             )}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-surface-tint uppercase tracking-wider hidden sm:block">Sort By:</span>
+              <span className="text-[10px] font-medium text-surface-tint uppercase tracking-[0.15em] hidden sm:block">Sort By:</span>
               <select 
                 suppressHydrationWarning
                 value={sortBy}
@@ -298,7 +294,7 @@ function SearchContent() {
             <div className="h-16 w-16 bg-surface-container/50 rounded-full flex items-center justify-center mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </div>
-            <h3 className="text-2xl font-serif font-bold text-primary mb-3">No artifacts found</h3>
+            <h3 className="text-2xl font-serif font-medium text-primary mb-3">No artifacts found</h3>
             <p className="text-surface-tint font-medium max-w-sm">
               We couldn't find any pieces matching your current filters. Try exploring different categories.
             </p>
@@ -307,7 +303,7 @@ function SearchContent() {
                 setCategory("All"); setPriceRange("All"); setCondition("All"); 
                 router.push("/search"); 
               }}
-              className="mt-8 text-sm font-bold text-primary border-b border-primary pb-0.5 hover:text-primary-container hover:border-primary-container transition-colors uppercase tracking-widest"
+              className="mt-8 text-[11px] font-medium text-primary border-b border-primary pb-0.5 hover:text-primary-container hover:border-primary-container transition-colors uppercase tracking-[0.2em]"
             >
               Clear all filters
             </button>

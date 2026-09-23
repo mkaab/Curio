@@ -62,11 +62,11 @@ const StepCard = ({
       transition={{ duration: 0.6, delay }}
       className="border-t border-primary/20 pt-8 pb-8 flex flex-col h-full relative"
     >
-      <div className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mb-6 uppercase" style={{ fontFamily: 'var(--font-jost)' }}>
+      <div className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mb-6 uppercase">
         Step {number.padStart(2, '0')}
       </div>
-      <h3 className="text-3xl font-medium text-primary mb-4" style={{ fontFamily: 'var(--font-cormorant)' }}>{title}</h3>
-      <p className="text-primary/80 font-light leading-relaxed flex-grow text-lg" style={{ fontFamily: 'var(--font-jost)' }}>{description}</p>
+      <h3 className="text-3xl font-serif font-medium text-primary mb-4">{title}</h3>
+      <p className="text-primary/80 font-light leading-relaxed flex-grow text-lg">{description}</p>
     </motion.div>
   );
 };
@@ -90,14 +90,12 @@ export default function HowItWorksPage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
               className="text-[11.5px] uppercase tracking-[0.2em] text-primary/60 mb-6 font-bold"
-              style={{ fontFamily: 'var(--font-jost)' }}
             >
               HOW IT WORKS
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              className="text-[48px] md:text-[84px] font-medium text-primary mb-6 tracking-tight leading-[1.1]"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
+              className="text-[48px] md:text-[84px] font-serif font-medium text-primary mb-6 tracking-tight leading-[1.1]"
             >
               Curate.<br />
               <span className="italic text-primary/70">Circulate.</span>
@@ -105,7 +103,6 @@ export default function HowItWorksPage() {
             <motion.p
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
               className="text-[16px] md:text-[20px] text-primary/80 font-light leading-relaxed max-w-md"
-              style={{ fontFamily: 'var(--font-jost)' }}
             >
               One community, thousands of brands, and a whole lot of second-hand style. Ready to get started? Here's how it works.
             </motion.p>
@@ -127,8 +124,8 @@ export default function HowItWorksPage() {
         {/* Section: For Sellers */}
         <div className="w-full mb-32">
           <div className="flex flex-col mb-12">
-            <h2 className="text-[40px] md:text-[54px] font-medium text-primary tracking-tight leading-[1.1]" style={{ fontFamily: 'var(--font-cormorant)' }}>For Sellers</h2>
-            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Zero fees. Zero friction.</p>
+            <h2 className="text-[40px] md:text-[54px] font-serif font-medium text-primary tracking-tight leading-[1.1]">For Sellers</h2>
+            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide">Zero fees. Zero friction.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -159,8 +156,8 @@ export default function HowItWorksPage() {
         {/* Section: Seller Pro Tips */}
         <div className="w-full mb-32 relative overflow-hidden">
           <div className="flex flex-col mb-12">
-            <h2 className="text-[40px] md:text-[54px] font-medium text-primary tracking-tight leading-[1.1]" style={{ fontFamily: 'var(--font-cormorant)' }}>How to sell 3x faster.</h2>
-            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide max-w-lg" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h2 className="text-[40px] md:text-[54px] font-serif font-medium text-primary tracking-tight leading-[1.1]">How to sell 3x faster.</h2>
+            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide max-w-lg">
               High-quality listings build trust. Follow these 3 golden rules to make your wardrobe irresistible to buyers.
             </p>
           </div>
@@ -170,48 +167,48 @@ export default function HowItWorksPage() {
             <div className="flex flex-col items-center">
               <div className="w-full aspect-square relative rounded-none overflow-hidden shadow-none border border-primary/10 mb-4">
                 <Image src="/assets/good_photo.png" alt="Good Listing Photo" fill unoptimized className="object-cover" />
-                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest text-primary flex items-center shadow-sm uppercase" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest text-primary flex items-center shadow-sm uppercase">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                   DO THIS
                 </div>
               </div>
-              <p className="text-[14px] text-primary/80" style={{ fontFamily: 'var(--font-jost)' }}>Aesthetic, well-lit, centered.</p>
+              <p className="text-[14px] text-primary/80">Aesthetic, well-lit, centered.</p>
             </div>
 
             {/* Bad Example */}
             <div className="flex flex-col items-center">
               <div className="w-full aspect-square relative rounded-none overflow-hidden shadow-none border border-primary/10 mb-4">
                 <Image src="/assets/bad_photo.png" alt="Bad Listing Photo" fill unoptimized className="object-cover opacity-90" />
-                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest text-red-600 flex items-center shadow-sm uppercase" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest text-red-600 flex items-center shadow-sm uppercase">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
                   DON'T DO THIS
                 </div>
               </div>
-              <p className="text-[14px] text-primary/60" style={{ fontFamily: 'var(--font-jost)' }}>Dark, messy background, off-center.</p>
+              <p className="text-[14px] text-primary/60">Dark, messy background, off-center.</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="border-t border-primary/20 pt-8 pb-8">
-              <h4 className="text-[20px] font-medium text-primary mb-4 flex items-center" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase" style={{ fontFamily: 'var(--font-jost)' }}>01</span>
+              <h4 className="text-[20px] font-serif font-medium text-primary mb-4 flex items-center">
+                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase">01</span>
                 Lighting is Everything
               </h4>
-              <p className="text-[16px] text-primary/80 font-light leading-relaxed" style={{ fontFamily: 'var(--font-jost)' }}>Always shoot in natural daylight. Avoid harsh flash or yellow room lights. A clean, bright photo instantly signals quality.</p>
+              <p className="text-[16px] text-primary/80 font-light leading-relaxed">Always shoot in natural daylight. Avoid harsh flash or yellow room lights. A clean, bright photo instantly signals quality.</p>
             </div>
             <div className="border-t border-primary/20 pt-8 pb-8">
-              <h4 className="text-[20px] font-medium text-primary mb-4 flex items-center" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase" style={{ fontFamily: 'var(--font-jost)' }}>02</span>
+              <h4 className="text-[20px] font-serif font-medium text-primary mb-4 flex items-center">
+                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase">02</span>
                 Show All Angles
               </h4>
-              <p className="text-[16px] text-primary/80 font-light leading-relaxed" style={{ fontFamily: 'var(--font-jost)' }}>Buyers appreciate honesty. Include photos of tags, soles, and any minor wear. Transparency prevents returns and builds trust.</p>
+              <p className="text-[16px] text-primary/80 font-light leading-relaxed">Buyers appreciate honesty. Include photos of tags, soles, and any minor wear. Transparency prevents returns and builds trust.</p>
             </div>
             <div className="border-t border-primary/20 pt-8 pb-8">
-              <h4 className="text-[20px] font-medium text-primary mb-4 flex items-center" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase" style={{ fontFamily: 'var(--font-jost)' }}>03</span>
+              <h4 className="text-[20px] font-serif font-medium text-primary mb-4 flex items-center">
+                <span className="text-[11px] font-bold tracking-[0.2em] text-primary/40 mr-4 uppercase">03</span>
                 Write Like a Stylist
               </h4>
-              <p className="text-[16px] text-primary/80 font-light leading-relaxed" style={{ fontFamily: 'var(--font-jost)' }}>Instead of 'blue shirt', write 'Navy oversized linen shirt, perfect for summer.' Detailed, engaging descriptions sell faster.</p>
+              <p className="text-[16px] text-primary/80 font-light leading-relaxed">Instead of 'blue shirt', write 'Navy oversized linen shirt, perfect for summer.' Detailed, engaging descriptions sell faster.</p>
             </div>
           </div>
         </div>
@@ -219,8 +216,8 @@ export default function HowItWorksPage() {
         {/* Section: For Buyers */}
         <div className="w-full mb-32">
           <div className="flex flex-col mb-12">
-            <h2 className="text-[40px] md:text-[54px] font-medium text-primary tracking-tight leading-[1.1]" style={{ fontFamily: 'var(--font-cormorant)' }}>For Buyers</h2>
-            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Premium aesthetics. Pre-loved prices.</p>
+            <h2 className="text-[40px] md:text-[54px] font-serif font-medium text-primary tracking-tight leading-[1.1]">For Buyers</h2>
+            <p className="text-[16px] text-primary/60 font-light mt-2 tracking-wide">Premium aesthetics. Pre-loved prices.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

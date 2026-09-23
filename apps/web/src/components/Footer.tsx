@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
-    <footer className="bg-primary pt-20 pb-10 px-8 md:px-16 w-full text-white" style={{ fontFamily: 'var(--font-jost)' }}>
+    <footer className="bg-primary pt-20 pb-10 px-8 md:px-16 w-full text-white">
       <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between mb-20 gap-12">
         <div className="max-w-xs">
           <Logo className="text-4xl mb-6" colorClass="text-white" />

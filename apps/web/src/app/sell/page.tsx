@@ -247,7 +247,7 @@ export default function SellPage() {
             <div className="h-20 w-20 bg-surface-dim rounded-full flex items-center justify-center mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
             </div>
-            <h2 className="text-3xl font-serif font-extrabold text-primary mb-4">Identity Verification Required</h2>
+            <h2 className="text-3xl font-serif font-medium text-primary mb-4">Identity Verification Required</h2>
             <p className="text-on-surface-variant text-base mb-8 max-w-md">To keep our community safe from scammers, we require all sellers to verify their identity before listing an item. It only takes a few seconds!</p>
             <Link href="/profile?tab=settings">
               <Button className="w-full font-bold bg-primary hover:bg-primary-container text-on-primary h-12 text-lg rounded shadow-xl">Verify Identity in Settings</Button>
@@ -258,7 +258,7 @@ export default function SellPage() {
             {step === 1 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Upload Photos</h1>
+              <h1 className="text-3xl font-serif font-medium text-on-surface tracking-tight mb-2">Upload Photos</h1>
               <p className="text-surface-tint text-base">Add up to 10 photos of your item. Make sure they are clear and well lit.</p>
             </div>
             
@@ -315,7 +315,7 @@ export default function SellPage() {
         {step === 2 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Item Details</h1>
+              <h1 className="text-3xl font-serif font-medium text-on-surface tracking-tight mb-2">Item Details</h1>
               <p className="text-surface-tint text-base">Tell buyers about your item and its condition.</p>
             </div>
             
@@ -465,7 +465,7 @@ export default function SellPage() {
         {step === 3 && (
           <div className="space-y-6 animate-slide-in">
             <div>
-              <h1 className="text-3xl font-serif font-extrabold text-on-surface tracking-tight mb-2">Set your price</h1>
+              <h1 className="text-3xl font-serif font-medium text-on-surface tracking-tight mb-2">Set your price</h1>
               <p className="text-surface-tint text-base">You keep 100% of what you earn on Curio.</p>
             </div>
             
@@ -532,7 +532,7 @@ export default function SellPage() {
         <div className="fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl relative animate-slide-in">
             <button onClick={() => setShowGuidelines(false)} className="absolute top-6 right-6 text-primary/50 hover:text-primary font-bold text-xl leading-none">✕</button>
-            <h3 className="text-2xl font-serif font-black text-primary mb-2">Before you upload</h3>
+            <h3 className="text-2xl font-serif font-medium text-primary mb-2">Before you upload</h3>
             <p className="text-primary/70 text-sm mb-6 font-medium">Great photos sell 3x faster. Follow these rules.</p>
             
             <div className="space-y-4 mb-8">

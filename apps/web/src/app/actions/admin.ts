@@ -137,10 +137,13 @@ export async function resolveDispute(disputeId: number, decision: 'refund_buyer'
     if (tx.payment_gateway !== 'cod') {
       const { data: buyerWallet } = await adminClient.from('wallet').select('id').eq('user_id', tx.buyer_id).single();
       if (buyerWallet) {
+        const shipping_fee = tx.shipping_fee || 250;
+        const refundAmount = tx.agreed_amount + shipping_fee;
+
         await adminClient.from('wallet_transaction').insert({
           wallet_id: buyerWallet.id,
           type: 'refund',
-          amount: tx.agreed_amount,
+          amount: refundAmount,
           status: 'completed',
           reference_id: tx.id.toString(),
           reference_note: `Refund for disputed order: ${tx.listing.title}`

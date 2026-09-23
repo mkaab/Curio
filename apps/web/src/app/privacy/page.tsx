@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <Header showSearch={true} />
       
       <div className="flex-1 max-w-4xl mx-auto px-6 py-12 md:py-20 animate-fade-in w-full">
-        <h1 className="text-4xl md:text-5xl font-serif font-black text-primary mb-8 tracking-tight">Privacy Policy</h1>
+        <h1 className="text-4xl md:text-5xl font-serif font-medium text-primary mb-8 tracking-tight">Privacy Policy</h1>
         <p className="text-surface-tint mb-12">Last updated: {new Date().toLocaleDateString()}</p>
         
         <div className="prose prose-p:text-on-surface-variant prose-headings:text-primary prose-headings:font-serif prose-headings:font-bold max-w-none">
