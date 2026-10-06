@@ -7,9 +7,12 @@ export function Footer() {
       <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between mb-20 gap-12">
         <div className="max-w-xs">
           <Logo className="text-4xl mb-6" colorClass="text-white" />
-          <p className="text-white/70 text-sm leading-relaxed mb-8 font-light tracking-wide">
+          <p className="text-white/70 text-sm leading-relaxed mb-4 font-light tracking-wide">
             Elevating the experience of finding and owning preloved artifacts for the modern home.
           </p>
+          <div className="text-white/50 text-xs mb-8">
+            <p>104F DHA Phase 8 Ex Parkview, Lahore</p>
+          </div>
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:border-white transition-colors cursor-pointer">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>

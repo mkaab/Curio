@@ -11,3 +11,4 @@ curio.db
 # Agent Data
 graphify-out/
 .agents/skills/
+brag-output-*/

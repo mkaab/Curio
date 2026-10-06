@@ -169,7 +169,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
             <div className="px-4 -mt-16 relative z-10">
               <div className="max-w-xl mx-auto backdrop-blur-xl bg-white/70 p-6 rounded-3xl border border-white/60 shadow-2xl animate-slide-in flex flex-col items-center text-center">
                 <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-primary uppercase bg-white rounded-full shadow-sm border border-primary/20">
-                  Zero Selling Fees
+                  Zero Listing Fees
                 </div>
                 <h2 className="text-2xl font-serif font-extrabold mb-3 tracking-tight text-on-surface">
                   Ready to declutter your wardrobe?
@@ -215,7 +215,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
               <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12">
                 <div className="max-w-md backdrop-blur-md bg-black/35 p-6 rounded-2xl border border-white/10 shadow-xl animate-slide-in">
                   <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-on-primary uppercase bg-primary rounded-full shadow-md">
-                    Zero Selling Fees
+                    Zero Listing Fees
                   </div>
                   <h2 className="text-2xl md:text-3xl font-serif font-extrabold mb-2 tracking-tight text-white drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]">
                     Turn your closet into cash.

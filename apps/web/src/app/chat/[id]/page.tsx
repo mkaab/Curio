@@ -413,6 +413,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       <PaymentModal 
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
+        agreedAmount={transaction?.agreed_amount || 0}
         initialAddress={userProfile?.shipping_address}
         isProcessing={isProcessingPayment}
         onConfirm={async (address) => {
