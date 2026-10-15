@@ -25,7 +25,7 @@ export default function ContactPage() {
             <div>
               <h3 className="font-bold text-on-surface mb-1">Company Information</h3>
               <p className="text-surface-tint">Altaserv Limited</p>
-              <p className="text-surface-tint">Quaid Block, Bahria Town, Lahore, Pakistan</p>
+              <p className="text-surface-tint">104F, DHA phase 8 ex parkview, Lahore, Pakistan</p>
             </div>
 
             <div>
