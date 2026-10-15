@@ -10,6 +10,9 @@ export function Footer() {
           <p className="text-white/70 text-sm leading-relaxed mb-4 font-light tracking-wide">
             Elevating the experience of finding and owning preloved artifacts for the modern home.
           </p>
+           <p className="text-white/70 text-sm leading-relaxed mb-4 font-light tracking-wide">
+            Powered by AltaServ (Private) Limited
+          </p>
           <div className="text-white/50 text-xs mb-8">
             <p>104F DHA Phase 8 Ex Parkview, Lahore</p>
           </div>
