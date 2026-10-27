@@ -24,23 +24,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/',
-          missing: [
-            {
-              type: 'query',
-              key: 'dev',
-              value: '1',
-            },
-          ],
-          destination: '/waitlist',
-        },
-      ],
-    };
-  },
 };
 
 export default nextConfig;
