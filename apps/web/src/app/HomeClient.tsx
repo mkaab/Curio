@@ -31,10 +31,11 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
   const router = useRouter();
   const supabase = createClient();
 
+  const PAGE_SIZE = 12;
   const [items, setItems] = useState(initialItems);
   const [favorites, setFavorites] = useState(initialFavorites);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(initialItems.length >= 24);
+  const [hasMore, setHasMore] = useState(initialItems.length >= PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -67,32 +68,32 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
     try {
       let { data, error } = await supabase
         .from("listing")
-        .select("*, seller:public_user_profiles(name), favorite(count)")
+        .select("id, title, price, brand, size, images, status, condition, department, created_at, seller:public_user_profiles(name), favorite(count)")
         .eq("status", "active")
         .order("created_at", { ascending: false })
-        .range(nextPage * 24, (nextPage + 1) * 24 - 1);
+        .range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1);
 
       if (error) {
         const fallback = await supabase
           .from("listing")
-          .select("*, favorite(count)")
+          .select("id, title, price, brand, size, images, status, condition, department, created_at, favorite(count)")
           .eq("status", "active")
           .order("created_at", { ascending: false })
-          .range(nextPage * 24, (nextPage + 1) * 24 - 1);
+          .range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1);
         data = fallback.data;
       }
 
       if (data && data.length > 0) {
         const mappedItems = data.map((item: Record<string, unknown>) => {
-          const formatted = formatListingForCard(item);
+          const { images: _dropFullImages, ...card } = formatListingForCard(item);
           return {
-            ...formatted,
+            ...card,
             department: item.department as string,
           };
         });
         setItems(prev => [...prev, ...mappedItems]);
         setPage(nextPage);
-        if (data.length < 24) setHasMore(false);
+        if (data.length < PAGE_SIZE) setHasMore(false);
       } else {
         setHasMore(false);
       }

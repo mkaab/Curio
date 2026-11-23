@@ -26,11 +26,13 @@ const SIZES = [
   { label: "Double XL (XXL)", value: "XXL" },
 ];
 
-const compressImage = (file: File): Promise<string> => {
-  return new Promise((resolve) => {
+const compressImageToBlob = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.onload = (event) => {
       const img = new window.Image();
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.onload = () => {
         const canvas = document.createElement("canvas");
         const MAX_WIDTH = 1200;
@@ -54,10 +56,15 @@ const compressImage = (file: File): Promise<string> => {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, width, height);
-        
-        // Compress to 0.85 quality JPEG
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-        resolve(dataUrl);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("Image compression failed"));
+          },
+          "image/jpeg",
+          0.82
+        );
       };
       img.src = event.target?.result as string;
     };
@@ -139,19 +146,44 @@ export default function SellPage() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0 || !userId) return;
 
     setUploadingPhoto(true);
+    setMessage("");
     const newPhotos: string[] = [];
 
     for (let i = 0; i < files.length; i++) {
       if (photos.length + newPhotos.length >= 10) break;
       const file = files[i];
       try {
-        const compressed = await compressImage(file);
-        newPhotos.push(compressed);
+        const blob = await compressImageToBlob(file);
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+        const filePath = `${userId}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("listing-images")
+          .upload(filePath, blob, {
+            contentType: "image/jpeg",
+            cacheControl: "31536000",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Storage upload error:", uploadError);
+          setMessage(`Photo upload failed: ${uploadError.message}`);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("listing-images")
+          .getPublicUrl(filePath);
+
+        if (publicUrlData?.publicUrl) {
+          newPhotos.push(publicUrlData.publicUrl);
+        }
       } catch (err) {
-        console.error("Error compressing file:", err);
+        console.error("Error compressing/uploading file:", err);
+        setMessage("Failed to process one of the photos. Please try again.");
       }
     }
 
@@ -195,31 +227,35 @@ export default function SellPage() {
       const lvl2Cat = CATEGORIES.find(c => c.id === lvl2);
       const lvl3Cat = CATEGORIES.find(c => c.id === lvl3);
 
-      const { error } = await supabase.from("listing").insert({
-        seller_id: userId,
-        title: title.trim(),
-        description: description.trim(),
-        department: lvl1Cat ? lvl1Cat.name : "Unknown",
-        subcategory: lvl2Cat ? lvl2Cat.name : "Unknown",
-        category: lvl3Cat ? lvl3Cat.name : "Unknown",
-        brand: brand ? brand.trim() : "",
-        condition,
-        size: size ? size.trim() : "",
-        price: parseFloat(price),
-        images: photos,
-        status: "active",
-        moderation_status: "pending",
-      });
+      const { data: created, error } = await supabase
+        .from("listing")
+        .insert({
+          seller_id: userId,
+          title: title.trim(),
+          description: description.trim(),
+          department: lvl1Cat ? lvl1Cat.name : "Unknown",
+          subcategory: lvl2Cat ? lvl2Cat.name : "Unknown",
+          category: lvl3Cat ? lvl3Cat.name : "Unknown",
+          brand: brand ? brand.trim() : "",
+          condition,
+          size: size ? size.trim() : "",
+          price: parseFloat(price),
+          images: photos,
+          status: "active",
+          moderation_status: "pending",
+        })
+        .select("id")
+        .single();
 
       if (error) {
         setMessage(`Error: ${error.message}`);
+        setLoading(false);
       } else {
-        setMessage("Listing published successfully!");
-        setTimeout(() => router.push("/"), 1000);
+        setMessage("Listing published! Taking you there...");
+        router.replace(created?.id ? `/item/${created.id}` : "/");
       }
     } catch (err) {
       setMessage("Error: Unable to connect to database.");
-    } finally {
       setLoading(false);
     }
   };

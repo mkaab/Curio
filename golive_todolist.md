@@ -46,6 +46,6 @@ Pre-launch checklist based on the codebase & compliance review.
 - [x] Add `robots.ts` and dynamic `sitemap.ts`.
 
 ## 6. Post-Launch Improvements
-- [ ] Migrate listing image uploads from base64 strings in Postgres to Supabase Storage (`apps/web/src/app/sell/page.tsx`).
+- [x] Migrate listing image uploads from base64 strings in Postgres to Supabase Storage (`apps/web/src/app/sell/page.tsx`).
 - [ ] Add Sentry error tracking and PostHog analytics.
 - [ ] Clean up default Next.js starter SVGs in `apps/web/public/` (`vercel.svg`, `next.svg`, etc.).
