@@ -115,20 +115,25 @@ export default function SellPage() {
   }, [router, supabase]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const pendingUploadMode = useRef<"gallery" | "camera">("gallery");
 
-  const handlePhotoUpload = () => {
+  const handlePhotoUpload = (mode: "gallery" | "camera" = "gallery") => {
     if (!hasAcceptedGuidelines) {
+      pendingUploadMode.current = mode;
       setShowGuidelines(true);
       return;
     }
-    fileInputRef.current?.click();
+    (mode === "camera" ? cameraInputRef : fileInputRef).current?.click();
   };
 
   const handleAcceptGuidelines = () => {
     if (guidelinesCheckbox) {
       setHasAcceptedGuidelines(true);
       setShowGuidelines(false);
-      setTimeout(() => fileInputRef.current?.click(), 100);
+      setTimeout(() => {
+        (pendingUploadMode.current === "camera" ? cameraInputRef : fileInputRef).current?.click();
+      }, 100);
     }
   };
 
@@ -153,9 +158,7 @@ export default function SellPage() {
     setPhotos((prev) => [...prev, ...newPhotos]);
     setUploadingPhoto(false);
     
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    e.target.value = "";
   };
 
   const handleRemovePhoto = (index: number) => {
@@ -262,36 +265,65 @@ export default function SellPage() {
               <p className="text-surface-tint text-base">Add up to 10 photos of your item. Make sure they are clear and well lit.</p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {photos.map((url, index) => (
-                <div key={index} className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-surface-container group bg-surface-container shadow-inner">
-                  <Image src={url} alt={`Upload ${index + 1}`} fill className="object-cover" />
+            {photos.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {photos.map((url, index) => (
+                  <div key={index} className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-surface-container group bg-surface-container shadow-inner">
+                    <Image src={url} alt={`Upload ${index + 1}`} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePhoto(index)}
+                      className="absolute top-2 right-2 h-7 w-7 rounded-full bg-white/80 backdrop-blur-md text-on-surface flex items-center justify-center hover:bg-white transition-colors text-xs font-bold shadow z-10"
+                    >
+                      ✕
+                    </button>
+                    {index === 0 && (
+                      <span className="absolute bottom-2 left-2 bg-primary text-on-primary text-[10px] uppercase font-bold px-2 py-1 rounded-md shadow-lg backdrop-blur-md z-10">Cover</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {photos.length < 10 && (
+              <>
+                <input
+                  type="file"
+                  ref={cameraInputRef}
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto w-full">
                   <button
                     type="button"
-                    onClick={() => handleRemovePhoto(index)}
-                    className="absolute top-2 right-2 h-7 w-7 rounded-full bg-white/80 backdrop-blur-md text-on-surface flex items-center justify-center hover:bg-white transition-colors text-xs font-bold shadow z-10"
+                    onClick={() => handlePhotoUpload("camera")}
+                    disabled={uploadingPhoto}
+                    className="aspect-[3/4] border-2 border-dashed border-surface-container rounded-2xl flex flex-col items-center justify-center text-surface-tint hover:border-primary/60 hover:text-primary transition-all bg-surface-container/10 cursor-pointer"
                   >
-                    ✕
+                    {uploadingPhoto ? (
+                      <span className="text-xs font-bold animate-pulse">Uploading...</span>
+                    ) : (
+                      <>
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-wider">Take Photo</span>
+                      </>
+                    )}
                   </button>
-                  {index === 0 && (
-                    <span className="absolute bottom-2 left-2 bg-primary text-on-primary text-[10px] uppercase font-bold px-2 py-1 rounded-md shadow-lg backdrop-blur-md z-10">Cover</span>
-                  )}
-                </div>
-              ))}
-              
-              {photos.length < 10 && (
-                <>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
                   <button
                     type="button"
-                    onClick={handlePhotoUpload}
+                    onClick={() => handlePhotoUpload("gallery")}
                     disabled={uploadingPhoto}
                     className="aspect-[3/4] border-2 border-dashed border-surface-container rounded-2xl flex flex-col items-center justify-center text-surface-tint hover:border-primary/60 hover:text-primary transition-all bg-surface-container/10 cursor-pointer"
                   >
@@ -306,9 +338,9 @@ export default function SellPage() {
                       </>
                     )}
                   </button>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
