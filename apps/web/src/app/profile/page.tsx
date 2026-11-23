@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ProductCard } from "@curio/ui";
 import { Button } from "@heroui/react";
 import { Header } from "@/components/Header";
+import { CurioLoader } from "@/components/CurioLoader";
 import { WalletTab } from "@/components/WalletTab";
 import { OrdersTab } from "@/components/profile/OrdersTab";
 import { SettingsTab } from "@/components/profile/SettingsTab";
@@ -92,22 +93,22 @@ export default function ProfilePage() {
       }
       setSession(session);
 
-      // Fetch Profile
-      const { data: profileData } = await supabase
-        .from("user")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
-      
+      // 1. Fetch Profile + My Listings in parallel — unblock UI immediately (1 round trip)
+      const [{ data: profileData }, { data: listingsData }] = await Promise.all([
+        supabase
+          .from("user")
+          .select("*")
+          .eq("id", session.user.id)
+          .single(),
+        supabase
+          .from("listing")
+          .select("id, title, price, brand, images, favorite(count)")
+          .eq("seller_id", session.user.id)
+          .order("created_at", { ascending: false }),
+      ]);
+
       const pData = profileData || { name: session.user.email?.split('@')[0], email: session.user.email };
       setProfile(pData);
-
-      // Fetch active listings
-      const { data: listingsData } = await supabase
-        .from("listing")
-        .select("*, favorite(count)")
-        .eq("seller_id", session.user.id)
-        .order("created_at", { ascending: false });
 
       if (listingsData) {
         const parsedListings: ProfileListing[] = listingsData.map((item: Record<string, unknown>) => {
@@ -125,12 +126,26 @@ export default function ProfilePage() {
         setListings(parsedListings);
       }
 
-      // Fetch Favorites
-      const { data: favData } = await supabase
-        .from("favorite")
-        .select("listing(*, seller:public_user_profiles(name), favorite(count))")
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+      setLoading(false);
+
+      // 2. Fetch secondary tabs (Favorites, Chats, Orders) in parallel without blocking initial render
+      const [{ data: favData }, { data: convData }, { data: txData }] = await Promise.all([
+        supabase
+          .from("favorite")
+          .select("listing(id, title, price, brand, size, images, seller:public_user_profiles(name), favorite(count))")
+          .eq("user_id", session.user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("conversation")
+          .select("*, listing(title, images), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
+          .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
+          .order("last_message_at", { ascending: false }),
+        supabase
+          .from("transaction")
+          .select("*, listing(title, images, price), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
+          .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
+          .order("created_at", { ascending: false }),
+      ]);
 
       if (favData) {
         const parsedFavs: FavoriteItem[] = (favData as Record<string, unknown>[])
@@ -154,29 +169,13 @@ export default function ProfilePage() {
         setFavoritesList(parsedFavs);
       }
 
-      // Fetch Conversations
-      const { data: convData } = await supabase
-        .from("conversation")
-        .select("*, listing(title, images), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
-        .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
-        .order("last_message_at", { ascending: false });
-
       if (convData) {
         setConversationsList(convData);
       }
 
-      // Fetch Orders (Transactions)
-      const { data: txData } = await supabase
-        .from("transaction")
-        .select("*, listing(title, images, price), buyer:public_user_profiles!buyer_id(name), seller:public_user_profiles!seller_id(name)")
-        .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
-        .order("created_at", { ascending: false });
-
       if (txData) {
         setOrdersList(txData);
       }
-
-      setLoading(false);
     }
     loadData();
   }, [router, supabase]);
@@ -197,11 +196,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-dim">
-        <div className="h-10 w-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-      </div>
-    );
+    return <CurioLoader label="Loading profile..." />;
   }
 
   const tabs: { id: Tab; label: string }[] = [

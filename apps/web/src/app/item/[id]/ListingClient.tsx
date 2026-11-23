@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@heroui/react";
 import { Header } from "@/components/Header";
+import { CurioLoader } from "@/components/CurioLoader";
 import Link from "next/link";
 import Image from "next/image";
 import { ProductCard } from "@curio/ui";
@@ -169,96 +170,101 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             parsedImages,
             sellerName: data.seller?.name || "Anonymous",
           });
-          
-          if (data.seller_id) {
-            const { data: reviews } = await supabase.from("review").select("rating").eq("reviewee_id", data.seller_id);
-            if (reviews && reviews.length > 0) {
-              const reviewCount = reviews.length;
-              const averageRating = reviews.reduce((acc: number, curr: { rating: number }) => acc + curr.rating, 0) / reviewCount;
-              setReviewStats({ average: averageRating, count: reviewCount });
-            }
 
-            // Fetch seller's other active items
-            const { data: otherSellerData } = await supabase
+          // Unblock main listing UI immediately (1 round trip)
+          setLoading(false);
+
+          // Fetch reviews, seller's other items, and similar items in parallel
+          const [reviewsRes, otherSellerRes, similarRes] = await Promise.all([
+            data.seller_id
+              ? supabase.from("review").select("rating").eq("reviewee_id", data.seller_id)
+              : Promise.resolve({ data: null }),
+            data.seller_id
+              ? supabase
+                  .from("listing")
+                  .select("id, title, price, brand, size, condition, images, favorite(count)")
+                  .eq("status", "active")
+                  .eq("seller_id", data.seller_id)
+                  .neq("id", id)
+                  .order("created_at", { ascending: false })
+                  .limit(6)
+              : Promise.resolve({ data: null }),
+            data.department
+              ? supabase
+                  .from("listing")
+                  .select("id, title, price, brand, size, condition, images, seller:public_user_profiles(name), favorite(count)")
+                  .eq("status", "active")
+                  .eq("department", data.department)
+                  .neq("id", id)
+                  .order("created_at", { ascending: false })
+                  .limit(5)
+              : Promise.resolve({ data: null, error: null }),
+          ]);
+
+          if (reviewsRes.data && reviewsRes.data.length > 0) {
+            const reviewCount = reviewsRes.data.length;
+            const averageRating = reviewsRes.data.reduce((acc: number, curr: { rating: number }) => acc + curr.rating, 0) / reviewCount;
+            setReviewStats({ average: averageRating, count: reviewCount });
+          }
+
+          if (otherSellerRes.data) {
+            const mappedSeller: CardSummary[] = otherSellerRes.data.map((sItem: Record<string, unknown>) => {
+              let sParsed: string[] = [];
+              try {
+                sParsed = typeof sItem.images === "string" ? JSON.parse(sItem.images) : (sItem.images as string[]) || [];
+              } catch {
+                sParsed = sItem.images ? [String(sItem.images)] : [];
+              }
+              const fav = sItem.favorite as { count?: number }[] | null;
+              return {
+                id: sItem.id as number | string,
+                title: sItem.title as string,
+                price: sItem.price as number,
+                brand: sItem.brand as string | undefined,
+                size: sItem.size as string | undefined,
+                condition: sItem.condition as string | undefined,
+                image: sParsed?.[0] || "/assets/hero.png",
+                favoriteCount: fav?.[0]?.count || 0,
+              };
+            });
+            setSellerItems(mappedSeller);
+          }
+
+          let similarData = similarRes.data;
+          if ("error" in similarRes && similarRes.error && data.department) {
+            const fallback = await supabase
               .from("listing")
               .select("id, title, price, brand, size, condition, images, favorite(count)")
-              .eq("status", "active")
-              .eq("seller_id", data.seller_id)
-              .neq("id", id)
-              .order("created_at", { ascending: false })
-              .limit(6);
-
-            if (otherSellerData) {
-              const mappedSeller: CardSummary[] = otherSellerData.map((sItem: Record<string, unknown>) => {
-                let sParsed: string[] = [];
-                try {
-                  sParsed = typeof sItem.images === "string" ? JSON.parse(sItem.images) : (sItem.images as string[]) || [];
-                } catch {
-                  sParsed = sItem.images ? [String(sItem.images)] : [];
-                }
-                const fav = sItem.favorite as { count?: number }[] | null;
-                return {
-                  id: sItem.id as number | string,
-                  title: sItem.title as string,
-                  price: sItem.price as number,
-                  brand: sItem.brand as string | undefined,
-                  size: sItem.size as string | undefined,
-                  condition: sItem.condition as string | undefined,
-                  image: sParsed?.[0] || "/assets/hero.png",
-                  favoriteCount: fav?.[0]?.count || 0,
-                };
-              });
-              setSellerItems(mappedSeller);
-            }
-          }
-          
-          // Fetch similar items
-          if (data.department) {
-            const similarRes = await supabase
-              .from("listing")
-              .select("*, seller:public_user_profiles(name), favorite(count)")
               .eq("status", "active")
               .eq("department", data.department)
               .neq("id", id)
               .order("created_at", { ascending: false })
               .limit(5);
+            similarData = fallback.data;
+          }
 
-            let similarData = similarRes.data;
-            if (similarRes.error) {
-              const fallback = await supabase
-                .from("listing")
-                .select("*, favorite(count)")
-                .eq("status", "active")
-                .eq("department", data.department)
-                .neq("id", id)
-                .order("created_at", { ascending: false })
-                .limit(5);
-              similarData = fallback.data;
-            }
-            
-            if (similarData) {
-              const mappedSimilar: CardSummary[] = similarData.map((simItem: Record<string, unknown>) => {
-                let simParsed: string[] = [];
-                try {
-                  simParsed = typeof simItem.images === 'string' ? JSON.parse(simItem.images) : (simItem.images as string[]) || [];
-                } catch {
-                  simParsed = simItem.images ? [String(simItem.images)] : [];
-                }
-                const fav = simItem.favorite as { count?: number }[] | null;
-                return {
-                  id: simItem.id as number | string,
-                  title: simItem.title as string,
-                  price: simItem.price as number,
-                  brand: simItem.brand as string | undefined,
-                  size: simItem.size as string | undefined,
-                  condition: simItem.condition as string | undefined,
-                  seller: simItem.seller as { name?: string } | null | undefined,
-                  image: simParsed?.[0] || "/assets/hero.png",
-                  favoriteCount: fav?.[0]?.count || 0
-                };
-              });
-              setSimilarItems(mappedSimilar);
-            }
+          if (similarData) {
+            const mappedSimilar: CardSummary[] = similarData.map((simItem: Record<string, unknown>) => {
+              let simParsed: string[] = [];
+              try {
+                simParsed = typeof simItem.images === "string" ? JSON.parse(simItem.images) : (simItem.images as string[]) || [];
+              } catch {
+                simParsed = simItem.images ? [String(simItem.images)] : [];
+              }
+              const fav = simItem.favorite as { count?: number }[] | null;
+              return {
+                id: simItem.id as number | string,
+                title: simItem.title as string,
+                price: simItem.price as number,
+                brand: simItem.brand as string | undefined,
+                size: simItem.size as string | undefined,
+                condition: simItem.condition as string | undefined,
+                seller: simItem.seller as { name?: string } | null | undefined,
+                image: simParsed?.[0] || "/assets/hero.png",
+                favoriteCount: fav?.[0]?.count || 0,
+              };
+            });
+            setSimilarItems(mappedSimilar);
           }
         }
       } catch (err) {
@@ -346,11 +352,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="h-10 w-10 border-4 border-brand-green/20 border-t-brand-green rounded-full animate-spin"></div>
-      </div>
-    );
+    return <CurioLoader />;
   }
 
   if (!item) {

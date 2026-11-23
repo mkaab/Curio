@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
+import { CurioLoader } from "@/components/CurioLoader";
 import { Button, Input, Select } from "@curio/ui";
 import { CATEGORIES, getChildCategories } from "@curio/types";
 import { createClient } from "@/lib/supabase/client";
@@ -700,13 +701,7 @@ function SellForm() {
 
 export default function SellPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-surface">
-          <div className="h-10 w-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        </div>
-      }
-    >
+    <Suspense fallback={<CurioLoader />}>
       <SellForm />
     </Suspense>
   );
