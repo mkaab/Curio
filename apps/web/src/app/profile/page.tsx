@@ -13,28 +13,74 @@ import { parseListingImages } from "@/lib/listings";
 import Image from "next/image";
 import Link from "next/link";
 
+import type { Session } from "@supabase/supabase-js";
+
 type Tab = "listings" | "orders" | "favorites" | "chats" | "wallet" | "settings";
+
+interface ProfileData {
+  name?: string;
+  email?: string;
+  image?: string;
+  is_admin?: boolean;
+  [key: string]: unknown;
+}
+
+interface ProfileListing {
+  id: number | string;
+  title: string;
+  price: number;
+  brand?: string;
+  images: string[];
+  favoriteCount: number;
+}
+
+interface FavoriteItem {
+  id: string;
+  title: string;
+  price: number;
+  brand: string;
+  size: string;
+  image: string;
+  seller: string;
+  favoriteCount: number;
+}
+
+interface ProfileConversation {
+  id: number | string;
+  buyer_id?: string;
+  last_message?: string;
+  last_message_at?: string;
+  listing?: { title?: string; price?: number; images?: unknown } | null;
+  buyer?: { id?: string; name?: string } | null;
+  seller?: { id?: string; name?: string } | null;
+}
+
+interface ProfileOrder {
+  id: number | string;
+  [key: string]: unknown;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
   const supabase = createClient();
   
-  // Read ?tab= from URL
-  const [activeTab, setActiveTab] = useState<Tab>("listings");
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get("tab");
-    if (tab && ["listings", "orders", "favorites", "chats", "wallet", "settings"].includes(tab)) {
-      setActiveTab(tab as Tab);
+  // Read ?tab= from URL lazily on first client render
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (typeof window !== "undefined") {
+      const tab = new URLSearchParams(window.location.search).get("tab");
+      if (tab && ["listings", "orders", "favorites", "chats", "wallet", "settings"].includes(tab)) {
+        return tab as Tab;
+      }
     }
-  }, []);
+    return "listings";
+  });
 
-  const [session, setSession] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [listings, setListings] = useState<any[]>([]);
-  const [favoritesList, setFavoritesList] = useState<any[]>([]);
-  const [conversationsList, setConversationsList] = useState<any[]>([]);
-  const [ordersList, setOrdersList] = useState<any[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [listings, setListings] = useState<ProfileListing[]>([]);
+  const [favoritesList, setFavoritesList] = useState<FavoriteItem[]>([]);
+  const [conversationsList, setConversationsList] = useState<ProfileConversation[]>([]);
+  const [ordersList, setOrdersList] = useState<ProfileOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,12 +110,16 @@ export default function ProfilePage() {
         .order("created_at", { ascending: false });
 
       if (listingsData) {
-        const parsedListings = listingsData.map((item: any) => {
+        const parsedListings: ProfileListing[] = listingsData.map((item: Record<string, unknown>) => {
           const images = parseListingImages(item.images);
+          const fav = item.favorite as { count?: number }[] | null;
           return { 
-            ...item, 
+            id: item.id as number | string,
+            title: item.title as string,
+            price: item.price as number,
+            brand: item.brand as string | undefined,
             images,
-            favoriteCount: item.favorite?.[0]?.count || 0
+            favoriteCount: fav?.[0]?.count || 0
           };
         });
         setListings(parsedListings);
@@ -83,20 +133,22 @@ export default function ProfilePage() {
         .order("created_at", { ascending: false });
 
       if (favData) {
-        const parsedFavs = favData
-          .map((f: any) => f.listing)
-          .filter(Boolean)
-          .map((item: any) => {
+        const parsedFavs: FavoriteItem[] = (favData as Record<string, unknown>[])
+          .map((f) => f.listing as Record<string, unknown> | null)
+          .filter((x): x is Record<string, unknown> => Boolean(x))
+          .map((item) => {
             const images = parseListingImages(item.images);
+            const seller = item.seller as { name?: string } | null;
+            const fav = item.favorite as { count?: number }[] | null;
             return {
               id: String(item.id),
-              title: item.title,
-              price: item.price,
-              brand: item.brand || "Unbranded",
-              size: item.size || "OS",
+              title: item.title as string,
+              price: item.price as number,
+              brand: (item.brand as string) || "Unbranded",
+              size: (item.size as string) || "OS",
               image: images[0],
-              seller: item.seller?.name || "Curio Member",
-              favoriteCount: item.favorite?.[0]?.count || 0
+              seller: seller?.name || "Curio Member",
+              favoriteCount: fav?.[0]?.count || 0
             };
           });
         setFavoritesList(parsedFavs);
@@ -171,11 +223,13 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-6">
               <div className="relative h-24 w-24 rounded-full border-4 border-surface bg-surface-dim shadow-xl overflow-hidden shrink-0 flex items-center justify-center">
                 {profile?.image ? (
-                  profile.image.startsWith("data:image") ? (
-                    <img src={profile.image} alt="Profile" className="object-cover w-full h-full" />
-                  ) : (
-                    <Image src={profile.image} alt="Profile" fill className="object-cover" />
-                  )
+                  <Image
+                    src={profile.image}
+                    alt="Profile"
+                    fill
+                    unoptimized={profile.image.startsWith("data:image")}
+                    className="object-cover"
+                  />
                 ) : (
                   <span className="text-3xl text-surface-tint font-bold">{profile?.name?.[0]?.toUpperCase() || "U"}</span>
                 )}
@@ -247,15 +301,44 @@ export default function ProfilePage() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {listings.map((item) => (
-                  <ProductCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    price={item.price}
-                    image={item.images[0]}
-                    brand={item.brand}
-                    favoriteCount={item.favoriteCount}
-                  />
+                  <div key={item.id} className="flex flex-col">
+                    <ProductCard
+                      id={String(item.id)}
+                      title={item.title}
+                      price={item.price}
+                      image={item.images[0]}
+                      brand={item.brand}
+                      favoriteCount={item.favoriteCount}
+                    />
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <Link
+                        href={`/sell?edit=${item.id}`}
+                        className="text-center py-1.5 text-xs font-semibold border border-surface-container rounded-lg text-on-surface hover:border-primary hover:text-primary transition-colors"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!session) return;
+                          if (!confirm(`Delete "${item.title}"? This cannot be undone.`)) return;
+                          const { error } = await supabase
+                            .from("listing")
+                            .delete()
+                            .eq("id", item.id)
+                            .eq("seller_id", session.user.id);
+                          if (error) {
+                            alert(`Failed to delete listing: ${error.message}`);
+                          } else {
+                            setListings((prev) => prev.filter((l) => l.id !== item.id));
+                          }
+                        }}
+                        className="py-1.5 text-xs font-semibold border border-red-200 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -324,7 +407,7 @@ export default function ProfilePage() {
              ) : (
                <div className="flex flex-col space-y-3">
                  {conversationsList.map(conv => {
-                   const isBuyer = session.user.id === conv.buyer_id;
+                   const isBuyer = session?.user.id === conv.buyer_id;
                    const otherName = isBuyer ? conv.seller?.name : conv.buyer?.name;
                    const roleTag = isBuyer ? "Buying" : "Selling";
                    const images = conv.listing?.images;
@@ -364,7 +447,7 @@ export default function ProfilePage() {
         )}
 
         {/* WALLET TAB */}
-        {activeTab === "wallet" && (
+        {activeTab === "wallet" && session && (
            <WalletTab userId={session.user.id} />
         )}
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Tooltip } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { Header } from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,24 +20,68 @@ function timeAgo(dateStr: string | null) {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+interface ListingDetail {
+  id: number | string;
+  seller_id: string;
+  title: string;
+  description: string;
+  price: number;
+  brand?: string;
+  size?: string;
+  condition?: string;
+  color?: string;
+  department?: string;
+  created_at: string | null;
+  parsedImages: string[];
+  sellerName: string;
+}
+
+interface CardSummary {
+  id: number | string;
+  title: string;
+  price: number;
+  brand?: string;
+  size?: string;
+  condition?: string;
+  image: string;
+  seller?: { name?: string } | null;
+  favoriteCount: number;
+}
+
 export default function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const supabase = createClient();
   const { id } = use(params);
 
-  const [item, setItem] = useState<any>(null);
-  const [similarItems, setSimilarItems] = useState<any[]>([]);
+  const [item, setItem] = useState<ListingDetail | null>(null);
+  const [sellerItems, setSellerItems] = useState<CardSummary[]>([]);
+  const [similarItems, setSimilarItems] = useState<CardSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const openLightbox = (idx: number) => {
+    setCurrentImageIdx(idx);
+    setLightboxOpen(true);
+  };
+
+  useEffect(() => {
+    if (!lightboxOpen || !item?.parsedImages?.length) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      else if (e.key === "ArrowRight") setCurrentImageIdx((prev) => (prev + 1) % item.parsedImages.length);
+      else if (e.key === "ArrowLeft") setCurrentImageIdx((prev) => (prev === 0 ? item.parsedImages.length - 1 : prev - 1));
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lightboxOpen, item]);
   
   // Negotiation State
   const [showOfferInput, setShowOfferInput] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Auth & Favorite State
-  const [user, setUser] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  // Favorite & Review State
   const [isFavorite, setIsFavorite] = useState(false);
   const [reviewStats, setReviewStats] = useState({ average: 5, count: 0 });
 
@@ -72,7 +116,6 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
     async function loadUserAndFavorite() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        setUser(session.user);
         const { data: fav } = await supabase
           .from("favorite")
           .select("*")
@@ -87,13 +130,14 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
 
     async function fetchItem() {
       try {
-        let { data, error } = await supabase
+        const primaryRes = await supabase
           .from("listing")
           .select("*, seller:public_user_profiles(name)")
           .eq("id", id)
           .single();
 
-        if (error) {
+        let data = primaryRes.data;
+        if (primaryRes.error) {
           const fallback = await supabase
             .from("listing")
             .select("*")
@@ -110,7 +154,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             } else if (typeof data.images === "string") {
               try {
                 parsedImages = JSON.parse(data.images);
-              } catch (e) {
+              } catch {
                 parsedImages = [data.images];
               }
             }
@@ -130,14 +174,47 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             const { data: reviews } = await supabase.from("review").select("rating").eq("reviewee_id", data.seller_id);
             if (reviews && reviews.length > 0) {
               const reviewCount = reviews.length;
-              const averageRating = reviews.reduce((acc: number, curr: any) => acc + curr.rating, 0) / reviewCount;
+              const averageRating = reviews.reduce((acc: number, curr: { rating: number }) => acc + curr.rating, 0) / reviewCount;
               setReviewStats({ average: averageRating, count: reviewCount });
+            }
+
+            // Fetch seller's other active items
+            const { data: otherSellerData } = await supabase
+              .from("listing")
+              .select("id, title, price, brand, size, condition, images, favorite(count)")
+              .eq("status", "active")
+              .eq("seller_id", data.seller_id)
+              .neq("id", id)
+              .order("created_at", { ascending: false })
+              .limit(6);
+
+            if (otherSellerData) {
+              const mappedSeller: CardSummary[] = otherSellerData.map((sItem: Record<string, unknown>) => {
+                let sParsed: string[] = [];
+                try {
+                  sParsed = typeof sItem.images === "string" ? JSON.parse(sItem.images) : (sItem.images as string[]) || [];
+                } catch {
+                  sParsed = sItem.images ? [String(sItem.images)] : [];
+                }
+                const fav = sItem.favorite as { count?: number }[] | null;
+                return {
+                  id: sItem.id as number | string,
+                  title: sItem.title as string,
+                  price: sItem.price as number,
+                  brand: sItem.brand as string | undefined,
+                  size: sItem.size as string | undefined,
+                  condition: sItem.condition as string | undefined,
+                  image: sParsed?.[0] || "/assets/hero.png",
+                  favoriteCount: fav?.[0]?.count || 0,
+                };
+              });
+              setSellerItems(mappedSeller);
             }
           }
           
           // Fetch similar items
           if (data.department) {
-            let { data: similarData, error: similarError } = await supabase
+            const similarRes = await supabase
               .from("listing")
               .select("*, seller:public_user_profiles(name), favorite(count)")
               .eq("status", "active")
@@ -145,8 +222,9 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               .neq("id", id)
               .order("created_at", { ascending: false })
               .limit(5);
-              
-            if (similarError) {
+
+            let similarData = similarRes.data;
+            if (similarRes.error) {
               const fallback = await supabase
                 .from("listing")
                 .select("*, favorite(count)")
@@ -159,17 +237,24 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             }
             
             if (similarData) {
-              const mappedSimilar = similarData.map((simItem: any) => {
-                let simParsed = [];
+              const mappedSimilar: CardSummary[] = similarData.map((simItem: Record<string, unknown>) => {
+                let simParsed: string[] = [];
                 try {
-                  simParsed = typeof simItem.images === 'string' ? JSON.parse(simItem.images) : simItem.images;
-                } catch (e) {
-                  simParsed = [simItem.images];
+                  simParsed = typeof simItem.images === 'string' ? JSON.parse(simItem.images) : (simItem.images as string[]) || [];
+                } catch {
+                  simParsed = simItem.images ? [String(simItem.images)] : [];
                 }
+                const fav = simItem.favorite as { count?: number }[] | null;
                 return {
-                  ...simItem,
+                  id: simItem.id as number | string,
+                  title: simItem.title as string,
+                  price: simItem.price as number,
+                  brand: simItem.brand as string | undefined,
+                  size: simItem.size as string | undefined,
+                  condition: simItem.condition as string | undefined,
+                  seller: simItem.seller as { name?: string } | null | undefined,
                   image: simParsed?.[0] || "/assets/hero.png",
-                  favoriteCount: simItem.favorite?.[0]?.count || 0
+                  favoriteCount: fav?.[0]?.count || 0
                 };
               });
               setSimilarItems(mappedSimilar);
@@ -188,6 +273,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   }, [id, supabase]);
 
   const handleInitiateChat = async (action: 'buy' | 'offer' | 'message') => {
+    if (!item) return;
     setIsProcessing(true);
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -309,11 +395,11 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
 
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 md:py-20 w-full flex-1">
 
-        {/* Left Side: Image Panel */}
+        {/* Left Side: Image Panel + Member's Other Items */}
         <div className="w-full md:w-3/5 flex flex-col animate-slide-in">
           {/* Desktop Grid Collage */}
           <div className="hidden md:grid grid-cols-3 gap-2 h-[500px]">
-            <div className="col-span-2 h-full relative bg-surface-dim rounded-l-lg overflow-hidden cursor-pointer" onClick={() => setCurrentImageIdx(0)}>
+            <div className="col-span-2 h-full relative bg-surface-dim rounded-l-lg overflow-hidden cursor-zoom-in" onClick={() => openLightbox(0)}>
               <Image 
                 src={item.parsedImages[0]} 
                 alt={item.title} 
@@ -324,7 +410,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             </div>
             <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
               {item.parsedImages[1] ? (
-                <div className="relative bg-surface-dim rounded-tr-lg overflow-hidden cursor-pointer" onClick={() => setCurrentImageIdx(1)}>
+                <div className="relative bg-surface-dim rounded-tr-lg overflow-hidden cursor-zoom-in" onClick={() => openLightbox(1)}>
                   <Image src={item.parsedImages[1]} alt={item.title} fill className="object-cover hover:scale-[1.02] transition-transform duration-300" />
                 </div>
               ) : (
@@ -333,7 +419,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 </div>
               )}
               {item.parsedImages[2] ? (
-                <div className="relative bg-surface-dim rounded-br-lg overflow-hidden cursor-pointer" onClick={() => setCurrentImageIdx(2)}>
+                <div className="relative bg-surface-dim rounded-br-lg overflow-hidden cursor-zoom-in" onClick={() => openLightbox(2)}>
                   <Image src={item.parsedImages[2]} alt={item.title} fill className="object-cover hover:scale-[1.02] transition-transform duration-300" />
                   {item.parsedImages.length > 3 && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-xl">
@@ -350,7 +436,10 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
           </div>
           
           {/* Mobile Image Carousel */}
-          <div className="md:hidden relative w-full aspect-[3/4] min-h-[400px] bg-surface-dim group rounded-lg overflow-hidden">
+          <div
+            className="md:hidden relative w-full aspect-[3/4] min-h-[400px] bg-surface-dim group rounded-lg overflow-hidden cursor-zoom-in"
+            onClick={() => openLightbox(currentImageIdx)}
+          >
             <Image 
               src={item.parsedImages[currentImageIdx]} 
               alt={item.title} 
@@ -375,6 +464,38 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               </>
             )}
           </div>
+
+          {/* Member's Other Items (fills desktop left-column space directly under photos) */}
+          {sellerItems.length > 0 && (
+            <div className="hidden md:block mt-10">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">
+                  More from {item.sellerName}
+                </h2>
+                <Link href={`/user/${item.seller_id}`} className="text-xs font-semibold text-primary hover:underline">
+                  View all
+                </Link>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {sellerItems.map((sItem) => (
+                  <ProductCard
+                    key={sItem.id}
+                    id={sItem.id.toString()}
+                    title={sItem.title}
+                    price={sItem.price}
+                    image={sItem.image}
+                    brand={sItem.brand}
+                    size={sItem.size}
+                    condition={sItem.condition}
+                    sellerName={item.sellerName}
+                    isFavorite={false}
+                    favoriteCount={sItem.favoriteCount}
+                    onToggleFavorite={() => {}}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Side: Details Pane */}
@@ -531,7 +652,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <p className="text-xs text-surface-tint leading-relaxed">
               Every purchase is covered by our refund policy, secure transactions, and support.
               <br/>
-              <span className="text-primary hover:underline cursor-pointer font-semibold mt-1 inline-block">How you're covered</span>
+              <span className="text-primary hover:underline cursor-pointer font-semibold mt-1 inline-block">How you&apos;re covered</span>
             </p>
           </div>
           
@@ -558,6 +679,38 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
         </div>
       </div>
 
+      {/* Mobile: Member's Other Items */}
+      {sellerItems.length > 0 && (
+        <div className="md:hidden max-w-6xl mx-auto px-4 pb-12 w-full animate-slide-in">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">
+              More from {item.sellerName}
+            </h2>
+            <Link href={`/user/${item.seller_id}`} className="text-xs font-semibold text-primary hover:underline">
+              View all
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {sellerItems.map((sItem) => (
+              <ProductCard
+                key={sItem.id}
+                id={sItem.id.toString()}
+                title={sItem.title}
+                price={sItem.price}
+                image={sItem.image}
+                brand={sItem.brand}
+                size={sItem.size}
+                condition={sItem.condition}
+                sellerName={item.sellerName}
+                isFavorite={false}
+                favoriteCount={sItem.favoriteCount}
+                onToggleFavorite={() => {}}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Similar Items Section */}
       {similarItems.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 md:px-8 pb-20 w-full animate-slide-in">
@@ -579,6 +732,64 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 onToggleFavorite={() => {}}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Image Lightbox */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close fullscreen"
+            className="absolute top-4 right-4 h-11 w-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center text-xl font-bold z-20 cursor-pointer"
+          >
+            ✕
+          </button>
+
+          {item.parsedImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                aria-label="Previous image"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIdx((prev) => (prev === 0 ? item.parsedImages.length - 1 : prev - 1));
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center z-20 cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Next image"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIdx((prev) => (prev === item.parsedImages.length - 1 ? 0 : prev + 1));
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center z-20 cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </>
+          )}
+
+          <div className="relative w-full max-w-4xl h-[85vh]" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={item.parsedImages[currentImageIdx]}
+              alt={item.title}
+              fill
+              className="object-contain"
+              sizes="100vw"
+            />
+          </div>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold">
+            {currentImageIdx + 1} / {item.parsedImages.length}
           </div>
         </div>
       )}

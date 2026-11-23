@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
-import { Button, Card, CardContent, Input, Select, Textarea } from "@curio/ui";
+import { Button, Input, Select } from "@curio/ui";
 import { CATEGORIES, getChildCategories } from "@curio/types";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
@@ -72,8 +72,10 @@ const compressImageToBlob = (file: File): Promise<Blob> => {
   });
 };
 
-export default function SellPage() {
+function SellForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
   const supabase = createClient();
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -116,10 +118,43 @@ export default function SellPage() {
         } else {
           setIsVerified(true);
         }
+
+        // If editing an existing listing, load and prefill all steps
+        if (editId) {
+          const { data: existing } = await supabase
+            .from("listing")
+            .select("*")
+            .eq("id", editId)
+            .eq("seller_id", session.user.id)
+            .single();
+
+          if (existing) {
+            let parsedPhotos: string[] = [];
+            if (Array.isArray(existing.images)) parsedPhotos = existing.images;
+            else if (typeof existing.images === "string") {
+              try { parsedPhotos = JSON.parse(existing.images); } catch { parsedPhotos = [existing.images]; }
+            }
+            setPhotos(parsedPhotos);
+            setTitle(existing.title || "");
+            setDescription(existing.description || "");
+            setCondition(existing.condition || "");
+            setSize(existing.size || "M");
+            setBrand(existing.brand || "");
+            setPrice(existing.price != null ? String(existing.price) : "");
+            setHasAcceptedGuidelines(true);
+
+            const match1 = CATEGORIES.find((c) => c.level === 1 && c.name === existing.department);
+            const match2 = match1 ? CATEGORIES.find((c) => c.level === 2 && c.parentId === match1.id && c.name === existing.subcategory) : undefined;
+            const match3 = match2 ? CATEGORIES.find((c) => c.level === 3 && c.parentId === match2.id && c.name === existing.category) : undefined;
+            if (match1) setLvl1(match1.id);
+            if (match2) setLvl2(match2.id);
+            if (match3) setLvl3(match3.id);
+          }
+        }
       }
     }
     checkSession();
-  }, [router, supabase]);
+  }, [router, supabase, editId]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -227,34 +262,54 @@ export default function SellPage() {
       const lvl2Cat = CATEGORIES.find(c => c.id === lvl2);
       const lvl3Cat = CATEGORIES.find(c => c.id === lvl3);
 
-      const { data: created, error } = await supabase
-        .from("listing")
-        .insert({
-          seller_id: userId,
-          title: title.trim(),
-          description: description.trim(),
-          department: lvl1Cat ? lvl1Cat.name : "Unknown",
-          subcategory: lvl2Cat ? lvl2Cat.name : "Unknown",
-          category: lvl3Cat ? lvl3Cat.name : "Unknown",
-          brand: brand ? brand.trim() : "",
-          condition,
-          size: size ? size.trim() : "",
-          price: parseFloat(price),
-          images: photos,
-          status: "active",
-          moderation_status: "pending",
-        })
-        .select("id")
-        .single();
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        department: lvl1Cat ? lvl1Cat.name : "Unknown",
+        subcategory: lvl2Cat ? lvl2Cat.name : "Unknown",
+        category: lvl3Cat ? lvl3Cat.name : "Unknown",
+        brand: brand ? brand.trim() : "",
+        condition,
+        size: size ? size.trim() : "",
+        price: parseFloat(price),
+        images: photos,
+      };
 
-      if (error) {
-        setMessage(`Error: ${error.message}`);
-        setLoading(false);
+      if (editId) {
+        const { error } = await supabase
+          .from("listing")
+          .update(payload)
+          .eq("id", editId)
+          .eq("seller_id", userId);
+
+        if (error) {
+          setMessage(`Error: ${error.message}`);
+          setLoading(false);
+        } else {
+          setMessage("Listing updated! Taking you there...");
+          router.replace(`/item/${editId}`);
+        }
       } else {
-        setMessage("Listing published! Taking you there...");
-        router.replace(created?.id ? `/item/${created.id}` : "/");
+        const { data: created, error } = await supabase
+          .from("listing")
+          .insert({
+            ...payload,
+            seller_id: userId,
+            status: "active",
+            moderation_status: "pending",
+          })
+          .select("id")
+          .single();
+
+        if (error) {
+          setMessage(`Error: ${error.message}`);
+          setLoading(false);
+        } else {
+          setMessage("Listing published! Taking you there...");
+          router.replace(created?.id ? `/item/${created.id}` : "/");
+        }
       }
-    } catch (err) {
+    } catch {
       setMessage("Error: Unable to connect to database.");
       setLoading(false);
     }
@@ -588,7 +643,7 @@ export default function SellPage() {
               <Button variant="primary" size="lg" onClick={nextStep} className="h-14 font-bold text-lg rounded-2xl w-40 shadow-xl shadow-primary/20">Next</Button>
             ) : (
               <Button variant="primary" size="lg" onClick={handleSubmit} disabled={loading} className="h-14 font-bold text-lg rounded-2xl w-48 shadow-xl shadow-primary/20">
-                {loading ? "Publishing..." : "Publish Item"}
+                {editId ? (loading ? "Saving..." : "Save Changes") : (loading ? "Publishing..." : "Publish Item")}
               </Button>
             )}
           </div>
@@ -640,5 +695,19 @@ export default function SellPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function SellPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-surface">
+          <div className="h-10 w-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <SellForm />
+    </Suspense>
   );
 }
