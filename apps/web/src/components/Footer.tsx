@@ -53,7 +53,7 @@ export function Footer() {
       </div>
       
       <div className="max-w-7xl mx-auto w-full pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-white/50 font-light tracking-wide">
-        <p>© 2024 Curio Marketplace. Sustainably Curated.</p>
+        <p>© 2026 Curio Marketplace. Sustainably Curated.</p>
         <p className="mt-4 md:mt-0 tracking-wide">Curating for the future, honoring the past.</p>
       </div>
     </footer>

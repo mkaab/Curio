@@ -139,7 +139,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
             <button 
               key={cat} 
               onClick={() => setSelectedCategory(cat === "All" ? null : cat)}
-              className={`text-[11px] whitespace-nowrap transition-all uppercase tracking-[0.2em] cursor-pointer font-medium ${
+              className={`text-[11px] whitespace-nowrap transition-all uppercase tracking-[0.2em] cursor-pointer font-semibold ${
                 isActive ? "text-primary border-b-2 border-primary pb-1" : "text-surface-tint hover:text-primary"
               }`}
             >

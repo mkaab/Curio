@@ -65,7 +65,7 @@ export async function GET(req: Request) {
           type: 'order_received',
           message: `The buyer's order for ${listingTitle} was auto-completed! Earnings will be transferred.`,
           link: `/chat/${tx.conversation_id}`,
-          read: false
+          is_read: false
         });
 
         // D. Credit the seller's wallet if not COD

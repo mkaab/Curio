@@ -26,6 +26,9 @@ function SignupForm() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (error) {
@@ -170,7 +173,7 @@ function SignupForm() {
             </div>
             
             <p className="mt-8 text-center text-xs text-surface-tint/60 px-6 leading-relaxed">
-              By joining, you agree to Curio&apos;s <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
+              By joining, you agree to Curio&apos;s <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link> and <Link href="/privacy" className="underline hover:text-primary">Privacy Policy</Link>.
             </p>
           </CardContent>
         </Card>

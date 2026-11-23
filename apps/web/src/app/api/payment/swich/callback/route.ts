@@ -14,8 +14,12 @@ export async function GET(request: Request) {
     const requestUrl = new URL(request.url);
     const searchParams = requestUrl.searchParams;
     
-
-
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    const isLocalEnv = process.env.NODE_ENV === 'development';
+    const appUrl = (forwardedHost && !isLocalEnv)
+      ? `${forwardedProto}://${forwardedHost}`
+      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
 
     // Case-insensitive param extraction
     const params = Object.fromEntries(searchParams.entries());
@@ -35,7 +39,7 @@ export async function GET(request: Request) {
     // If we have absolutely no customerTransactionId, fallback to home
     if (!customerTransactionId) {
       console.error('No CustomerTransactionId found in callback. Redirecting to home.');
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(`${appUrl}/`);
     }
 
     const secretKey = process.env.SWICH_SECRET_KEY;
@@ -102,13 +106,12 @@ export async function GET(request: Request) {
           }
         }
         
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         return NextResponse.redirect(`${appUrl}/chat/${tx.conversation_id}`);
       }
     }
 
     // If something fails or we don't have conversation_id to redirect to, go to home
-    return NextResponse.redirect(new URL('/profile?tab=orders', request.url));
+    return NextResponse.redirect(`${appUrl}/profile?tab=orders`);
 
   } catch (error: any) {
     console.error('Error handling Swich callback:', error);

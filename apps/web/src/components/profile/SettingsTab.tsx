@@ -24,9 +24,57 @@ export function SettingsTab({ profile, session, supabase, setProfile, onSignOut 
   const [saveMessage, setSaveMessage] = useState("");
   
   // CNIC Verification State
+  const [cnicInput, setCnicInput] = useState("");
   const [cnicLoading, setCnicLoading] = useState(false);
   const [cnicError, setCnicError] = useState("");
   const [cnicSuccess, setCnicSuccess] = useState("");
+
+  const handleCnicChange = (val: string) => {
+    const cleaned = val.replace(/\D/g, '').slice(0, 13);
+    let formatted = cleaned;
+    if (cleaned.length > 5 && cleaned.length <= 12) {
+      formatted = `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`;
+    } else if (cleaned.length > 12) {
+      formatted = `${cleaned.slice(0, 5)}-${cleaned.slice(5, 12)}-${cleaned.slice(12, 13)}`;
+    }
+    setCnicInput(formatted);
+  };
+
+  const handleVerifyCnic = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!cnicInput.trim()) {
+      setCnicError("Please enter your 13-digit CNIC number.");
+      return;
+    }
+
+    setCnicLoading(true);
+    setCnicError("");
+    setCnicSuccess("");
+
+    try {
+      const res = await fetch('/api/verify-cnic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnic: cnicInput })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setCnicSuccess(`Verified successfully! CNIC: ${data.cnic}`);
+        setProfile((prev: any) => ({ 
+          ...prev, 
+          cnic_number: data.cnic, 
+          verification_status: 'verified' 
+        }));
+      } else {
+        setCnicError(data.error || "Failed to verify CNIC. Please check the number and try again.");
+      }
+    } catch (err) {
+      setCnicError("Network error occurred during verification.");
+    } finally {
+      setCnicLoading(false);
+    }
+  };
 
   // Push Notifications State
   const [pushEnabled, setPushEnabled] = useState(false);
@@ -158,49 +206,6 @@ export function SettingsTab({ profile, session, supabase, setProfile, onSignOut 
     reader.readAsDataURL(file);
   };
 
-  const handleCnicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      setCnicError("File size exceeds 2MB. Please choose a smaller image.");
-      return;
-    }
-
-    setCnicLoading(true);
-    setCnicError("");
-    setCnicSuccess("");
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const base64 = event.target?.result as string;
-      try {
-        const res = await fetch('/api/verify-cnic', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64: base64 })
-        });
-        const data = await res.json();
-        
-        if (res.ok && data.success) {
-          setCnicSuccess(`Verified successfully! CNIC: ${data.cnic}`);
-          setProfile((prev: any) => ({ 
-            ...prev, 
-            cnic_number: data.cnic, 
-            verification_status: 'verified' 
-          }));
-        } else {
-          setCnicError(data.error || "Failed to verify CNIC. Please try again with a clearer image.");
-        }
-      } catch (err) {
-        setCnicError("Network error occurred during verification.");
-      } finally {
-        setCnicLoading(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   return (
     <div className="max-w-2xl animate-slide-in">
       <div className="flex items-center justify-between mb-6">
@@ -308,43 +313,42 @@ export function SettingsTab({ profile, session, supabase, setProfile, onSignOut 
               </div>
             </div>
           ) : (
-            <div className="bg-surface-bright border border-surface-container p-4 rounded">
-              <p className="text-sm font-bold text-on-surface mb-2">Verify Your Identity</p>
-              <p className="text-xs text-surface-tint mb-4">Upload a clear photo of your CNIC. We will automatically extract the ID number and verify it instantly. Your image will not be saved.</p>
+            <div className="bg-surface-bright border border-surface-container p-5 rounded-lg space-y-4">
+              <div>
+                <p className="text-sm font-bold text-on-surface mb-1">Verify Your Identity</p>
+                <p className="text-xs text-surface-tint">Enter your 13-digit National ID (CNIC) number to unlock seller privileges instantly.</p>
+              </div>
               
               {cnicError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-xs font-bold">
+                <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-xs font-bold">
                   {cnicError}
                 </div>
               )}
               
               {cnicSuccess && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-700 text-xs font-bold">
+                <div className="p-3 bg-green-50 border border-green-200 rounded text-green-700 text-xs font-bold">
                   {cnicSuccess}
                 </div>
               )}
 
-              <div className="relative border-2 border-dashed border-surface-container rounded-lg p-6 flex flex-col items-center justify-center hover:bg-surface-dim transition-colors">
+              <form onSubmit={handleVerifyCnic} className="flex flex-col sm:flex-row gap-3">
                 <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleCnicUpload}
+                  type="text" 
+                  placeholder="e.g. 35202-1234567-1" 
+                  value={cnicInput}
+                  onChange={(e) => handleCnicChange(e.target.value)}
                   disabled={cnicLoading}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  maxLength={15}
+                  className="flex-1 px-4 py-3 bg-surface-dim border border-surface-container rounded focus:outline-none focus:border-primary text-sm font-mono tracking-wider"
                 />
-                {cnicLoading ? (
-                  <div className="flex flex-col items-center">
-                    <div className="h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2"></div>
-                    <span className="text-sm font-bold text-primary">Running AI Verification...</span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint mb-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                    <span className="text-sm font-bold text-primary">Tap to upload CNIC</span>
-                    <span className="text-xs text-surface-tint mt-1">JPEG/PNG under 2MB</span>
-                  </div>
-                )}
-              </div>
+                <Button 
+                  type="submit" 
+                  isDisabled={cnicLoading || !cnicInput}
+                  className="font-bold bg-primary hover:bg-primary-container text-on-primary px-6 h-11 rounded"
+                >
+                  {cnicLoading ? "Verifying..." : "Verify ID"}
+                </Button>
+              </form>
             </div>
           )}
         </div>

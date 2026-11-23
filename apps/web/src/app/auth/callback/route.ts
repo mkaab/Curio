@@ -2,11 +2,21 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const requestUrl = new URL(request.url)
+  const searchParams = requestUrl.searchParams
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
   const nextParam = searchParams.get('next') ?? '/'
   const next = (nextParam.startsWith('/') && !nextParam.startsWith('//')) ? nextParam : '/'
+
+  // Resolve true public origin (handles Docker, Railway, reverse proxies where internal port is 8080)
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https'
+  const isLocalEnv = process.env.NODE_ENV === 'development'
+
+  const origin = (forwardedHost && !isLocalEnv)
+    ? `${forwardedProto}://${forwardedHost}`
+    : (process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin)
 
   if (code) {
     const supabase = await createClient()

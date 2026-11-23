@@ -161,7 +161,7 @@ export default function LoginPage() {
             </div>
             
             <p className="mt-8 text-center text-xs text-surface-tint/60 px-6 leading-relaxed">
-              By continuing, you agree to Curio&apos;s <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
+              By continuing, you agree to Curio&apos;s <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link> and <Link href="/privacy" className="underline hover:text-primary">Privacy Policy</Link>.
             </p>
           </CardContent>
         </Card>

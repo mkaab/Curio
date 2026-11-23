@@ -19,14 +19,14 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://curio.pk"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://curiopk.com"),
   title: "Curio | Preloved Fashion Marketplace",
   description: "Curated preloved fashion and lifestyle marketplace in Pakistan.",
   manifest: "/manifest.json",
   openGraph: {
     title: "Curio | Preloved Fashion Marketplace",
     description: "Curated preloved fashion and lifestyle marketplace in Pakistan.",
-    url: "https://curio.pk",
+    url: "https://curiopk.com",
     siteName: "Curio",
     locale: "en_PK",
     type: "website",
