@@ -7,6 +7,7 @@ import { CurioLoader } from "@/components/CurioLoader";
 import { Button, Input, Select } from "@curio/ui";
 import { CATEGORIES, getChildCategories } from "@curio/types";
 import { createClient } from "@/lib/supabase/client";
+import { buildItemPath } from "@/lib/listings";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,6 +26,23 @@ const SIZES = [
   { label: "Large (L)", value: "L" },
   { label: "Extra Large (XL)", value: "XL" },
   { label: "Double XL (XXL)", value: "XXL" },
+];
+
+const COLORS = [
+  { label: "Select color (optional)", value: "" },
+  { label: "Black", value: "Black" },
+  { label: "White", value: "White" },
+  { label: "Beige / Cream", value: "Beige" },
+  { label: "Grey", value: "Grey" },
+  { label: "Brown", value: "Brown" },
+  { label: "Blue / Navy", value: "Blue" },
+  { label: "Green", value: "Green" },
+  { label: "Red / Maroon", value: "Red" },
+  { label: "Pink", value: "Pink" },
+  { label: "Yellow / Gold", value: "Yellow" },
+  { label: "Orange", value: "Orange" },
+  { label: "Purple", value: "Purple" },
+  { label: "Multi / Patterned", value: "Multi" },
 ];
 
 const compressImageToBlob = (file: File): Promise<Blob> => {
@@ -103,6 +121,7 @@ function SellForm() {
   const [lvl3, setLvl3] = useState("");
   const [size, setSize] = useState("M");
   const [brand, setBrand] = useState("Unknown");
+  const [color, setColor] = useState("");
   
   const [price, setPrice] = useState("");
 
@@ -141,6 +160,7 @@ function SellForm() {
             setCondition(existing.condition || "");
             setSize(existing.size || "M");
             setBrand(existing.brand || "");
+            setColor(existing.color || "");
             setPrice(existing.price != null ? String(existing.price) : "");
             setHasAcceptedGuidelines(true);
 
@@ -272,6 +292,7 @@ function SellForm() {
         brand: brand ? brand.trim() : "",
         condition,
         size: size ? size.trim() : "",
+        color: color ? color.trim() : null,
         price: parseFloat(price),
         images: photos,
       };
@@ -288,7 +309,7 @@ function SellForm() {
           setLoading(false);
         } else {
           setMessage("Listing updated! Taking you there...");
-          router.replace(`/item/${editId}`);
+          router.replace(buildItemPath(editId, payload.title));
         }
       } else {
         const { data: created, error } = await supabase
@@ -307,7 +328,7 @@ function SellForm() {
           setLoading(false);
         } else {
           setMessage("Listing published! Taking you there...");
-          router.replace(created?.id ? `/item/${created.id}` : "/");
+          router.replace(created?.id ? buildItemPath(created.id, payload.title) : "/");
         }
       }
     } catch {
@@ -613,12 +634,20 @@ function SellForm() {
                   onChange={(e) => setSize(e.target.value)}
                   options={SIZES}
                 />
-                <Input
-                  label="Brand"
-                  placeholder="e.g., Khaadi"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
+                <Select
+                  label="Color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  options={COLORS}
                 />
+                <div className="col-span-2">
+                  <Input
+                    label="Brand"
+                    placeholder="e.g., Khaadi"
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                  />
+                </div>
             </div>
           </div>
         )}

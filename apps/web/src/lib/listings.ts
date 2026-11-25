@@ -1,4 +1,23 @@
 /**
+ * Builds a Vinted-style SEO listing path: `/item/38-vintage-silk-kurta`.
+ */
+export function buildItemPath(id: string | number, title?: string | null): string {
+  const slug = (title || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+  return slug ? `/item/${id}-${slug}` : `/item/${id}`;
+}
+
+/**
+ * Extracts the numeric/raw listing ID from either `38` or `38-vintage-silk-kurta`.
+ */
+export function extractListingId(param: string): string {
+  return param.split("-")[0] || param;
+}
+
+/**
  * Parses listing images from the database format into a clean string array.
  * Handles: JSON arrays, JSON strings, raw strings, and null/undefined.
  */

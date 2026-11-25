@@ -1,5 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { extractListingId } from "@/lib/listings";
 import ListingClient from "./ListingClient";
 
 type Props = {
@@ -10,7 +11,8 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = extractListingId(rawId);
   const supabase = await createClient();
 
   const { data: item } = await supabase

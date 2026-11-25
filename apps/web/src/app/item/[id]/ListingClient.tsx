@@ -10,6 +10,7 @@ import Image from "next/image";
 import { ProductCard } from "@curio/ui";
 import { useRouter } from "next/navigation";
 import { calculatePricing } from "@/lib/pricing";
+import { extractListingId } from "@/lib/listings";
 
 function timeAgo(dateStr: string | null) {
   if (!dateStr) return "recently";
@@ -52,7 +53,8 @@ interface CardSummary {
 export default function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const supabase = createClient();
-  const { id } = use(params);
+  const { id: rawId } = use(params);
+  const id = extractListingId(rawId);
 
   const [item, setItem] = useState<ListingDetail | null>(null);
   const [sellerItems, setSellerItems] = useState<CardSummary[]>([]);
@@ -60,6 +62,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [showProtectionModal, setShowProtectionModal] = useState(false);
 
   const openLightbox = (idx: number) => {
     setCurrentImageIdx(idx);
@@ -67,15 +70,19 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   };
 
   useEffect(() => {
-    if (!lightboxOpen || !item?.parsedImages?.length) return;
+    if (!lightboxOpen && !showProtectionModal) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxOpen(false);
-      else if (e.key === "ArrowRight") setCurrentImageIdx((prev) => (prev + 1) % item.parsedImages.length);
-      else if (e.key === "ArrowLeft") setCurrentImageIdx((prev) => (prev === 0 ? item.parsedImages.length - 1 : prev - 1));
+      if (e.key === "Escape") {
+        setLightboxOpen(false);
+        setShowProtectionModal(false);
+      } else if (lightboxOpen && item?.parsedImages?.length) {
+        if (e.key === "ArrowRight") setCurrentImageIdx((prev) => (prev + 1) % item.parsedImages.length);
+        else if (e.key === "ArrowLeft") setCurrentImageIdx((prev) => (prev === 0 ? item.parsedImages.length - 1 : prev - 1));
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightboxOpen, item]);
+  }, [lightboxOpen, showProtectionModal, item]);
   
   // Negotiation State
   const [showOfferInput, setShowOfferInput] = useState(false);
@@ -577,10 +584,12 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 <span className="text-surface-tint col-span-1">Condition</span>
                 <span className="font-medium text-on-surface col-span-2">{item.condition}</span>
               </div>
-              <div className="grid grid-cols-3 text-sm">
-                <span className="text-surface-tint col-span-1">Color</span>
-                <span className="font-medium text-on-surface col-span-2">{item.color || 'N/A'}</span>
-              </div>
+              {item.color && (
+                <div className="grid grid-cols-3 text-sm">
+                  <span className="text-surface-tint col-span-1">Color</span>
+                  <span className="font-medium text-on-surface col-span-2">{item.color}</span>
+                </div>
+              )}
               <div className="grid grid-cols-3 text-sm">
                 <span className="text-surface-tint col-span-1">Uploaded</span>
                 <span className="font-medium text-on-surface col-span-2">{timeAgo(item.created_at)}</span>
@@ -654,7 +663,13 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <p className="text-xs text-surface-tint leading-relaxed">
               Every purchase is covered by our refund policy, secure transactions, and support.
               <br/>
-              <span className="text-primary hover:underline cursor-pointer font-semibold mt-1 inline-block">How you&apos;re covered</span>
+              <button
+                type="button"
+                onClick={() => setShowProtectionModal(true)}
+                className="text-primary hover:underline cursor-pointer font-semibold mt-1 inline-block"
+              >
+                How you&apos;re covered
+              </button>
             </p>
           </div>
           
@@ -792,6 +807,72 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
 
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold">
             {currentImageIdx + 1} / {item.parsedImages.length}
+          </div>
+        </div>
+      )}
+
+      {/* Buyer Protection Modal */}
+      {showProtectionModal && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowProtectionModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-w-md p-6 md:p-8 shadow-2xl relative animate-slide-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowProtectionModal(false)}
+              aria-label="Close modal"
+              className="absolute top-5 right-5 h-8 w-8 rounded-full flex items-center justify-center text-surface-tint hover:text-on-surface hover:bg-surface-dim transition-colors cursor-pointer font-bold"
+            >
+              ✕
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-serif font-semibold text-on-surface">Buyer Protection</h3>
+            </div>
+
+            <p className="text-xs text-surface-tint leading-relaxed mb-5">
+              Every eligible purchase on Curio includes Buyer Protection (5% + Rs 150) so you can shop preloved fashion with confidence.
+            </p>
+
+            <div className="space-y-4 mb-6 text-sm">
+              <div>
+                <p className="font-semibold text-on-surface mb-0.5">Refund Policy</p>
+                <p className="text-xs text-surface-tint leading-relaxed">
+                  Get a full refund (including shipping and Buyer Protection fee) if your item never arrives, is damaged in transit, or is significantly not as described. Open a dispute within 48 hours of delivery.
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-on-surface mb-0.5">Secure Escrow Payments</p>
+                <p className="text-xs text-surface-tint leading-relaxed">
+                  Your payment is held safely until you confirm the item arrived as described. Sellers are only paid once your order is confirmed.
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-on-surface mb-0.5">Dedicated Support</p>
+                <p className="text-xs text-surface-tint leading-relaxed">
+                  Need help with an order? Reach us via Profile &gt; Orders or see our{" "}
+                  <Link href="/returns" className="text-primary font-semibold hover:underline">Returns &amp; Refunds Policy</Link>{" "}
+                  and{" "}
+                  <Link href="/contact" className="text-primary font-semibold hover:underline">Contact page</Link>.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setShowProtectionModal(false)}
+              className="w-full bg-primary hover:bg-primary-container text-white font-bold h-11 rounded-xl border-none cursor-pointer"
+            >
+              Got it
+            </Button>
           </div>
         </div>
       )}

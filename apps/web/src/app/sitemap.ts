@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { buildItemPath } from "@/lib/listings";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +26,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
     const { data: listings } = await supabase
       .from("listing")
-      .select("id, created_at")
+      .select("id, title, created_at")
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(500);
 
     const listingRoutes: MetadataRoute.Sitemap = (listings || []).map((item) => ({
-      url: `${baseUrl}/item/${item.id}`,
+      url: `${baseUrl}${buildItemPath(item.id, item.title)}`,
       lastModified: item.created_at ? new Date(item.created_at) : now,
       changeFrequency: "weekly",
       priority: 0.8,

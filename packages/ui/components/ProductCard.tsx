@@ -33,8 +33,15 @@ export function ProductCard({
   onToggleFavorite,
   className,
 }: ProductCardProps) {
+  const slug = (title || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+  const href = slug ? `/item/${id}-${slug}` : `/item/${id}`;
+
   return (
-    <Link href={`/item/${id}`} className="group block cursor-pointer h-full">
+    <Link href={href} className="group block cursor-pointer h-full">
       <Card 
         className={cn(
           "h-full flex flex-col bg-transparent border-none shadow-none overflow-hidden transition-all duration-300", 
