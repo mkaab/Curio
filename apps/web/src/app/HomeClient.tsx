@@ -6,6 +6,7 @@ import { Button } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatListingForCard } from "@/lib/listings";
+import { useTranslation } from "@/lib/i18n/client";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -30,6 +31,7 @@ interface HomeClientProps {
 export default function HomeClient({ initialItems, user, initialFavorites }: HomeClientProps) {
   const router = useRouter();
   const supabase = createClient();
+  const { t } = useTranslation();
 
   const PAGE_SIZE = 12;
   const [items, setItems] = useState(initialItems);
@@ -144,7 +146,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
                 isActive ? "text-primary border-b-2 border-primary pb-1" : "text-surface-tint hover:text-primary"
               }`}
             >
-              {cat}
+              {t(`home.categories.${cat}`)}
             </button>
           );
         })}
@@ -170,20 +172,20 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
             <div className="px-4 -mt-16 relative z-10">
               <div className="max-w-xl mx-auto backdrop-blur-xl bg-white/70 p-6 rounded-3xl border border-white/60 shadow-2xl animate-slide-in flex flex-col items-center text-center">
                 <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-primary uppercase bg-white rounded-full shadow-sm border border-primary/20">
-                  Zero Listing Fees
+                  {t("home.zeroFeesBadge")}
                 </div>
                 <h2 className="text-2xl font-serif font-extrabold mb-3 tracking-tight text-on-surface">
-                  Ready to declutter your wardrobe?
+                  {t("home.mobileHeroTitle")}
                 </h2>
                 <p className="text-xs mb-6 font-medium text-surface-tint max-w-sm leading-relaxed">
-                  Join thousands of others selling pre-loved fashion. List an item in 60 seconds and keep 100% of your profits.
+                  {t("home.heroSubtitle")}
                 </p>
                 <div className="flex flex-col items-center gap-3 w-full">
                   <Link href={sellPath} className="w-full">
                     <Button 
                       className="bg-primary text-on-primary font-bold h-12 px-10 text-base shadow-lg shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container transition-all border-none cursor-pointer w-full rounded-xl"
                     >
-                      Sell now
+                      {t("home.sellNow")}
                     </Button>
                   </Link>
                   <Link href="/how-it-works" className="w-full">
@@ -191,7 +193,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
                       variant="outline" 
                       className="h-12 px-10 text-base font-bold text-primary border-2 border-primary hover:bg-primary/5 transition-all cursor-pointer w-full rounded-xl"
                     >
-                      How it works
+                      {t("home.howItWorks")}
                     </Button>
                   </Link>
                 </div>
@@ -216,20 +218,20 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
               <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12">
                 <div className="max-w-md backdrop-blur-md bg-black/35 p-6 rounded-2xl border border-white/10 shadow-xl animate-slide-in">
                   <div className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-widest text-on-primary uppercase bg-primary rounded-full shadow-md">
-                    Zero Listing Fees
+                    {t("home.zeroFeesBadge")}
                   </div>
                   <h2 className="text-2xl md:text-3xl font-serif font-extrabold mb-2 tracking-tight text-white drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]">
-                    Turn your closet into cash.
+                    {t("home.desktopHeroTitle")}
                   </h2>
                   <p className="text-xs md:text-sm mb-4 font-medium text-white/90 drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.6)] max-w-sm leading-relaxed">
-                    Join thousands of others selling pre-loved fashion. List an item in 60 seconds and keep 100% of your profits.
+                    {t("home.heroSubtitle")}
                   </p>
                   <div className="flex flex-row gap-3">
                     <Link href={sellPath}>
                       <Button 
                         className="bg-primary text-on-primary font-bold h-11 px-6 text-sm shadow-lg shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container transition-all border-none cursor-pointer"
                       >
-                        Start Selling
+                        {t("home.startSelling")}
                       </Button>
                     </Link>
                     <Link href="/how-it-works">
@@ -237,7 +239,7 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
                         variant="outline" 
                         className="h-11 px-6 text-sm text-white border-white hover:bg-white hover:text-on-surface transition-all cursor-pointer"
                       >
-                        How it works
+                        {t("home.howItWorks")}
                       </Button>
                     </Link>
                   </div>
@@ -251,9 +253,9 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
       {/* Marketplace Grid */}
       <div className="flex-1 px-6 md:px-10 pt-8 pb-16 bg-surface-dim">
         <div className="flex items-center justify-between mb-8 pb-2 border-b border-surface-container/60">
-          <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">Newest Arrivals</h2>
+          <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">{t("home.newestArrivals")}</h2>
           <Link href="/" className="text-[11px] font-medium text-primary hover:text-primary-container transition-colors uppercase tracking-[0.15em]">
-            Explore All
+            {t("home.exploreAll")}
           </Link>
         </div>
 
@@ -262,8 +264,8 @@ export default function HomeClient({ initialItems, user, initialFavorites }: Hom
             <div className="h-16 w-16 bg-surface-container/50 rounded-full flex items-center justify-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-surface-tint"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
             </div>
-            <h3 className="text-xl font-serif font-medium text-on-surface mb-2">No matching items found</h3>
-            <p className="text-surface-tint max-w-sm">Try modifying your search query or selecting a different category.</p>
+            <h3 className="text-xl font-serif font-medium text-on-surface mb-2">{t("home.noItemsTitle")}</h3>
+            <p className="text-surface-tint max-w-sm">{t("home.noItemsDesc")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-[1600px] mx-auto">

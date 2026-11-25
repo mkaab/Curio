@@ -11,6 +11,7 @@ import { ProductCard } from "@curio/ui";
 import { useRouter } from "next/navigation";
 import { calculatePricing } from "@/lib/pricing";
 import { extractListingId } from "@/lib/listings";
+import { useTranslation } from "@/lib/i18n/client";
 
 function timeAgo(dateStr: string | null) {
   if (!dateStr) return "recently";
@@ -53,6 +54,7 @@ interface CardSummary {
 export default function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const supabase = createClient();
+  const { t } = useTranslation();
   const { id: rawId } = use(params);
   const id = extractListingId(rawId);
 
@@ -365,8 +367,8 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
   if (!item) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white space-y-4">
-        <p className="text-lg font-bold text-on-surface">Item not found.</p>
-        <Button onClick={() => router.push("/")} variant="outline">Go Back</Button>
+        <p className="text-lg font-bold text-on-surface">{t("listing.notFound")}</p>
+        <Button onClick={() => router.push("/")} variant="outline">{t("listing.goBack")}</Button>
       </div>
     );
   }
@@ -479,10 +481,10 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <div className="hidden md:block mt-10">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">
-                  More from {item.sellerName}
+                  {t("listing.moreFrom")} {item.sellerName}
                 </h2>
                 <Link href={`/user/${item.seller_id}`} className="text-xs font-semibold text-primary hover:underline">
-                  View all
+                  {t("listing.viewAll")}
                 </Link>
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -519,7 +521,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 <p className="text-sm text-surface-tint">
                   {item.size || "OS"} • {item.condition} • <span className="hover:underline cursor-pointer">{item.brand || "Unbranded"}</span>
                 </p>
-                <p className="text-xs text-surface-tint mt-1">Uploaded {timeAgo(item.created_at)}</p>
+                <p className="text-xs text-surface-tint mt-1">{t("listing.uploaded")} {timeAgo(item.created_at)}</p>
               </div>
               {/* Favorites heart button */}
               <button 
@@ -551,15 +553,15 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                 <span className="text-[22px] font-bold">
                   ₨ {(item.price + calculatePricing(item.price).buyerProtectionFee).toLocaleString()}
                 </span>
-                <span className="text-sm font-semibold ml-1">incl.</span>
+                <span className="text-sm font-semibold ml-1">{t("listing.incl")}</span>
                 <div className="relative flex items-center cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="ml-1 text-surface-tint group-hover:text-primary transition-colors">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   </svg>
                   {/* Custom CSS Tooltip */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-surface text-on-surface text-xs rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-surface-container pointer-events-none">
-                    <span className="font-bold text-primary block mb-1">Buyer Protection</span>
-                    <span className="text-surface-tint leading-relaxed block">A 5% + Rs 150 fee is applied to cover your purchase up to Rs 100,000 against scams and significantly not as described items.</span>
+                    <span className="font-bold text-primary block mb-1">{t("listing.curioFees")}</span>
+                    <span className="text-surface-tint leading-relaxed block">{t("listing.curioFeesTooltip")}</span>
                     {/* Tooltip Arrow */}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-surface-container"></div>
                     <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[6px] border-transparent border-t-surface"></div>
@@ -573,25 +575,25 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             {/* Properties Grid */}
             <div className="space-y-2 mb-6">
               <div className="grid grid-cols-3 text-sm">
-                <span className="text-surface-tint col-span-1">Brand</span>
+                <span className="text-surface-tint col-span-1">{t("listing.brand")}</span>
                 <span className="font-medium text-primary col-span-2 cursor-pointer hover:underline">{item.brand || 'Unbranded'}</span>
               </div>
               <div className="grid grid-cols-3 text-sm">
-                <span className="text-surface-tint col-span-1">Size</span>
+                <span className="text-surface-tint col-span-1">{t("listing.size")}</span>
                 <span className="font-medium text-on-surface col-span-2">{item.size || 'OS'}</span>
               </div>
               <div className="grid grid-cols-3 text-sm">
-                <span className="text-surface-tint col-span-1">Condition</span>
+                <span className="text-surface-tint col-span-1">{t("listing.condition")}</span>
                 <span className="font-medium text-on-surface col-span-2">{item.condition}</span>
               </div>
               {item.color && (
                 <div className="grid grid-cols-3 text-sm">
-                  <span className="text-surface-tint col-span-1">Color</span>
+                  <span className="text-surface-tint col-span-1">{t("listing.color")}</span>
                   <span className="font-medium text-on-surface col-span-2">{item.color}</span>
                 </div>
               )}
               <div className="grid grid-cols-3 text-sm">
-                <span className="text-surface-tint col-span-1">Uploaded</span>
+                <span className="text-surface-tint col-span-1">{t("listing.uploaded")}</span>
                 <span className="font-medium text-on-surface col-span-2">{timeAgo(item.created_at)}</span>
               </div>
             </div>
@@ -599,7 +601,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             <div className="h-px bg-surface-container/60 mb-4" />
 
             <div className="text-sm font-medium text-on-surface mb-6 flex items-center space-x-2">
-              Free shipping
+              {t("listing.freeShipping")}
             </div>
 
             {/* Action Buttons */}
@@ -617,7 +619,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                   />
                   <Button onClick={() => setShowOfferInput(false)} variant="ghost" size="sm" className="h-8 w-8 p-0 text-on-surface-variant hover:bg-surface-container rounded-full">✕</Button>
                   <Button onClick={() => handleInitiateChat('offer')} isDisabled={isProcessing} className="bg-primary hover:bg-primary-container text-white font-bold h-9 rounded px-4 text-xs whitespace-nowrap border-none cursor-pointer">
-                    Send
+                    {t("listing.send")}
                   </Button>
                 </div>
               ) : (
@@ -627,7 +629,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     isDisabled={isProcessing} 
                     className="w-full bg-primary hover:bg-primary-container text-white font-bold h-10 rounded shadow-sm border-none cursor-pointer"
                   >
-                    Buy now
+                    {t("listing.buyNow")}
                   </Button>
                   <Button 
                     onClick={() => setShowOfferInput(true)} 
@@ -635,7 +637,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     variant="outline" 
                     className="w-full border border-primary text-primary hover:bg-primary/5 bg-transparent font-bold h-10 rounded cursor-pointer"
                   >
-                    Make an offer
+                    {t("listing.makeOffer")}
                   </Button>
                   <Button 
                     onClick={() => handleInitiateChat('message')} 
@@ -643,7 +645,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                     variant="outline" 
                     className="w-full border border-primary text-primary hover:bg-primary/5 bg-transparent font-bold h-10 rounded cursor-pointer"
                   >
-                    Message seller
+                    {t("listing.messageSeller")}
                   </Button>
                 </>
               )}
@@ -659,16 +661,16 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
           
           {/* Shop and sell safely banner */}
           <div className="bg-white md:border md:border-surface-container md:rounded-lg p-4">
-            <h3 className="font-bold text-sm text-on-surface mb-1">Shop and sell safely</h3>
+            <h3 className="font-bold text-sm text-on-surface mb-1">{t("listing.shopSafelyTitle")}</h3>
             <p className="text-xs text-surface-tint leading-relaxed">
-              Every purchase is covered by our refund policy, secure transactions, and support.
+              {t("listing.shopSafelyDesc")}
               <br/>
               <button
                 type="button"
                 onClick={() => setShowProtectionModal(true)}
                 className="text-primary hover:underline cursor-pointer font-semibold mt-1 inline-block"
               >
-                How you&apos;re covered
+                {t("listing.howCovered")}
               </button>
             </p>
           </div>
@@ -689,7 +691,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
             </div>
             <Link href={`/user/${item.seller_id}`}>
               <Button variant="outline" size="sm" className="border border-surface-container hover:border-primary text-primary font-bold h-8 px-3 rounded cursor-pointer bg-transparent text-xs">
-                View
+                {t("listing.view")}
               </Button>
             </Link>
           </div>
@@ -701,10 +703,10 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
         <div className="md:hidden max-w-6xl mx-auto px-4 pb-12 w-full animate-slide-in">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface">
-              More from {item.sellerName}
+              {t("listing.moreFrom")} {item.sellerName}
             </h2>
             <Link href={`/user/${item.seller_id}`} className="text-xs font-semibold text-primary hover:underline">
-              View all
+              {t("listing.viewAll")}
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -731,7 +733,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
       {/* Similar Items Section */}
       {similarItems.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 md:px-8 pb-20 w-full animate-slide-in">
-          <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface mb-6">Similar Products</h2>
+          <h2 className="text-sm uppercase tracking-[0.2em] font-medium text-on-surface mb-6">{t("listing.similarProducts")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {similarItems.map(item => (
               <ProductCard
@@ -836,33 +838,33 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-serif font-semibold text-on-surface">Buyer Protection</h3>
+              <h3 className="text-xl font-serif font-semibold text-on-surface">{t("listing.protectionModalTitle")}</h3>
             </div>
 
             <p className="text-xs text-surface-tint leading-relaxed mb-5">
-              Every eligible purchase on Curio includes Buyer Protection (5% + Rs 150) so you can shop preloved fashion with confidence.
+              {t("listing.protectionModalIntro")}
             </p>
 
             <div className="space-y-4 mb-6 text-sm">
               <div>
-                <p className="font-semibold text-on-surface mb-0.5">Refund Policy</p>
+                <p className="font-semibold text-on-surface mb-0.5">{t("listing.refundPolicyTitle")}</p>
                 <p className="text-xs text-surface-tint leading-relaxed">
-                  Get a full refund (including shipping and Buyer Protection fee) if your item never arrives, is damaged in transit, or is significantly not as described. Open a dispute within 48 hours of delivery.
+                  {t("listing.refundPolicyDesc")}
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-on-surface mb-0.5">Secure Escrow Payments</p>
+                <p className="font-semibold text-on-surface mb-0.5">{t("listing.escrowTitle")}</p>
                 <p className="text-xs text-surface-tint leading-relaxed">
-                  Your payment is held safely until you confirm the item arrived as described. Sellers are only paid once your order is confirmed.
+                  {t("listing.escrowDesc")}
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-on-surface mb-0.5">Dedicated Support</p>
+                <p className="font-semibold text-on-surface mb-0.5">{t("listing.supportTitle")}</p>
                 <p className="text-xs text-surface-tint leading-relaxed">
-                  Need help with an order? Reach us via Profile &gt; Orders or see our{" "}
-                  <Link href="/returns" className="text-primary font-semibold hover:underline">Returns &amp; Refunds Policy</Link>{" "}
-                  and{" "}
-                  <Link href="/contact" className="text-primary font-semibold hover:underline">Contact page</Link>.
+                  {t("listing.supportDescPrefix")}{" "}
+                  <Link href="/returns" className="text-primary font-semibold hover:underline">{t("listing.returnsLink")}</Link>{" "}
+                  {t("listing.and")}{" "}
+                  <Link href="/contact" className="text-primary font-semibold hover:underline">{t("listing.contactLink")}</Link>.
                 </p>
               </div>
             </div>
@@ -871,7 +873,7 @@ export default function ListingPage({ params }: { params: Promise<{ id: string }
               onClick={() => setShowProtectionModal(false)}
               className="w-full bg-primary hover:bg-primary-container text-white font-bold h-11 rounded-xl border-none cursor-pointer"
             >
-              Got it
+              {t("listing.gotIt")}
             </Button>
           </div>
         </div>

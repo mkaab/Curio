@@ -1,14 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-primary pt-20 pb-10 px-8 md:px-16 w-full text-white">
       <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between mb-20 gap-12">
         <div className="max-w-xs">
           <Logo className="text-4xl mb-6" colorClass="text-white" />
           <p className="text-white/70 text-sm leading-relaxed mb-4 font-light tracking-wide">
-            Elevating the experience of finding and owning preloved artifacts for the modern home.
+            {t("footer.tagline")}
           </p>
            <p className="text-white/70 text-sm leading-relaxed mb-4 font-light tracking-wide">
             Powered by AltaServ (Private) Limited
@@ -31,30 +36,30 @@ export function Footer() {
         
         <div className="flex gap-16 md:gap-24">
           <div>
-            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">Marketplace</h4>
+            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">{t("footer.marketplace")}</h4>
             <ul className="space-y-4 text-sm text-white/70 font-light">
-              <li><Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-              <li><Link href="/mission" className="hover:text-white transition-colors">Our Mission</Link></li>
-              <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
+              <li><Link href="/how-it-works" className="hover:text-white transition-colors">{t("footer.howItWorks")}</Link></li>
+              <li><Link href="/mission" className="hover:text-white transition-colors">{t("footer.mission")}</Link></li>
+              <li><Link href="/careers" className="hover:text-white transition-colors">{t("footer.careers")}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">Support</h4>
+            <h4 className="font-bold text-xs tracking-[0.15em] uppercase mb-6 text-white/90">{t("footer.support")}</h4>
             <ul className="space-y-4 text-sm text-white/70 font-light">
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
-              <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Refunds</Link></li>
-              <li><Link href="/cancellation" className="hover:text-white transition-colors">Cancellation Policy</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">{t("footer.privacy")}</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">{t("footer.terms")}</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-white transition-colors">{t("footer.shipping")}</Link></li>
+              <li><Link href="/returns" className="hover:text-white transition-colors">{t("footer.returns")}</Link></li>
+              <li><Link href="/cancellation" className="hover:text-white transition-colors">{t("footer.cancellation")}</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">{t("footer.contact")}</Link></li>
             </ul>
           </div>
         </div>
       </div>
       
       <div className="max-w-7xl mx-auto w-full pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-white/50 font-light tracking-wide">
-        <p>© 2026 Curio Marketplace. Sustainably Curated.</p>
-        <p className="mt-4 md:mt-0 tracking-wide">Curating for the future, honoring the past.</p>
+        <p>{t("footer.copyright")}</p>
+        <p className="mt-4 md:mt-0 tracking-wide">{t("footer.bottomTagline")}</p>
       </div>
     </footer>
   );

@@ -136,12 +136,12 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
   return (
     <nav className="sticky top-0 z-50 flex h-[72px] items-center justify-between bg-white px-6 md:px-10 border-b border-surface-container shadow-sm">
       <div className="flex items-center flex-1 mr-4 md:mr-8">
-        <Logo className="text-xl hidden sm:flex mr-4 md:mr-10" />
+        <Logo className="text-2xl md:text-[28px] font-extrabold hidden sm:flex mr-4 md:mr-10" />
 
         {showSearch && (
           <div className="relative flex-1 max-w-xl group" ref={suggestionRef}>
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-tint group-focus-within:text-primary transition-colors z-10 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             </div>
             <input
               type="text"
@@ -152,7 +152,7 @@ export function Header({ initialQuery = "", showSearch = true }: HeaderProps) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSearchSubmit(localQuery);
               }}
-              className="w-full h-10 bg-surface-container/40 hover:bg-surface-container/60 focus:bg-surface-dim rounded-full pl-11 pr-5 text-xs font-semibold text-on-surface transition-all outline-none border border-surface-container/60 focus:border-primary/45 focus:ring-1 focus:ring-primary/30 shadow-inner"
+              className="w-full h-11 bg-surface-container/40 hover:bg-surface-container/60 focus:bg-surface-dim rounded-full pl-11 pr-5 text-sm md:text-[15px] font-medium text-on-surface placeholder:text-surface-tint transition-all outline-none border border-surface-container/60 focus:border-primary/45 focus:ring-1 focus:ring-primary/30 shadow-inner"
             />
             
             {/* Vinted-style Generic Autocomplete */}
