@@ -24,7 +24,7 @@ export default function ReturnsPage() {
 
           <h2>2. Buyer Protection (When You Can Return)</h2>
           <p>
-            You are eligible for a full refund (including shipping and Buyer Protection fees) if the item you receive is:
+            You are eligible for a full refund (including shipping and Curio Fees) if the item you receive is:
           </p>
           <ul>
             <li>Significantly not as described in the listing.</li>

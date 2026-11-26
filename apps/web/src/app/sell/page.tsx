@@ -603,6 +603,29 @@ function SellForm() {
                   </div>
                 )}
               </div>
+
+              <div className="pt-2 grid grid-cols-2 gap-4">
+                <Select
+                  label="Size"
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  options={SIZES}
+                />
+                <Select
+                  label="Color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  options={COLORS}
+                />
+                <div className="col-span-2">
+                  <Input
+                    label="Brand"
+                    placeholder="e.g., Khaadi"
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -625,29 +648,6 @@ function SellForm() {
                 placeholder="0"
                 className="w-full pl-16 pr-6 py-6 text-4xl font-extrabold text-on-surface bg-white border-2 border-surface-container rounded-3xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-surface-container/80"
               />
-            </div>
-
-            <div className="pt-6 grid grid-cols-2 gap-4">
-                <Select
-                  label="Size"
-                  value={size}
-                  onChange={(e) => setSize(e.target.value)}
-                  options={SIZES}
-                />
-                <Select
-                  label="Color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  options={COLORS}
-                />
-                <div className="col-span-2">
-                  <Input
-                    label="Brand"
-                    placeholder="e.g., Khaadi"
-                    value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
-                  />
-                </div>
             </div>
           </div>
         )}
